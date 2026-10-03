@@ -1123,11 +1123,19 @@ class MainActivity : AppCompatActivity() {
         // display name (spaces, punctuation, alternate naming, etc.).
         val aliases = when (normalized) {
             "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" ->
-                listOf("anby-demara-soldier-0")
+                listOf("anby-demara-soldier-0", "anby-soldier-0")
+            "billy", "billy-kid" ->
+                listOf("billy", "billy-kid")
             "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
-                listOf("billy-starlight")
+                listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
+            "corin", "corin-wickes" ->
+                listOf("corin", "corin-wickes")
             "buling" -> listOf("buling", "bulin")
+            "taoqi" -> listOf("taoqi", "tao-qi")
             "youhu" -> listOf("youhu", "you-hu")
+            "lumi" -> listOf("lumi", "dengdeng", "deng-deng")
+            "danjin" -> listOf("danjin")
+            "chixia" -> listOf("chixia")
             "komano-manato" -> listOf("komano-manato", "manato")
             else -> listOf(normalized)
         }
@@ -1258,23 +1266,28 @@ class MainActivity : AppCompatActivity() {
         val arr = b.optJSONArray("five_star") ?: JSONArray()
         val fourStarArr = b.optJSONArray("four_star") ?: JSONArray()
         val fiveStars = (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }.distinct()
-        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.optString(it) }.filter { it.isNotBlank() }.distinct().take(3)
+        val fourStars = (0 until fourStarArr.length()).map { arrName ->
+            fourStarArr.optString(arrName)
+        }.filter { it.isNotBlank() }.distinct().take(3)
         if (fiveStars.isEmpty()) return emptyList()
 
-        return listOf(
+        // Each featured 5★ is its own swipeable banner card again.
+        // The 4★ lineup belongs to the phase, so it is repeated on each
+        // 5★ card exactly as it appears on the in-game phase.
+        return fiveStars.map { five ->
             Banner(
                 game.getString("id"),
                 game.getString("name"),
                 b.optString("version"),
                 b.optString("start").takeIf { it.isNotBlank() && it != "null" },
                 b.optString("end").takeIf { it.isNotBlank() && it != "null" },
-                fiveStars,
+                listOf(five),
                 fourStars,
                 key == "next",
                 b.optBoolean("unconfirmed", false),
                 parseRerunLabels(b)
             )
-        )
+        }
     }
 
     private fun isFavorite(gameId: String): Boolean =
