@@ -6,6 +6,11 @@ import android.os.Bundle
 import android.view.Gravity
 import android.view.View
 import android.widget.*
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewpager2.widget.ViewPager2
 import org.json.JSONArray
@@ -54,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         codesFeed = loadCachedCodes()
+        scheduleCodeSync()
         refreshCodesInBackground()
         showHome()
         startCountdownTicker()
@@ -337,6 +343,20 @@ class MainActivity : AppCompatActivity() {
         })
         card.addView(info, LinearLayout.LayoutParams(0, -1, 1f))
         return card
+    }
+
+    private fun scheduleCodeSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val request = PeriodicWorkRequestBuilder<CodeSyncWorker>(15, java.util.concurrent.TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "g_codus_code_sync",
+            ExistingPeriodicWorkPolicy.KEEP,
+            request
+        )
     }
 
     private fun refreshCodesInBackground() {
