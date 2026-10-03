@@ -1036,8 +1036,6 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) { }
     }
 
-    private fun refreshCharacterDatabaseInBackground() { }
-
     private fun refreshCurrentScreen() {
         when (currentScreen) {
             Screen.TRACKING -> currentGameId?.let { showTracking(it) } ?: showWishlist()
@@ -1099,6 +1097,36 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
     }
 
+    private val localCharacterKeys: Set<String> by lazy {
+        try {
+            val root = JSONObject(assets.open("gacha_character_manifest.json").bufferedReader().use(BufferedReader::readText))
+            val images = root.optJSONArray("images") ?: JSONArray()
+            buildSet {
+                for (i in 0 until images.length()) {
+                    val item = images.optJSONObject(i) ?: continue
+                    val game = when (item.optString("game")) {
+                        "Genshin Impact" -> "genshin"
+                        "Wuthering Waves" -> "wuwa"
+                        "Zenless Zone Zero" -> "zzz"
+                        else -> continue
+                    }
+                    val name = item.optString("character")
+                    if (name.isNotBlank()) add(game + "|" + normalizeCharacterForMatch(name))
+                }
+            }
+        } catch (_: Exception) { emptySet() }
+    }
+
+    private fun isKnownLocalCharacter(gameId: String, character: String): Boolean {
+        val key = gameId + "|" + normalizeCharacterForMatch(character)
+        if (key in localCharacterKeys) return true
+        val aliases = when (gameId) {
+            "zzz" -> mapOf("billy" to "billykid", "billykid" to "billykid", "corinwickes" to "corinwickes")
+            "wuwa" -> mapOf("augusta" to "augusta")
+            else -> emptyMap()
+        }
+        return aliases[normalizeCharacterForMatch(character)]?.let { gameId + "|" + it in localCharacterKeys } ?: false
+    }
     private fun loadPortrait(image: ImageView, character: String, gameId: String, allowRemote: Boolean = false) {
         // Portraits are STRICTLY LOCAL. The only source is the user-provided
         // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
@@ -1199,7 +1227,7 @@ class MainActivity : AppCompatActivity() {
                             (compact.startsWith(a) || a.startsWith(compact)))
                 }
             } ?: run {
-                if (allowRemote) loadPrydwenPortrait(image, gameId, normalized)
+                if (allowRemote && !isKnownLocalCharacter(gameId, character)) loadPrydwenPortrait(image, gameId, normalized)
                 return
             }
 
