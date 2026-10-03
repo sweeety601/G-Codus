@@ -586,6 +586,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPortrait(image: ImageView, character: String, gameId: String) {
+        // Portraits are LOCAL ONLY. No URL/CDN/network fallback is allowed here.
+        image.setImageDrawable(null)
+
         val slug = character.lowercase()
             .replace("’", "")
             .replace("'", "")
@@ -594,23 +597,38 @@ class MainActivity : AppCompatActivity() {
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')
 
-        val localName = when (gameId) {
-            "genshin" -> "banner_genshin_" + slug.replace("-", "_")
-            "wuwa" -> "banner_wuthering_waves_" + slug.replace("-", "_")
-            "zzz" -> "banner_zenless_zone_zero_" + slug.replace("-", "_")
-            else -> ""
+        val assetPath = when (gameId) {
+            // These are the exact portrait files already present in the repository.
+            "genshin" -> "genshin/portraits/$slug.png"
+            "wuwa" -> "wuwa/portraits/$slug.png"
+            "zzz" -> "zzz/portraits/$slug.png"
+            else -> return
         }
 
-        val localId = if (localName.isNotEmpty()) resources.getIdentifier(
-            localName, "drawable", packageName
-        ) else 0
+        try {
+            assets.open(assetPath).use { input ->
+                val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                if (bitmap != null) {
+                    image.setImageBitmap(bitmap)
+                    return
+                }
+            }
+        } catch (_: Exception) {
+            // Asset does not exist: leave the image blank.
+        }
 
-        if (localId != 0) {
-            image.setImageResource(localId)
-        } else {
-            // IMPORTANT: banner art must come only from portraits bundled in the APK.
-            // Never download a substitute image from the network.
-            image.setImageDrawable(null)
+        // Legacy bundled drawable is also LOCAL, never downloaded.
+        // It is used only for WuWa/ZZZ if their already-bundled assets are stored there.
+        if (gameId != "genshin") {
+            val localName = when (gameId) {
+                "wuwa" -> "banner_wuthering_waves_" + slug.replace("-", "_")
+                "zzz" -> "banner_zenless_zone_zero_" + slug.replace("-", "_")
+                else -> ""
+            }
+            if (localName.isNotEmpty()) {
+                val localId = resources.getIdentifier(localName, "drawable", packageName)
+                if (localId != 0) image.setImageResource(localId)
+            }
         }
     }
 
