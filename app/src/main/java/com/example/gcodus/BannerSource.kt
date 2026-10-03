@@ -93,8 +93,8 @@ object BannerSource {
             for (i in 0 until arr.length()) {
                 val name = arr.optString(i).trim()
                 if (name.isBlank()) continue
-                val runs = findHistoricalPickupCount(plain, normalizedPlain, name)
-                    ?: sourceFallbackPickupCount(game.optString("id"), name)
+                val runs = sourceFallbackPickupCount(game.optString("id"), name)
+                    ?: findHistoricalPickupCount(plain, normalizedPlain, name)?.takeIf { it in 1..20 }
                 if (runs != null && runs > 0) {
                     labels.put(name, if (runs == 1) "Дебют" else (runs - 1).toString() + "-й реран")
                 }
@@ -151,7 +151,7 @@ object BannerSource {
     // the live page is still queried first and remains the primary source.
     private fun sourceFallbackPickupCount(gameId: String, name: String): Int? {
         return when (gameId) {
-            "wuwa" -> when (normalizeForHistory(name)) { "hsin" -> 1; "chisa" -> 2; "iuno" -> 2; "suoming" -> 1; "lucilla" -> 2; "lynae" -> 3; else -> null }
+            "wuwa" -> when (normalizeForHistory(name)) { "hsin" -> 1; "chisa" -> 3; "iuno" -> 2; "suoming" -> 1; "lucilla" -> 2; "lynae" -> 3; else -> null }
             "zzz" -> when (normalizeForHistory(name)) { "roxy" -> 1; "promeia" -> 2; else -> null }
             "genshin" -> when (normalizeForHistory(name)) { "vesna", "vodyanitsa", "mitya", "valeriy" -> 1; "skirk", "escoffier" -> 2; else -> null }
             else -> null
@@ -285,7 +285,7 @@ object BannerSource {
         // Corin and Billy are A-Rank on both Exclusive Channels.
         if (now >= phaseStart && now < phaseEnd) {
             val current = JSONObject()
-                .put("version", "3.2")
+                .put("version", "3.2 Phase 2")
                 .put("start", "2026-09-30T12:00:00Z")
                 .put("end", "2026-10-20T14:59:00Z")
                 .put("five_star", JSONArray(listOf("Roxy", "Promeia")))
