@@ -1117,6 +1117,7 @@ class MainActivity : AppCompatActivity() {
             "zzz" -> "zenless_zone_zero"
             else -> return
         }
+        val assetFolder = "images_big/$gameFolder"
 
         // Resolve against the ACTUAL bundled filenames. This is important for
         // 4-star portraits because their source filenames can differ from the
@@ -1124,6 +1125,8 @@ class MainActivity : AppCompatActivity() {
         val aliases = when (normalized) {
             "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" ->
                 listOf("anby-demara-soldier-0")
+            "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
+                listOf("billy-starlight")
             "buling" -> listOf("buling", "bulin")
             "youhu" -> listOf("youhu", "you-hu")
             "komano-manato" -> listOf("komano-manato", "manato")
@@ -1136,7 +1139,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            val files = assets.list(gameFolder)?.toList().orEmpty()
+            val files = assets.list(assetFolder)?.toList().orEmpty()
             val exact = specialFile?.takeIf { files.contains(it) }
             val target = exact ?: files.firstOrNull { file ->
                 val stem = file.substringBeforeLast('.').lowercase()
@@ -1155,7 +1158,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } ?: return
 
-            assets.open("$gameFolder/$target").use { input ->
+            assets.open("$assetFolder/$target").use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
                 if (bitmap != null) image.setImageBitmap(bitmap)
             }
@@ -1255,16 +1258,17 @@ class MainActivity : AppCompatActivity() {
         val b = game.getJSONObject(key)
         val arr: JSONArray = b.optJSONArray("five_star") ?: JSONArray()
         val fourStarArr: JSONArray = b.optJSONArray("four_star") ?: JSONArray()
-        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.getString(it) }
+        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.getString(it) }.distinct()
+        val phaseFiveStars = (0 until arr.length()).map { arr.getString(it) }.distinct()
         val result = mutableListOf<Banner>()
-        for (i in 0 until arr.length()) {
+        for (i in phaseFiveStars.indices) {
             result += Banner(
                 game.getString("id"),
                 game.getString("name"),
                 b.optString("version"),
                 b.optString("start").takeIf { it.isNotBlank() && it != "null" },
                 b.optString("end").takeIf { it.isNotBlank() && it != "null" },
-                listOf(arr.getString(i)),
+                listOf(phaseFiveStars[i]),
                 fourStars,
                 key == "next",
                 b.optBoolean("unconfirmed", false),
