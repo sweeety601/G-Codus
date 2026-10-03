@@ -15,6 +15,12 @@ android {
         versionName = "0.3.0"
     }
 
+    sourceSets {
+        getByName("main") {
+            assets.srcDirs("src/main/assets", "../../assets", "../../data")
+        }
+    }
+
     buildFeatures {
         buildConfig = true
     }
