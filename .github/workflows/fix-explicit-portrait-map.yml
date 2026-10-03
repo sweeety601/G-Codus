@@ -14,10 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
-      - name: Replace portrait resolver with explicit bundled map
+      - name: Patch portrait resolver
+        shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
@@ -25,12 +24,10 @@ jobs:
 
           p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
           s = p.read_text()
-          pattern = r'    private fun loadPortrait\(image: ImageView, character: String, gameId: String\) \{.*?\n    \}\n\n    private fun startCountdownTicker'
-          replacement = '''    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
-        // IMPORTANT: this table is the single source of truth for banner art.
-        // Every entry points to a file that is physically bundled in drawable-nodpi.
-        // There is deliberately no name-derived lookup and no network fallback.
-        val key = gameId.lowercase() + ":" + character.trim().lowercase()
+          start = s.index('    private fun loadPortrait(')
+          end = s.index('    private fun startCountdownTicker', start)
+          fn = '''    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
+        val key = gameId.trim().lowercase() + ":" + character.trim().lowercase()
         val localName = when (key) {
             "wuwa:hsin" -> "banner_wuthering_waves_hsin"
             "wuwa:chisa" -> "banner_wuthering_waves_chisa"
@@ -42,35 +39,19 @@ jobs:
             "zzz:promeia" -> "banner_zenless_zone_zero_promeia"
             else -> ""
         }
-
-        val localId = if (localName.isNotEmpty()) {
-            resources.getIdentifier(localName, "drawable", packageName)
-        } else 0
-
-        if (localId != 0) {
-            image.setImageResource(localId)
-        } else {
-            // No bundled portrait means no portrait. Never substitute another character
-            // and never download an image at runtime.
-            image.setImageDrawable(null)
-        }
+        val localId = if (localName.isNotEmpty()) resources.getIdentifier(localName, "drawable", packageName) else 0
+        if (localId != 0) image.setImageResource(localId) else image.setImageDrawable(null)
     }
 
-    private fun startCountdownTicker'''
-          new = re.sub(pattern, replacement, s, flags=re.S)
-          if new == s:
-              raise SystemExit('loadPortrait block not found; refusing to modify the file')
-          p.write_text(new)
+'''
+          p.write_text(s[:start] + fn + s[end:])
           PY
 
-      - name: Commit patch
+      - name: Commit changes
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add app/src/main/java/com/example/gcodus/MainActivity.kt
-          if git diff --cached --quiet; then
-            echo 'No changes needed'
-            exit 0
-          fi
+          git diff --cached --quiet && exit 0
           git commit -m 'Use explicit bundled portrait mapping'
           git push
