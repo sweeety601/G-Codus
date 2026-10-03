@@ -257,6 +257,11 @@ class NotificationSyncWorker(
                 .filter { it.endsWith(".webp", true) }
                 .filter { appPrefs.getBoolean("tracked_" + gameId + "_" + it, false) }
                 .toMutableList()
+            val virtualPrefix = "tracked_" + gameId + "_"
+            appPrefs.all.keys
+                .filter { it.startsWith(virtualPrefix + "__online_") && appPrefs.getBoolean(it, false) }
+                .map { it.removePrefix(virtualPrefix) }
+                .forEach { files += it }
             if (gameId == "wuwa") {
                 listOf("__wuwa-lucy.webp", "__wuwa-aemeath.webp", "__wuwa-hiyuki.webp").forEach {
                     if (appPrefs.getBoolean("tracked_wuwa_" + it, false)) files += it
@@ -269,6 +274,10 @@ class NotificationSyncWorker(
     private fun sameCharacter(name: String, file: String): Boolean {
         val a = slug(name)
         val b = file.substringBeforeLast(".").lowercase()
+        if (b.startsWith("__online_")) {
+            val onlineSlug = b.substringAfterLast("_")
+            return a == onlineSlug
+        }
         if (b == "__wuwa-lucy" && a == "lucy") return true
         if (b == "__wuwa-aemeath" && a == "aemeath") return true
         if (b == "__wuwa-hiyuki" && a == "hiyuki") return true
@@ -294,6 +303,11 @@ class NotificationSyncWorker(
 
     private fun displayName(file: String): String {
         val base = file.substringBeforeLast(".")
+        if (base.startsWith("__online_")) {
+            return base.substringAfterLast("_").split("-").joinToString(" ") { word ->
+                word.replaceFirstChar { ch -> if (ch.isLowerCase()) ch.titlecase() else ch.toString() }
+            }
+        }
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
             "__wuwa-aemeath" to "Aemeath",
