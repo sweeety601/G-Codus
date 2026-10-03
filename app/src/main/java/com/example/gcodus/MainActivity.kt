@@ -42,7 +42,9 @@ data class Banner(
     val end: String?,
     val characters: List<String>,
     val fourStars: List<String>,
-    val next: Boolean
+    val next: Boolean,
+    val unconfirmed: Boolean = false,
+    val rerunLabels: Map<String, String> = emptyMap()
 )
 
 class MainActivity : AppCompatActivity() {
@@ -491,11 +493,21 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(14), dp(8), dp(8), dp(4))
         }
         info.addView(label("5★", 17f, Color.rgb(255, 211, 76), true))
-        info.addView(label(banner.characters.firstOrNull() ?: "Баннер", 22f, text, true).apply {
+        val fiveName = banner.characters.firstOrNull() ?: "Баннер"
+        info.addView(label(fiveName, 22f, text, true).apply {
             setPadding(0, dp(4), 0, dp(2))
             maxLines = 2
         })
-        info.addView(label(banner.version, 13f, muted, false))
+        info.addView(label(banner.version, 13f, muted, false))        val rerun = banner.rerunLabels[fiveName]
+        if (rerun != null) {
+            info.addView(label(rerun, 13f, muted, true))
+        }
+
+        if (banner.unconfirmed) {
+            info.addView(label("НЕ ПОДТВЕРЖДЕНО", 11f, Color.rgb(255, 170, 80), true).apply {
+                setPadding(0, dp(5), 0, dp(2))
+            })
+        }
 
         if (banner.fourStars.isNotEmpty()) {
             val fourStarRow = LinearLayout(this).apply {
@@ -1225,6 +1237,17 @@ class MainActivity : AppCompatActivity() {
         }
         executor.execute { refreshOnce() }
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
+    }
+
+    private fun parseRerunLabels(b: JSONObject): Map<String, String> {
+        val obj = b.optJSONObject("rerun_labels") ?: return emptyMap()
+        val result = mutableMapOf<String, String>()
+        val keys = obj.keys()
+        while (keys.hasNext()) {
+            val k = keys.next()
+            result[k] = obj.optString(k)
+        }
+        return result
     }
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
