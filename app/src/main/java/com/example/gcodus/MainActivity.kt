@@ -750,7 +750,23 @@ class MainActivity : AppCompatActivity() {
             clipToOutline = true
         }
         val imageFrame = FrameLayout(this)
-        val image = ImageView(this).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
+        val image = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            setOnTouchListener { view, event ->
+                when (event.actionMasked) {
+                    android.view.MotionEvent.ACTION_DOWN -> {
+                        view.animate().cancel()
+                        view.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start()
+                    }
+                    android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
+                        view.animate().cancel()
+                        view.animate().scaleX(1f).scaleY(1f).setDuration(140)
+                            .setInterpolator(android.view.animation.OvershootInterpolator(1.6f)).start()
+                    }
+                }
+                false
+            }
+        }
         imageFrame.addView(image, FrameLayout.LayoutParams(-1, dp(136)))
         loadTrackingPortrait(image, character.file, character.gameId)
 
@@ -789,6 +805,22 @@ class MainActivity : AppCompatActivity() {
             toggleTracked(character.gameId, character.file)
             heart.text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
             heart.setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
+
+            // In the wishlist, untracking removes the card immediately with a
+            // small iPhone-style uninstall animation: shrink, fade and tilt.
+            if (currentScreen == Screen.WISHLIST && !isTracked(character.gameId, character.file)) {
+                cell.isClickable = false
+                cell.animate().cancel()
+                cell.animate()
+                    .scaleX(0.08f)
+                    .scaleY(0.08f)
+                    .alpha(0f)
+                    .rotation(-7f)
+                    .setDuration(230)
+                    .setInterpolator(android.view.animation.AccelerateInterpolator())
+                    .withEndAction { refreshCurrentScreen() }
+                    .start()
+            }
         }
         return cell
     }
