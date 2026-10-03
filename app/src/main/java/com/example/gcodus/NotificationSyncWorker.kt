@@ -82,8 +82,10 @@ class NotificationSyncWorker(
             val gameId = game.optString("id")
             val current = game.optJSONObject("current") ?: JSONObject()
             val next = game.optJSONObject("next") ?: JSONObject()
-            val currentChars = readChars(current.optJSONArray("five_star"))
-            val nextChars = readChars(next.optJSONArray("five_star"))
+            val currentChars = readChars(current.optJSONArray("five_star")) +
+                readChars(current.optJSONArray("four_star"))
+            val nextChars = readChars(next.optJSONArray("five_star")) +
+                readChars(next.optJSONArray("four_star"))
             for (file in trackedFiles(gameId)) {
                 val characterName = displayName(file)
                 val bannerName = bannerCharacterName(currentChars, nextChars, file) ?: characterName
