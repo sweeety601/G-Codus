@@ -14,13 +14,14 @@ CHARACTERS_FILE = ROOT / "data/genshin_characters.json"
 OUT = ROOT / "assets/genshin/portraits"
 MANIFEST_OUT = ROOT / "data/genshin_portrait_manifest.json"
 BASE = "https://www.prydwen.gg"
+CDN = "https://cdn.prydwen.gg/images/genshin-impact/characters/"
 INDEX_URL = f"{BASE}/genshin-impact/characters"
 USER_AGENT = "G-Codus/1.0 (Genshin portrait asset sync)"
 
 
 def fetch(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=45) as response:
+    with urllib.request.urlopen(req, timeout=25) as response:
         return response.read()
 
 
@@ -34,10 +35,6 @@ def norm(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
 
 
-def slug_from_href(href: str) -> str:
-    return href.rstrip("/").split("/")[-1]
-
-
 def parse_character_links(page: str):
     links = {}
     pattern = re.compile(
@@ -49,15 +46,6 @@ def parse_character_links(page: str):
         if name:
             links.setdefault(norm(name), BASE + href)
     return links
-
-
-def find_full_art(page: str):
-    urls = re.findall(
-        r'https://cdn\.prydwen\.gg/images/genshin-impact/characters/[^"\'<> ]+_full\.webp',
-        page,
-        flags=re.I,
-    )
-    return html.unescape(urls[0]) if urls else None
 
 
 def save_portrait(data: bytes, dest: Path):
@@ -76,7 +64,6 @@ def save_portrait(data: bytes, dest: Path):
 manifest = json.loads(CHARACTERS_FILE.read_text(encoding="utf-8"))
 characters = manifest["characters"]
 OUT.mkdir(parents=True, exist_ok=True)
-
 index_html = fetch(INDEX_URL).decode("utf-8", errors="replace")
 links = parse_character_links(index_html)
 entries = []
@@ -88,12 +75,10 @@ for index, name in enumerate(characters, start=1):
     try:
         if not page_url:
             raise RuntimeError("character page was not found on Prydwen")
-        page_html = fetch(page_url).decode("utf-8", errors="replace")
-        portrait_url = find_full_art(page_html)
-        if not portrait_url:
-            raise RuntimeError("Prydwen page has no character full-art image")
+        slug = page_url.rstrip("/").split("/")[-1]
+        portrait_url = f"{CDN}{slug}_full.webp"
         data = fetch(portrait_url)
-        dest = OUT / (slug_from_href(page_url) + ".png")
+        dest = OUT / f"{slug}.png"
         save_portrait(data, dest)
         entry.update({
             "portrait_url": portrait_url,
@@ -105,13 +90,12 @@ for index, name in enumerate(characters, start=1):
         missing.append(name)
     entries.append(entry)
     print(f"[{index}/{len(characters)}] {name}: {entry['status']}")
-    time.sleep(0.15)
 
 MANIFEST_OUT.write_text(
     json.dumps({
         "game": "Genshin Impact",
         "source_character_list": INDEX_URL,
-        "portrait_source": "Prydwen character profile full-art images, cropped locally into square transparent portraits",
+        "portrait_source": "Prydwen CDN character full-art images, cropped locally into square transparent portraits",
         "last_synced": time.strftime("%Y-%m-%d"),
         "character_count": len(entries),
         "downloaded": sum(e["status"] == "downloaded" for e in entries),
