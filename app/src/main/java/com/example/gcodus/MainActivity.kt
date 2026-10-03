@@ -1148,20 +1148,46 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFeed(): List<GameFeed> {
-        val source = prefs.getString("banner_feed", null)
-            ?: assets.open("banner_feed.json").bufferedReader().use(BufferedReader::readText)
-        val games = JSONObject(source).getJSONArray("games")
-        val result = mutableListOf<GameFeed>()
-        for (i in 0 until games.length()) {
-            val g = games.getJSONObject(i)
-            result += GameFeed(
-                g.getString("id"),
-                g.getString("name"),
-                parseBanners(g, "current"),
-                parseBanners(g, "next")
-            )
+        fun parseSource(source: String): List<GameFeed> {
+            val games = JSONObject(source).optJSONArray("games") ?: JSONArray()
+            val result = mutableListOf<GameFeed>()
+            for (i in 0 until games.length()) {
+                val g = games.optJSONObject(i) ?: continue
+                val id = g.optString("id")
+                val name = g.optString("name")
+                if (id.isBlank() || name.isBlank()) continue
+                try {
+                    result += GameFeed(
+                        id,
+                        name,
+                        parseBanners(g, "current"),
+                        parseBanners(g, "next")
+                    )
+                } catch (_: Exception) {
+                    // One broken game's online payload must never prevent the
+                    // other games (or the game selector) from opening.
+                }
+            }
+            return result
         }
-        return result
+
+        val bundled = try {
+            assets.open("banner_feed.json").bufferedReader().use(BufferedReader::readText)
+        } catch (_: Exception) {
+            "{\"games\":[]}"
+        }
+
+        val cached = prefs.getString("banner_feed", null)
+        val onlineGames = if (!cached.isNullOrBlank()) parseSource(cached) else emptyList()
+        val bundledGames = parseSource(bundled)
+
+        // Prefer online banner data, but fall back per game to the bundled
+        // snapshot. This is especially important for WuWa if the Kuro API
+        // changes its response format temporarily.
+        return gameMeta.mapNotNull { meta ->
+            onlineGames.firstOrNull { it.id == meta.id }
+                ?: bundledGames.firstOrNull { it.id == meta.id }
+        }
     }
 
     private fun refreshBannerFeedInBackground() {
