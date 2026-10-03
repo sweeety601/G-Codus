@@ -1266,7 +1266,9 @@ class MainActivity : AppCompatActivity() {
                 b.optString("end").takeIf { it.isNotBlank() && it != "null" },
                 listOf(arr.getString(i)),
                 fourStars,
-                key == "next"
+                key == "next",
+                b.optBoolean("unconfirmed", false),
+                parseRerunLabels(b)
             )
         }
         return result
