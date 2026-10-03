@@ -24,6 +24,8 @@ import androidx.viewpager2.widget.ViewPager2
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.net.HttpURLConnection
+import java.net.URL
 import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -46,6 +48,7 @@ data class Banner(
 class MainActivity : AppCompatActivity() {
     companion object {
         const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
+        const val BANNER_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/banner_feed.json"
     }
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
@@ -103,6 +106,7 @@ class MainActivity : AppCompatActivity() {
         scheduleCodeSync()
         scheduleNotificationSync()
         refreshCodesInBackground()
+        refreshBannerFeedInBackground()
         showHome()
         startCountdownTicker()
     }
@@ -1145,8 +1149,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFeed(): List<GameFeed> {
-        val source = assets.open("banner_feed.json").bufferedReader()
-            .use(BufferedReader::readText)
+        val source = prefs.getString("banner_feed", null)
+            ?: assets.open("banner_feed.json").bufferedReader().use(BufferedReader::readText)
         val games = JSONObject(source).getJSONArray("games")
         val result = mutableListOf<GameFeed>()
         for (i in 0 until games.length()) {
@@ -1159,6 +1163,28 @@ class MainActivity : AppCompatActivity() {
             )
         }
         return result
+    }
+
+    private fun refreshBannerFeedInBackground() {
+        fun refreshOnce() {
+            try {
+                val connection = URL(BANNER_FEED_URL).openConnection() as HttpURLConnection
+                connection.connectTimeout = 15000
+                connection.readTimeout = 20000
+                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                val fresh = connection.inputStream.bufferedReader().use { it.readText() }
+                JSONObject(fresh).getJSONArray("games")
+                val old = prefs.getString("banner_feed", null)
+                if (old != fresh) {
+                    prefs.edit().putString("banner_feed", fresh).apply()
+                    runOnUiThread {
+                        if (!isFinishing && currentScreen != Screen.HOME) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+        executor.execute { refreshOnce() }
+        executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
     }
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
