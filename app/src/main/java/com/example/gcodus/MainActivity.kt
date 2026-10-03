@@ -802,18 +802,6 @@ class MainActivity : AppCompatActivity() {
                     entries += TrackedCharacter(meta.id, meta.name, name, file)
                 }
             }
-            onlineCharacters.filter { it.gameId == meta.id }.forEach { online ->
-                val alreadyLocal = localFiles.any {
-                    !isMainProtagonist(meta.id, it, characterDisplayName(it)) &&
-                        sameCharacterIdentity(meta.id, characterDisplayName(it), online.name, online.slug, it)
-                }
-                val virtualFile = "__online_" + meta.id + "_" + online.slug + ".webp"
-                val tracked = isTracked(meta.id, virtualFile)
-                if (!alreadyLocal && (gameId != null || tracked) &&
-                    (normalizedQuery.isBlank() || online.name.lowercase().contains(normalizedQuery))) {
-                    entries += TrackedCharacter(meta.id, meta.name, online.name, virtualFile)
-                }
-            }
         }
         entries.sortWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.name.lowercase() })
         if (entries.isEmpty()) {
@@ -1234,23 +1222,6 @@ class MainActivity : AppCompatActivity() {
             "zzz" -> n in setOf("belle", "wise", "proxy") || f in setOf("belle", "wise", "proxy")
             else -> false
         }
-    }
-
-    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
-        val a = normalizeCharacterForMatch(localName)
-        val b = normalizeCharacterForMatch(onlineName)
-        val slug = normalizeCharacterForMatch(onlineSlug)
-        val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
-        if (gameId == "zzz") {
-            val localStarlight = a.contains("starlight") || file.contains("starlight")
-            val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
-            if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
-            val ordinary = setOf("billy", "billykid")
-            val localBilly = a in ordinary || file in ordinary
-            val onlineBilly = b in ordinary || slug in ordinary
-            if (localBilly || onlineBilly) return localBilly && onlineBilly
-        }
-        return a == b || file == slug
     }
 
     private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
