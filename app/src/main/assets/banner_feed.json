@@ -17,7 +17,7 @@
         "start": "2026-10-13T18:00:00+03:00",
         "end": "2026-11-03T17:59:59+03:00",
         "five_star": ["Escoffier", "Skirk"],
-        "four_star": ["Lumi", "Danjin", "Chixia"],
+        "four_star": [],
         "status": "next"
       }
     },
@@ -37,7 +37,7 @@
         "start": "2026-10-22T05:00:00+03:00",
         "end": "2026-11-11T06:59:59+03:00",
         "five_star": ["Suoming", "Lucilla", "Lynae"],
-        "four_star": [],
+        "four_star": ["Lumi", "Danjin", "Chixia"],
         "status": "next"
       }
     },
@@ -49,7 +49,7 @@
         "start": "2026-09-30T06:00:00+03:00",
         "end": "2026-10-20T11:59:59+03:00",
         "five_star": ["Roxy", "Promeia"],
-        "four_star": [],
+        "four_star": ["Komano Manato"],
         "status": "live"
       },
       "next": {
