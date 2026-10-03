@@ -610,7 +610,9 @@ class MainActivity : AppCompatActivity() {
             else -> return
         }
 
-        val assetPath = "images_big/$gameFolder/$characterFile"
+        // images_big is an external asset source directory; Android places its contents at the asset root.
+        // Therefore the bundled path is <gameFolder>/<characterFile>, not images_big/<...>.
+        val assetPath = "$gameFolder/$characterFile"
 
         try {
             assets.open(assetPath).use { input ->
