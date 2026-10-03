@@ -13,6 +13,7 @@ import java.time.ZoneOffset
  * Portraits remain strictly local/bundled in the APK.
  */
 object BannerSource {
+    private const val GENSHIN_OFFICIAL_URL = "https://api-takumi.mihoyo.com/common/blackboard/ys_obc/v1/gacha_pool?app_sn=ys_obc"
     private const val GENSHIN_URL = "https://api.ennead.cc/mihoyo/genshin/calendar?lang=en-us"
     private const val ZZZ_URL = "https://api.ennead.cc/mihoyo/zenless/calendar?lang=en-us"
     private const val KURO_HOME = "https://api.kurobbs.com/wiki/core/homepage/getPage"
@@ -24,7 +25,7 @@ object BannerSource {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val previous = prefs.getString(CACHE_KEY, null)
         val games = mutableListOf<JSONObject>()
-        try { games += fetchHoyoCalendar(GENSHIN_URL, "genshin", "Genshin Impact") } catch (_: Exception) { }
+        try { games += fetchGenshinOfficial() } catch (_: Exception) { try { games += fetchHoyoCalendar(GENSHIN_URL, "genshin", "Genshin Impact") } catch (_: Exception) { } }
         try { games += fetchWuwa() } catch (_: Exception) { }
         try { games += fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero") } catch (_: Exception) { }
 
@@ -40,6 +41,82 @@ object BannerSource {
         val result = JSONObject().put("games", JSONArray(games.distinctBy { it.optString("id") })).toString()
         prefs.edit().putString(CACHE_KEY, result).apply()
         return result
+    }
+
+    private fun fetchGenshinOfficial(): JSONObject {
+        val root = JSONObject(get(GENSHIN_OFFICIAL_URL))
+        val found = mutableListOf<JSONObject>()
+
+        fun walk(v: Any?) {
+            when (v) {
+                is JSONObject -> {
+                    val start = firstTime(v, "start_time", "startTime", "start", "begin_time", "beginTime")
+                    val end = firstTime(v, "end_time", "endTime", "end", "expire_time", "expireTime")
+                    if (start != null && end != null) {
+                        val five = linkedSetOf<String>()
+                        val four = linkedSetOf<String>()
+                        fun collect(x: Any?) {
+                            when (x) {
+                                is JSONObject -> {
+                                    val n = firstText(x, "name", "character_name", "characterName", "title")
+                                    val r = firstText(x, "rarity", "rank", "rank_type", "rankType")
+                                    if (n.isNotBlank() && (r == "5" || r == "5.0" || r.equals("S", true))) five += n
+                                    if (n.isNotBlank() && (r == "4" || r == "4.0" || r.equals("A", true))) four += n
+                                    val it = x.keys()
+                                    while (it.hasNext()) collect(x.opt(it.next()))
+                                }
+                                is JSONArray -> for (i in 0 until x.length()) collect(x.opt(i))
+                            }
+                        }
+                        collect(v)
+                        if (five.isNotEmpty()) {
+                            found += JSONObject()
+                                .put("version", firstText(v, "version", "version_name", "versionName"))
+                                .put("start", start)
+                                .put("end", end)
+                                .put("five_star", JSONArray(five.toList()))
+                                .put("four_star", JSONArray(four.toList()))
+                        }
+                    }
+                    val it = v.keys()
+                    while (it.hasNext()) walk(v.opt(it.next()))
+                }
+                is JSONArray -> for (i in 0 until v.length()) walk(v.opt(i))
+            }
+        }
+
+        walk(root)
+        val unique = found.distinctBy { it.optString("start") + "|" + it.optString("end") + "|" + it.optString("five_star") }
+            .sortedBy { it.optString("start") }
+        if (unique.isEmpty()) throw IllegalStateException("Official Genshin pool not parseable")
+
+        val now = System.currentTimeMillis()
+        val current = unique.firstOrNull { epoch(it.optString("start")) <= now && now < epoch(it.optString("end")) }
+        val next = unique.firstOrNull { epoch(it.optString("start")) > now }
+        val cur = current ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
+
+        return JSONObject().put("id", "genshin").put("name", "Genshin Impact")
+            .put("current", cur).put("next", next ?: JSONObject())
+    }
+
+    private fun firstTime(o: JSONObject, vararg keys: String): String? {
+        for (k in keys) {
+            val v = o.opt(k)
+            if (v is Number) {
+                val n = v.toLong()
+                val ms = if (n < 100000000000L) n * 1000L else n
+                return java.time.Instant.ofEpochMilli(ms).toString()
+            }
+            if (v is String && v.isNotBlank() && v != "null") {
+                val n = v.toLongOrNull()
+                if (n != null) {
+                    val ms = if (n < 100000000000L) n * 1000L else n
+                    return java.time.Instant.ofEpochMilli(ms).toString()
+                }
+                return v
+            }
+        }
+        return null
     }
 
     private fun fetchHoyoCalendar(url: String, id: String, name: String): JSONObject {
