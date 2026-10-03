@@ -1120,7 +1120,13 @@ class MainActivity : AppCompatActivity() {
                     .replace("&", "and")
                     .replace(Regex("[^a-z0-9]+"), "-")
                     .trim('-')
-                aliases.any { it == stem }
+                val compact = stem.replace("-", "")
+                aliases.any { alias ->
+                    val a = alias.replace("-", "")
+                    a == compact ||
+                        (a.length >= 4 && compact.length >= 4 &&
+                            (compact.startsWith(a) || a.startsWith(compact)))
+                }
             } ?: return
 
             assets.open("$gameFolder/$target").use { input ->
