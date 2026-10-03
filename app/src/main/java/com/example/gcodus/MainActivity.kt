@@ -587,7 +587,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadPortrait(image: ImageView, character: String, gameId: String) {
         // Portraits are STRICTLY LOCAL. The only source is the user-provided
-        // G-Codus/<game>/ files bundled into the APK. No CDN/network fallback.
+        // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
 
         val normalized = character.lowercase()
@@ -610,7 +610,7 @@ class MainActivity : AppCompatActivity() {
             else -> return
         }
 
-        val assetPath = "G-Codus/$gameFolder/$characterFile"
+        val assetPath = "images_big/$gameFolder/$characterFile"
 
         try {
             assets.open(assetPath).use { input ->

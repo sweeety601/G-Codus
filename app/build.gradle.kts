@@ -17,7 +17,7 @@ android {
 
     sourceSets {
         getByName("main") {
-            assets.srcDirs("src/main/assets", "../assets", "../data", "../G-Codus")
+            assets.srcDirs("src/main/assets", "../assets", "../data", "../images_big")
         }
     }
 
