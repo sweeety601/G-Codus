@@ -330,7 +330,7 @@ object BannerSource {
         return out
     }
 
-    private fun extractFourStars(tab: JSONObject) {
+    private fun extractFourStars(tab: JSONObject): JSONArray {
         val names = linkedSetOf<String>()
         fun walk(v: Any?) {
             when (v) {
