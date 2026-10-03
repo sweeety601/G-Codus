@@ -1077,7 +1077,20 @@ class MainActivity : AppCompatActivity() {
         // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
 
-        val normalized = character.lowercase()
+        // Kuro's WuWa endpoint can return Chinese display names even when the
+        // app UI is English/Russian. Convert only those names to the existing
+        // local portrait filenames; never download or substitute a portrait.
+        val localizedAlias = when (character.trim()) {
+            "卜灵", "卜靈" -> "Buling"
+            "桃祈" -> "Taoqi"
+            "釉瑚" -> "Youhu"
+            "灯灯", "燈燈" -> "Lumi"
+            "丹瑾" -> "Danjin"
+            "炽霞", "熾霞" -> "Chixia"
+            else -> character
+        }
+
+        val normalized = localizedAlias.lowercase()
             .replace("’", "")
             .replace("'", "")
             .replace(":", "")
