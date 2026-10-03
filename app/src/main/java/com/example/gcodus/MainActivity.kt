@@ -1299,9 +1299,13 @@ class MainActivity : AppCompatActivity() {
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
         if (a == b || file == slug) return true
         if (gameId == "zzz") {
-            val billyA = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
-            val billyB = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
-            if (billyA && billyB) return true
+            val localStarlight = a.contains("starlight") || file.contains("starlight")
+            val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
+            if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
+
+            val localOrdinaryBilly = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
+            val onlineOrdinaryBilly = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
+            if (localOrdinaryBilly || onlineOrdinaryBilly) return localOrdinaryBilly && onlineOrdinaryBilly
         }
         return false
     }
