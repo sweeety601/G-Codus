@@ -47,11 +47,44 @@ object BannerSource {
 
         if (games.isEmpty()) throw IllegalStateException("No online banner source returned data")
         val normalizedGames = games.distinctBy { it.optString("id") }.toMutableList()
-        normalizedGames.forEach { game -> try { enrichRerunLabels(game) } catch (_: Exception) { } }
+        normalizedGames.forEach { game ->
+            try { enrichRerunLabels(game) } catch (_: Exception) { }
+            applyKnownRerunLabels(game)
+        }
         addLeakFallbacks(normalizedGames)
         val result = JSONObject().put("games", JSONArray(normalizedGames)).toString()
         prefs.edit().putString(CACHE_KEY, result).apply()
         return result
+    }
+
+    private fun applyKnownRerunLabels(game: JSONObject) {
+        val id = game.optString("id")
+        val known = when (id) {
+            "wuwa" -> mapOf(
+                "Hsin" to "Дебют",
+                "Chisa" to "Реран",
+                "Iuno" to "Реран",
+                "Suoming" to "Дебют",
+                "Lucilla" to "Реран",
+                "Lynae" to "Реран"
+            )
+            "zzz" -> mapOf(
+                "Roxy" to "Дебют",
+                "Promeia" to "Реран"
+            )
+            else -> emptyMap()
+        }
+        if (known.isEmpty()) return
+        for (key in listOf("current", "next")) {
+            val b = game.optJSONObject(key) ?: continue
+            val arr = b.optJSONArray("five_star") ?: continue
+            val labels = b.optJSONObject("rerun_labels") ?: JSONObject()
+            for (i in 0 until arr.length()) {
+                val name = arr.optString(i)
+                known[name]?.let { labels.put(name, it) }
+            }
+            b.put("rerun_labels", labels)
+        }
     }
 
     private fun enrichRerunLabels(game: JSONObject) {
