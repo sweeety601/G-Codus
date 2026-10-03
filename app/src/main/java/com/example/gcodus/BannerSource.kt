@@ -27,7 +27,7 @@ object BannerSource {
         val games = mutableListOf<JSONObject>()
         try { games += fetchGenshinOfficial() } catch (_: Exception) { try { games += fetchHoyoCalendar(GENSHIN_URL, "genshin", "Genshin Impact") } catch (_: Exception) { } }
         try { games += fetchWuwa() } catch (_: Exception) { }
-        try { games += fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero") } catch (_: Exception) { }
+        try { games += fetchZzzOnline() } catch (_: Exception) { }
 
         if (previous != null) {
             val oldGames = JSONObject(previous).optJSONArray("games") ?: JSONArray()
@@ -117,6 +117,40 @@ object BannerSource {
             }
         }
         return null
+    }
+
+    private fun fetchZzzOnline(): JSONObject {
+        val parsed = fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero")
+        val current = parsed.optJSONObject("current")
+        val next = parsed.optJSONObject("next")
+
+        // Enforce the official V3.2 Phase II rarity lineup when the online
+        // calendar returns incomplete/incorrect rarity metadata. Billy and
+        // Corin are A-Rank; Roxy and Promeia are S-Rank.
+        val currentFive = current?.optJSONArray("five_star")?.let { a ->
+            (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }
+        }.orEmpty()
+        val currentFour = current?.optJSONArray("four_star")?.let { a ->
+            (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }
+        }.orEmpty()
+
+        if (current != null && currentFour.any { it.equals("Billy", true) } &&
+            currentFive.any { it.equals("Billy", true) }) {
+            current.put("five_star", JSONArray(currentFive.filterNot { it.equals("Billy", true) }))
+            current.put("four_star", JSONArray((currentFour + "Billy").distinct()))
+        }
+
+        if (current != null && currentFour.any { it.equals("Corin", true) } &&
+            currentFive.any { it.equals("Corin", true) }) {
+            current.put("five_star", JSONArray(current.optJSONArray("five_star")?.let { a ->
+                (0 until a.length()).map { a.optString(it) }.filterNot { it.equals("Corin", true) }
+            } ?: emptyList<String>()))
+            current.put("four_star", JSONArray((current.optJSONArray("four_star")?.let { a ->
+                (0 until a.length()).map { a.optString(it) }
+            } ?: emptyList()) + "Corin").distinct())
+        }
+
+        return parsed
     }
 
     private fun fetchHoyoCalendar(url: String, id: String, name: String): JSONObject {
