@@ -1,126 +1,1216 @@
 {
   "version": 1,
-  "total_images": 116,
+  "total_images": 241,
   "games": {
     "Zenless Zone Zero": 60,
-    "Wuthering Waves": 56
+    "Wuthering Waves": 56,
+    "Genshin Impact": 125
   },
   "images": [
-    {"game":"Zenless Zone Zero","character":"Zhu Yuan","file":"zhu-yuan_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Zhao","file":"zhao_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Ukinami Yuzuha","file":"ukinami-yuzuha_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Yixuan","file":"yixuan_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Yidhari","file":"yidhari_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Ye Shunguang","file":"ye-shunguang_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Tsukishiro Yanagi","file":"yanagi_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Vivian","file":"vivian_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Velina Airgid","file":"velina_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Trigger","file":"trigger_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Sunna","file":"sunna_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Soukaku","file":"soukaku_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Soldier 11","file":"soldier-11_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Sigrid de L’Azur","file":"sigrid_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Seth Lowell","file":"seth_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Seed","file":"seed_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Roxy Ifrita Pryce","file":"roxy_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Alexandrina Sebastiane","file":"rina_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Remielle Dan","file":"remielle_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Qingyi","file":"qingyi_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Pyrois","file":"pyrois_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Pulchra Fellini","file":"pulchra_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Promeia","file":"promeia_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Piper Wheel","file":"piper_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Pan Yinhu","file":"pan-yinhu_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Orphie & Magus","file":"orphie-and-magus_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Norma Hollowell","file":"norma_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Nicole Demara","file":"nicole-demara_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Nekomiya Mana","file":"nekomata_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Nangong Yu","file":"nangong-yu_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Tsukishiro Miyabi","file":"miyabi_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Komano Manato","file":"manato_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Von Lycaon","file":"lycaon_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Lucy","file":"lucy_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Lucia","file":"lucia_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Lighter","file":"lighter_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Koleda Belobog","file":"koleda_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Ju Fufu","file":"ju-fufu_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Jane Doe","file":"jane-doe_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Hugo Vlad","file":"hugo_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Asaba Harumasa","file":"harumasa_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Grace Howard","file":"grace-howard_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Evelyn Chevalier","file":"evelyn_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Ellen Joe","file":"ellen_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Dialyn","file":"dialyn_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Corin Wickes","file":"corin_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Claret Flint","file":"claret_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Cissia","file":"cissia_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Caesar King","file":"caesar_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Burnice White","file":"burnice_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Starlight - Billy","file":"billy-starlight_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Billy Kid","file":"billy-kid_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Ben Bigger","file":"ben_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Banyue","file":"banyue_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Astra Yao","file":"astra-yao_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Aria","file":"aria_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Anton Ivanov","file":"anton_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Soldier 0 - Anby","file":"anby-demara-soldier-0_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Anby Demara","file":"anby-demara_card.webp"},
-    {"game":"Zenless Zone Zero","character":"Alice Thymefield","file":"alice_card.webp"},
-    {"game":"Wuthering Waves","character":"Sigrika","file":"44_card.webp"},
-    {"game":"Wuthering Waves","character":"Luuk Herssen","file":"45_card.webp"},
-    {"game":"Wuthering Waves","character":"Mornye","file":"46_card.webp"},
-    {"game":"Wuthering Waves","character":"Roccia","file":"47_card.webp"},
-    {"game":"Wuthering Waves","character":"Lynae","file":"48_card.webp"},
-    {"game":"Wuthering Waves","character":"Aalto","file":"aalto_card.webp"},
-    {"game":"Wuthering Waves","character":"Augusta","file":"aug_card.webp"},
-    {"game":"Wuthering Waves","character":"Baizhi","file":"baizhi_card.webp"},
-    {"game":"Wuthering Waves","character":"Buling","file":"buling_card.webp"},
-    {"game":"Wuthering Waves","character":"Brant","file":"card_brant.webp"},
-    {"game":"Wuthering Waves","character":"Camellya","file":"card_cam.webp"},
-    {"game":"Wuthering Waves","character":"Cantarella","file":"card_canta.webp"},
-    {"game":"Wuthering Waves","character":"Carlotta","file":"card_carlotta.webp"},
-    {"game":"Wuthering Waves","character":"Changli","file":"card_changli.webp"},
-    {"game":"Wuthering Waves","character":"Shorekeeper","file":"card_keeper.webp"},
-    {"game":"Wuthering Waves","character":"Lumi","file":"card_lumi.webp"},
-    {"game":"Wuthering Waves","character":"Phoebe","file":"card_phoebe.webp"},
-    {"game":"Wuthering Waves","character":"Roccia","file":"card_roccia.webp"},
-    {"game":"Wuthering Waves","character":"Xiangli Yao","file":"card_xiang.webp"},
-    {"game":"Wuthering Waves","character":"Youhu","file":"card_youhu.webp"},
-    {"game":"Wuthering Waves","character":"Zani","file":"card_zani.webp"},
-    {"game":"Wuthering Waves","character":"Zhezhi","file":"card_zhe.webp"},
-    {"game":"Wuthering Waves","character":"Cartethyia","file":"cart_card.webp"},
-    {"game":"Wuthering Waves","character":"Chisa","file":"chisa_card.webp"},
-    {"game":"Wuthering Waves","character":"Chixia","file":"chixia_card.webp"},
-    {"game":"Wuthering Waves","character":"Ciaccona","file":"cia_card.webp"},
-    {"game":"Wuthering Waves","character":"Danjin","file":"danjin_card.webp"},
-    {"game":"Wuthering Waves","character":"Denia","file":"denia_card.webp"},
-    {"game":"Wuthering Waves","character":"Encore","file":"encore_card.webp"},
-    {"game":"Wuthering Waves","character":"Galbrena","file":"gal_card.webp"},
-    {"game":"Wuthering Waves","character":"Hiyuki","file":"hiyuki_card.webp"},
-    {"game":"Wuthering Waves","character":"Hsin","file":"hsin_card.webp"},
-    {"game":"Wuthering Waves","character":"Iuno","file":"iuno_card.webp"},
-    {"game":"Wuthering Waves","character":"Jianxin","file":"jiaxin_card.webp"},
-    {"game":"Wuthering Waves","character":"Jinhsi","file":"jihni_card.webp"},
-    {"game":"Wuthering Waves","character":"Jingran","file":"jingran_card.webp"},
-    {"game":"Wuthering Waves","character":"Jiyan","file":"jiyan_card.webp"},
-    {"game":"Wuthering Waves","character":"Luuk Herssen","file":"kakarot_card.webp"},
-    {"game":"Wuthering Waves","character":"Lingyang","file":"ling_card.webp"},
-    {"game":"Wuthering Waves","character":"Lupa","file":"lupa_card.webp"},
-    {"game":"Wuthering Waves","character":"Lucy","file":"lucy_card (1).webp"},
-    {"game":"Wuthering Waves","character":"Aemeath","file":"math_card.webp"},
-    {"game":"Wuthering Waves","character":"Mortefi","file":"mortefi_card.webp"},
-    {"game":"Wuthering Waves","character":"Phrolova","file":"phr_card.webp"},
-    {"game":"Wuthering Waves","character":"Qiuyuan","file":"qiu_card.webp"},
-    {"game":"Wuthering Waves","character":"Qingxiao","file":"qingxiao_card.webp"},
-    {"game":"Wuthering Waves","character":"Rebecca","file":"rebecca_card (1).webp"},
-    {"game":"Wuthering Waves","character":"Sanhua","file":"senhua_card.webp"},
-    {"game":"Wuthering Waves","character":"Suisui","file":"suisui_card.webp"},
-    {"game":"Wuthering Waves","character":"Suoming","file":"suoming_card.webp"},
-    {"game":"Wuthering Waves","character":"Taoqi","file":"taoqi_card.webp"},
-    {"game":"Wuthering Waves","character":"Verina","file":"verina_card.webp"},
-    {"game":"Wuthering Waves","character":"Yangyang","file":"yang_card.webp"},
-    {"game":"Wuthering Waves","character":"Yangyang: Xuanling","file":"yangyang-xuanling_card.webp"},
-    {"game":"Wuthering Waves","character":"Yinlin","file":"yinglin_card.webp"},
-    {"game":"Wuthering Waves","character":"Yuanwu","file":"yuanwu_card.webp"}
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Zhu Yuan",
+      "file": "zhu-yuan_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Zhao",
+      "file": "zhao_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Ukinami Yuzuha",
+      "file": "ukinami-yuzuha_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Yixuan",
+      "file": "yixuan_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Yidhari",
+      "file": "yidhari_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Ye Shunguang",
+      "file": "ye-shunguang_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Tsukishiro Yanagi",
+      "file": "yanagi_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Vivian",
+      "file": "vivian_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Velina Airgid",
+      "file": "velina_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Trigger",
+      "file": "trigger_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Sunna",
+      "file": "sunna_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Soukaku",
+      "file": "soukaku_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Soldier 11",
+      "file": "soldier-11_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Sigrid de L’Azur",
+      "file": "sigrid_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Seth Lowell",
+      "file": "seth_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Seed",
+      "file": "seed_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Roxy Ifrita Pryce",
+      "file": "roxy_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Alexandrina Sebastiane",
+      "file": "rina_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Remielle Dan",
+      "file": "remielle_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Qingyi",
+      "file": "qingyi_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Pyrois",
+      "file": "pyrois_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Pulchra Fellini",
+      "file": "pulchra_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Promeia",
+      "file": "promeia_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Piper Wheel",
+      "file": "piper_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Pan Yinhu",
+      "file": "pan-yinhu_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Orphie & Magus",
+      "file": "orphie-and-magus_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Norma Hollowell",
+      "file": "norma_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Nicole Demara",
+      "file": "nicole-demara_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Nekomiya Mana",
+      "file": "nekomata_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Nangong Yu",
+      "file": "nangong-yu_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Tsukishiro Miyabi",
+      "file": "miyabi_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Komano Manato",
+      "file": "manato_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Von Lycaon",
+      "file": "lycaon_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Lucy",
+      "file": "lucy_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Lucia",
+      "file": "lucia_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Lighter",
+      "file": "lighter_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Koleda Belobog",
+      "file": "koleda_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Ju Fufu",
+      "file": "ju-fufu_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Jane Doe",
+      "file": "jane-doe_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Hugo Vlad",
+      "file": "hugo_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Asaba Harumasa",
+      "file": "harumasa_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Grace Howard",
+      "file": "grace-howard_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Evelyn Chevalier",
+      "file": "evelyn_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Ellen Joe",
+      "file": "ellen_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Dialyn",
+      "file": "dialyn_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Corin Wickes",
+      "file": "corin_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Claret Flint",
+      "file": "claret_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Cissia",
+      "file": "cissia_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Caesar King",
+      "file": "caesar_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Burnice White",
+      "file": "burnice_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Starlight - Billy",
+      "file": "billy-starlight_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Billy Kid",
+      "file": "billy-kid_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Ben Bigger",
+      "file": "ben_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Banyue",
+      "file": "banyue_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Astra Yao",
+      "file": "astra-yao_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Aria",
+      "file": "aria_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Anton Ivanov",
+      "file": "anton_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Soldier 0 - Anby",
+      "file": "anby-demara-soldier-0_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Anby Demara",
+      "file": "anby-demara_card.webp"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "character": "Alice Thymefield",
+      "file": "alice_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Sigrika",
+      "file": "44_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Luuk Herssen",
+      "file": "45_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Mornye",
+      "file": "46_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Roccia",
+      "file": "47_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Lynae",
+      "file": "48_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Aalto",
+      "file": "aalto_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Augusta",
+      "file": "aug_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Baizhi",
+      "file": "baizhi_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Buling",
+      "file": "buling_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Brant",
+      "file": "card_brant.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Camellya",
+      "file": "card_cam.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Cantarella",
+      "file": "card_canta.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Carlotta",
+      "file": "card_carlotta.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Changli",
+      "file": "card_changli.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Shorekeeper",
+      "file": "card_keeper.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Lumi",
+      "file": "card_lumi.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Phoebe",
+      "file": "card_phoebe.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Roccia",
+      "file": "card_roccia.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Xiangli Yao",
+      "file": "card_xiang.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Youhu",
+      "file": "card_youhu.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Zani",
+      "file": "card_zani.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Zhezhi",
+      "file": "card_zhe.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Cartethyia",
+      "file": "cart_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Chisa",
+      "file": "chisa_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Chixia",
+      "file": "chixia_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Ciaccona",
+      "file": "cia_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Danjin",
+      "file": "danjin_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Denia",
+      "file": "denia_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Encore",
+      "file": "encore_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Galbrena",
+      "file": "gal_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Hiyuki",
+      "file": "hiyuki_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Hsin",
+      "file": "hsin_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Iuno",
+      "file": "iuno_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Jianxin",
+      "file": "jiaxin_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Jinhsi",
+      "file": "jihni_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Jingran",
+      "file": "jingran_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Jiyan",
+      "file": "jiyan_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Luuk Herssen",
+      "file": "kakarot_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Lingyang",
+      "file": "ling_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Lupa",
+      "file": "lupa_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Lucy",
+      "file": "lucy_card (1).webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Aemeath",
+      "file": "math_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Mortefi",
+      "file": "mortefi_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Phrolova",
+      "file": "phr_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Qiuyuan",
+      "file": "qiu_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Qingxiao",
+      "file": "qingxiao_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Rebecca",
+      "file": "rebecca_card (1).webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Sanhua",
+      "file": "senhua_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Suisui",
+      "file": "suisui_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Suoming",
+      "file": "suoming_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Taoqi",
+      "file": "taoqi_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Verina",
+      "file": "verina_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Yangyang",
+      "file": "yang_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Yangyang: Xuanling",
+      "file": "yangyang-xuanling_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Yinlin",
+      "file": "yinglin_card.webp"
+    },
+    {
+      "game": "Wuthering Waves",
+      "character": "Yuanwu",
+      "file": "yuanwu_card.webp"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Aino",
+      "file": "aino.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Albedo",
+      "file": "albedo.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Alhaitham",
+      "file": "alhaitham.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Aloy",
+      "file": "aloy.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Alyosha",
+      "file": "alyosha.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Amber",
+      "file": "amber.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Arataki Itto",
+      "file": "arataki-itto.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Arlecchino",
+      "file": "arlecchino.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Baizhu",
+      "file": "baizhu.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Barbara",
+      "file": "barbara.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Beidou",
+      "file": "beidou.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Bennett",
+      "file": "bennett.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Candace",
+      "file": "candace.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Charlotte",
+      "file": "charlotte.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Chasca",
+      "file": "chasca.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Chevreuse",
+      "file": "chevreuse.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Chiori",
+      "file": "chiori.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Chongyun",
+      "file": "chongyun.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Citlali",
+      "file": "citlali.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Clorinde",
+      "file": "clorinde.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Collei",
+      "file": "collei.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Columbina",
+      "file": "columbina.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Cyno",
+      "file": "cyno.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Dahlia",
+      "file": "dahlia.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Dehya",
+      "file": "dehya.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Diluc",
+      "file": "diluc.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Diona",
+      "file": "diona.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Dori",
+      "file": "dori.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Durin",
+      "file": "durin.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Emilie",
+      "file": "emilie.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Escoffier",
+      "file": "escoffier.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Eula",
+      "file": "eula.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Faruzan",
+      "file": "faruzan.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Fischl",
+      "file": "fischl.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Flins",
+      "file": "flins.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Freminet",
+      "file": "freminet.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Furina",
+      "file": "furina.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Gaming",
+      "file": "gaming.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Ganyu",
+      "file": "ganyu.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Gorou",
+      "file": "gorou.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Hu Tao",
+      "file": "hu-tao.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Iansan",
+      "file": "iansan.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Ifa",
+      "file": "ifa.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Illuga",
+      "file": "illuga.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Ineffa",
+      "file": "ineffa.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Jahoda",
+      "file": "jahoda.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Jean",
+      "file": "jean.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kachina",
+      "file": "kachina.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kaedehara Kazuha",
+      "file": "kaedehara-kazuha.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kaeya",
+      "file": "kaeya.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kamisato Ayaka",
+      "file": "kamisato-ayaka.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kamisato Ayato",
+      "file": "kamisato-ayato.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kaveh",
+      "file": "kaveh.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Keqing",
+      "file": "keqing.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kinich",
+      "file": "kinich.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kirara",
+      "file": "kirara.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Klee",
+      "file": "klee.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kujou Sara",
+      "file": "kujou-sara.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Kuki Shinobu",
+      "file": "kuki-shinobu.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lan Yan",
+      "file": "lan-yan.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lauma",
+      "file": "lauma.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Layla",
+      "file": "layla.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Linnea",
+      "file": "linnea.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lisa",
+      "file": "lisa.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lohen",
+      "file": "lohen.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lynette",
+      "file": "lynette.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Lyney",
+      "file": "lyney.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Mavuika",
+      "file": "mavuika.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Mika",
+      "file": "mika.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Mona",
+      "file": "mona.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Mualani",
+      "file": "mualani.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Nahida",
+      "file": "nahida.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Navia",
+      "file": "navia.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Nefer",
+      "file": "nefer.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Neuvillette",
+      "file": "neuvillette.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Nicole",
+      "file": "nicole.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Nilou",
+      "file": "nilou.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Ningguang",
+      "file": "ningguang.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Noelle",
+      "file": "noelle.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Odette",
+      "file": "odette.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Ororon",
+      "file": "ororon.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Prune",
+      "file": "prune.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Qiqi",
+      "file": "qiqi.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Raiden Shogun",
+      "file": "raiden-shogun.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Razor",
+      "file": "razor.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Rosaria",
+      "file": "rosaria.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sandrone",
+      "file": "sandrone.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sangonomiya Kokomi",
+      "file": "sangonomiya-kokomi.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sayu",
+      "file": "sayu.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sethos",
+      "file": "sethos.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Shenhe",
+      "file": "shenhe.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Shikanoin Heizou",
+      "file": "shikanoin-heizou.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sigewinne",
+      "file": "sigewinne.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Skirk",
+      "file": "skirk.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Sucrose",
+      "file": "sucrose.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Tartaglia",
+      "file": "tartaglia.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Thoma",
+      "file": "thoma.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Tighnari",
+      "file": "tighnari.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Anemo",
+      "file": "traveler-anemo.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Cryo",
+      "file": "traveler-cryo.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Dendro",
+      "file": "traveler-dendro.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Electro",
+      "file": "traveler-electro.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Geo",
+      "file": "traveler-geo.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Hydro",
+      "file": "traveler-hydro.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Traveler Pyro",
+      "file": "traveler-pyro.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Varesa",
+      "file": "varesa.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Varka",
+      "file": "varka.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Venti",
+      "file": "venti.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Wanderer",
+      "file": "wanderer.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Wriothesley",
+      "file": "wriothesley.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xiangling",
+      "file": "xiangling.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xianyun",
+      "file": "xianyun.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xiao",
+      "file": "xiao.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xilonen",
+      "file": "xilonen.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xingqiu",
+      "file": "xingqiu.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Xinyan",
+      "file": "xinyan.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yae Miko",
+      "file": "yae-miko.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yanfei",
+      "file": "yanfei.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yaoyao",
+      "file": "yaoyao.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yelan",
+      "file": "yelan.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yoimiya",
+      "file": "yoimiya.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yumemizuki Mizuki",
+      "file": "yumemizuki-mizuki.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Yun Jin",
+      "file": "yun-jin.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Zhongli",
+      "file": "zhongli.png"
+    },
+    {
+      "game": "Genshin Impact",
+      "character": "Zibai",
+      "file": "zibai.png"
+    }
   ]
 }
