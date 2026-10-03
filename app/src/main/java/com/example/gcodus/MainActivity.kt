@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         val back = TextView(this).apply {
             text = "‹"
             textSize = 38f
-            setTextColor(text)
+            setTextColor(this@MainActivity.text)
             gravity = Gravity.CENTER
             setPadding(0, 0, dp(8), 0)
             setOnClickListener { showHome() }
