@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     private var previousScreen = Screen.HOME
     private var previousGameId: String? = null
     private var currentGameId: String? = null
+    private var onlineCharacters: List<OnlineCharacter> = emptyList()
 
     private val bg = Color.rgb(13, 14, 19)
     private val surface = Color.rgb(21, 23, 32)
@@ -108,6 +109,7 @@ class MainActivity : AppCompatActivity() {
         scheduleNotificationSync()
         refreshCodesInBackground()
         refreshBannerFeedInBackground()
+        refreshCharacterDatabaseInBackground()
         showHome()
         startCountdownTicker()
     }
@@ -790,11 +792,21 @@ class MainActivity : AppCompatActivity() {
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
         val entries = mutableListOf<TrackedCharacter>()
         games.forEach { meta ->
-            listCharacterFiles(meta.id).forEach { file ->
+            val localFiles = listCharacterFiles(meta.id)
+            localFiles.forEach { file ->
                 val name = characterDisplayName(file)
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
                     entries += TrackedCharacter(meta.id, meta.name, name, file)
+                }
+            }
+            onlineCharacters.filter { it.gameId == meta.id }.forEach { online ->
+                val alreadyLocal = localFiles.any { normalizeCharacterForMatch(characterDisplayName(it)) == normalizeCharacterForMatch(online.name) }
+                val virtualFile = "__online_" + meta.id + "_" + online.slug + ".webp"
+                val tracked = isTracked(meta.id, virtualFile)
+                if (!alreadyLocal && (gameId != null || tracked) &&
+                    (normalizedQuery.isBlank() || online.name.lowercase().contains(normalizedQuery))) {
+                    entries += TrackedCharacter(meta.id, meta.name, online.name, virtualFile)
                 }
             }
         }
@@ -945,6 +957,18 @@ class MainActivity : AppCompatActivity() {
         else -> null
     }
 
+    private fun normalizeCharacterForMatch(value: String): String =
+        value.lowercase().replace("’", "").replace("'", "").replace("&", "and")
+            .replace(Regex("[^a-z0-9]+"), "")
+
+    private fun onlineCharacterFor(gameId: String, file: String): OnlineCharacter? {
+        if (!file.startsWith("__online_")) return null
+        val prefix = "__online_" + gameId + "_"
+        if (!file.startsWith(prefix)) return null
+        val slug = file.removePrefix(prefix).removeSuffix(".webp")
+        return onlineCharacters.firstOrNull { it.gameId == gameId && it.slug == slug }
+    }
+
     private fun characterDisplayName(file: String): String {
         val base = file.substringBeforeLast(".")
         val overrides = mapOf(
@@ -992,6 +1016,12 @@ class MainActivity : AppCompatActivity() {
         val folder = gameFolder(gameId) ?: return
         image.setImageDrawable(null)
 
+        val online = onlineCharacterFor(gameId, file)
+        if (online != null) {
+            loadRemotePortrait(image, online.portraitUrl)
+            return
+        }
+
         if (gameId == "zzz" && (file == "billy-kid.webp" || file == "billy.webp")) {
             loadRemotePortrait(image, "https://img.altema.jp/zenless/chara/prof/12.jpg")
             return
@@ -1029,6 +1059,31 @@ class MainActivity : AppCompatActivity() {
                 if (bitmap != null) image.setImageBitmap(bitmap)
             }
         } catch (_: Exception) { }
+    }
+
+    private fun refreshCharacterDatabaseInBackground() {
+        executor.execute {
+            try {
+                val fresh = CharacterDatabase.fetch(this@MainActivity)
+                if (fresh.isNotEmpty()) {
+                    onlineCharacters = fresh
+                    runOnUiThread {
+                        if (!isFinishing) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+        executor.scheduleAtFixedRate({
+            try {
+                val fresh = CharacterDatabase.fetch(this@MainActivity)
+                if (fresh.isNotEmpty()) {
+                    onlineCharacters = fresh
+                    runOnUiThread {
+                        if (!isFinishing && currentScreen != Screen.GAME) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }, 60, 60, TimeUnit.MINUTES)
     }
 
     private fun refreshCurrentScreen() {
@@ -1191,7 +1246,10 @@ class MainActivity : AppCompatActivity() {
                         (a.length >= 4 && compact.length >= 4 &&
                             (compact.startsWith(a) || a.startsWith(compact)))
                 }
-            } ?: return
+            } ?: run {
+                loadPrydwenPortrait(image, gameId, normalized)
+                return
+            }
 
             assets.open("$gameFolder/$target").use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
@@ -1200,6 +1258,17 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) {
             // Missing mapping = blank image. Never substitute another character.
         }
+    }
+
+    private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
+        val slug = normalizedSlug.trim('-')
+        if (slug.isBlank()) return
+        val url = when (gameId) {
+            "wuwa" -> "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
+            "zzz" -> "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
+            else -> return
+        }
+        loadRemotePortrait(image, url)
     }
 
     private fun loadRemotePortrait(image: ImageView, url: String) {
