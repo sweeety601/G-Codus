@@ -21,19 +21,26 @@ for filename, url in ICONS.items():
     with urlopen(req, timeout=30) as response:
         target.write_bytes(response.read())
 
-try:
-    subprocess.run(["python3", "-m", "pip", "install", "--quiet", "cairosvg"], check=True)
-    for filename in ICONS:
-        src = SOURCE_DIR / filename
-        out = DRAWABLE_DIR / filename.replace(".svg", ".png")
-        subprocess.run(
-            ["python3", "-c",
-             "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1],write_to=sys.argv[2],output_width=256,output_height=256)",
-             str(src), str(out)],
-            check=True,
-        )
-except Exception as exc:
-    print("Icon conversion failed:", exc)
-    raise
+subprocess.run(["python3", "-m", "pip", "install", "--quiet", "cairosvg", "pillow"], check=True)
 
-print("Downloaded and converted 3 game icons.")
+for filename in ICONS:
+    src = SOURCE_DIR / filename
+    rendered = DRAWABLE_DIR / (filename.replace(".svg", "_rendered.png"))
+    out = DRAWABLE_DIR / filename.replace(".svg", ".png")
+
+    subprocess.run(
+        ["python3", "-c",
+         "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1],write_to=sys.argv[2],output_width=220)",
+         str(src), str(rendered)],
+        check=True,
+    )
+
+    from PIL import Image
+    logo = Image.open(rendered).convert("RGBA")
+    canvas = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+    logo.thumbnail((220, 180), Image.Resampling.LANCZOS)
+    canvas.alpha_composite(logo, ((256 - logo.width) // 2, (256 - logo.height) // 2))
+    canvas.save(out, "PNG", optimize=True)
+    rendered.unlink(missing_ok=True)
+
+print("Downloaded and integrated 3 game icons with preserved proportions.")
