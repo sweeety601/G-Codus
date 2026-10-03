@@ -91,9 +91,32 @@ object BannerSource {
         }
     }
 
-    private fun parseGenshinLeak(text: String): JSONObject? = if (text.contains("7.2")) JSONObject().put("version", "7.2").put("start", "2026-11-04T06:00:00Z").put("end", "2026-11-25T06:00:00Z").put("five_star", JSONArray(listOf("Mitya", "Furina", "Zibai", "Linnea"))).put("four_star", JSONArray()) else null
-    private fun parseWuwaLeak(text: String): JSONObject? = if (text.contains("3.8")) JSONObject().put("version", "3.8").put("start", "2026-11-10T03:00:00Z").put("end", "2026-12-22T03:00:00Z").put("five_star", JSONArray(listOf("Lily", "Sigrika", "Hiyuki"))).put("four_star", JSONArray()) else null
-    private fun parseZzzLeak(text: String): JSONObject? = if (text.contains("3.3")) JSONObject().put("version", "3.3").put("start", "2026-10-21T03:00:00Z").put("end", "2026-12-02T03:00:00Z").put("five_star", JSONArray(listOf("Phoenix", "Severian", "Velina", "Norma"))).put("four_star", JSONArray()) else null
+    private fun parseGenshinLeak(text: String): JSONObject? =
+        if (text.contains("7.2")) JSONObject()
+            .put("version", "7.2 Phase 1")
+            .put("start", "2026-11-04T06:00:00Z")
+            .put("end", "2026-11-24T06:00:00Z")
+            .put("five_star", JSONArray(listOf("Mitya", "Furina")))
+            .put("four_star", JSONArray(listOf("Valeriy")))
+        else null
+
+    private fun parseWuwaLeak(text: String): JSONObject? =
+        if (text.contains("3.8")) JSONObject()
+            .put("version", "3.8 Phase 1")
+            .put("start", "2026-11-11T03:00:00Z")
+            .put("end", "2026-12-02T03:00:00Z")
+            .put("five_star", JSONArray(listOf("Lily", "Sigrika", "Hiyuki")))
+            .put("four_star", JSONArray())
+        else null
+
+    private fun parseZzzLeak(text: String): JSONObject? =
+        if (text.contains("3.3")) JSONObject()
+            .put("version", "3.3 Phase 1")
+            .put("start", "2026-10-21T03:00:00Z")
+            .put("end", "2026-11-11T03:00:00Z")
+            .put("five_star", JSONArray(listOf("Phoenix")))
+            .put("four_star", JSONArray())
+        else null
     private fun fetchGenshinOfficial(): JSONObject {
         val root = JSONObject(get(GENSHIN_OFFICIAL_URL))
         val found = mutableListOf<JSONObject>()
@@ -180,7 +203,17 @@ object BannerSource {
         }
 
         return JSONObject().put("id", "genshin").put("name", "Genshin Impact")
-            .put("current", current).put("next", next ?: JSONObject())
+            .put("current", normalizeSinglePhase(current))
+            .put("next", if (next != null) normalizeSinglePhase(next) else JSONObject())
+    }
+
+    private fun normalizeSinglePhase(b: JSONObject): JSONObject {
+        val out = JSONObject(b.toString())
+        val five = b.optJSONArray("five_star")
+        val four = b.optJSONArray("four_star")
+        out.put("five_star", JSONArray((0 until (five?.length() ?: 0)).map { five!!.optString(it) }.filter { it.isNotBlank() }.distinct()))
+        out.put("four_star", JSONArray((0 until (four?.length() ?: 0)).map { four!!.optString(it) }.filter { it.isNotBlank() }.distinct().take(3)))
+        return out
     }
 
     private fun firstTime(o: JSONObject, vararg keys: String): String? {
@@ -240,8 +273,14 @@ object BannerSource {
                 val rarity = a.optString("rarity").uppercase()
                 val n = firstText(a, "name", "full_name")
                 if (n.isBlank()) continue
-                if (rarity == "S" || rarity == "5" || rarity == "5.0") five += n
-                else if (rarity == "A" || rarity == "4" || rarity == "4.0") four += n
+                val normalizedName = n.lowercase().replace("’", "").replace("'", "").replace(Regex("[^a-z0-9]+"), "-").trim('-')
+                val effectiveRarity = when {
+                    normalizedName.contains("billy-starlight") || normalizedName.contains("starlight-billy") -> "S"
+                    normalizedName == "billy" -> "A"
+                    else -> rarity
+                }
+                if (effectiveRarity == "S" || effectiveRarity == "5" || effectiveRarity == "5.0") five += n
+                else if (effectiveRarity == "A" || effectiveRarity == "4" || effectiveRarity == "4.0") four += n
             }
             if (five.isEmpty()) {
                 val featured = b.optJSONArray("featured")
@@ -250,7 +289,10 @@ object BannerSource {
                     val rarity = a.optString("rarity")
                     val n = firstText(a, "name", "full_name")
                     if (n.isBlank()) continue
-                    if (rarity.contains("5")) five += n else if (rarity.contains("4")) four += n
+                    val normalizedName = n.lowercase().replace("’", "").replace("'", "").replace(Regex("[^a-z0-9]+"), "-").trim('-')
+                    if (normalizedName.contains("billy-starlight") || normalizedName.contains("starlight-billy")) five += n
+                    else if (normalizedName == "billy") four += n
+                    else if (rarity.contains("5")) five += n else if (rarity.contains("4")) four += n
                 }
             }
             if (five.isEmpty()) continue
@@ -266,7 +308,8 @@ object BannerSource {
         val next = parsed.firstOrNull { epoch(it.optString("start")) > now }
         val cur = current ?: parsed.lastOrNull { epoch(it.optString("start")) <= now } ?: parsed.first()
         return JSONObject().put("id", id).put("name", name)
-            .put("current", cur).put("next", next ?: JSONObject())
+            .put("current", normalizeSinglePhase(cur))
+            .put("next", if (next != null) normalizeSinglePhase(next) else JSONObject())
     }
 
     private fun fetchWuwa(): JSONObject {
@@ -310,7 +353,8 @@ object BannerSource {
             ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
         val next = unique.firstOrNull { epoch(it.optString("start")) > now }
         return JSONObject().put("id", "wuwa").put("name", "Wuthering Waves")
-            .put("current", cur).put("next", next ?: JSONObject())
+            .put("current", normalizeSinglePhase(cur))
+            .put("next", if (next != null) normalizeSinglePhase(next) else JSONObject())
     }
 
     private fun extractFourStars(tab: JSONObject): JSONArray {
