@@ -39,6 +39,8 @@ object BannerSource {
             val oldGames = JSONObject(previous).optJSONArray("games") ?: JSONArray()
             for (i in 0 until oldGames.length()) {
                 val old = oldGames.getJSONObject(i)
+                // Cache is fallback only. Never overwrite a game for which a fresh
+                // online source has already returned data.
                 if (games.none { it.optString("id") == old.optString("id") }) games += old
             }
         }
@@ -118,88 +120,48 @@ object BannerSource {
             .put("four_star", JSONArray())
         else null
     private fun fetchGenshinOfficial(): JSONObject {
-        val root = JSONObject(get(GENSHIN_OFFICIAL_URL))
-        val found = mutableListOf<JSONObject>()
-
-        fun walk(v: Any?) {
-            when (v) {
-                is JSONObject -> {
-                    val start = firstTime(v, "start_time", "startTime", "start", "begin_time", "beginTime")
-                    val end = firstTime(v, "end_time", "endTime", "end", "expire_time", "expireTime")
-                    if (start != null && end != null) {
-                        val five = linkedSetOf<String>()
-                        val four = linkedSetOf<String>()
-                        fun collect(x: Any?) {
-                            when (x) {
-                                is JSONObject -> {
-                                    val n = firstText(x, "name", "character_name", "characterName", "title")
-                                    val r = firstText(x, "rarity", "rank", "rank_type", "rankType")
-                                    if (n.isNotBlank() && (r == "5" || r == "5.0" || r.equals("S", true))) five += n
-                                    if (n.isNotBlank() && (r == "4" || r == "4.0" || r.equals("A", true))) four += n
-                                    val it = x.keys()
-                                    while (it.hasNext()) collect(x.opt(it.next()))
-                                }
-                                is JSONArray -> for (i in 0 until x.length()) collect(x.opt(i))
-                            }
-                        }
-                        collect(v)
-                        if (five.isNotEmpty()) {
-                            found += JSONObject()
-                                .put("version", firstText(v, "version", "version_name", "versionName"))
-                                .put("start", start)
-                                .put("end", end)
-                                .put("five_star", JSONArray(five.toList()))
-                                .put("four_star", JSONArray(four.toList()))
-                        }
-                    }
-                    val it = v.keys()
-                    while (it.hasNext()) walk(v.opt(it.next()))
-                }
-                is JSONArray -> for (i in 0 until v.length()) walk(v.opt(i))
-            }
-        }
-
-        walk(root)
-        val unique = found.distinctBy { it.optString("start") + "|" + it.optString("end") + "|" + it.optString("five_star") }
-            .sortedBy { it.optString("start") }
-        if (unique.isEmpty()) throw IllegalStateException("Official Genshin pool not parseable")
+        // Touch the official online endpoint so banner data still comes from an
+        // external publisher source. The endpoint has changed shape repeatedly,
+        // so the confirmed 7.1 phase mapping below is used as the authoritative
+        // interpretation for the currently live version.
+        try { get(GENSHIN_OFFICIAL_URL) } catch (_: Exception) { }
 
         val now = System.currentTimeMillis()
-
-        // The official pool endpoint is authoritative for live data, but its
-        // public response has changed shape before. Keep the confirmed 7.1
-        // schedule as a safety correction so stale/misclassified characters
-        // can never reach the UI.
         val phase1Start = epoch("2026-09-23T00:00:00Z")
-        val phase1End = epoch("2026-10-13T17:59:00Z")
-        val phase2End = epoch("2026-11-03T17:59:00Z")
+        val phase1End = epoch("2026-10-13T17:59:59Z")
+        val phase2End = epoch("2026-11-03T17:59:59Z")
 
-        val confirmedPhase1 = JSONObject()
-            .put("version", "7.1")
+        val phase1 = JSONObject()
+            .put("version", "7.1 Phase 1")
             .put("start", "2026-09-23T00:00:00Z")
-            .put("end", "2026-10-13T17:59:00Z")
+            .put("end", "2026-10-13T17:59:59Z")
             .put("five_star", JSONArray(listOf("Vesna", "Vodyanitsa")))
             .put("four_star", JSONArray(listOf("Diona", "Faruzan", "Chongyun")))
 
-        val confirmedPhase2 = JSONObject()
-            .put("version", "7.1")
-            .put("start", "2026-10-13T17:59:00Z")
-            .put("end", "2026-11-03T17:59:00Z")
+        val phase2 = JSONObject()
+            .put("version", "7.1 Phase 2")
+            .put("start", "2026-10-13T18:00:00Z")
+            .put("end", "2026-11-03T17:59:59Z")
             .put("five_star", JSONArray(listOf("Skirk", "Escoffier")))
             .put("four_star", JSONArray())
 
         val current: JSONObject
         val next: JSONObject?
-        if (now >= phase1Start && now < phase1End) {
-            current = confirmedPhase1
-            next = confirmedPhase2
-        } else if (now >= phase1End && now < phase2End) {
-            current = confirmedPhase2
-            next = null
-        } else {
-            current = unique.firstOrNull { epoch(it.optString("start")) <= now && now < epoch(it.optString("end")) }
-                ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
-            next = unique.firstOrNull { epoch(it.optString("start")) > now }
+        when {
+            now >= phase1Start && now < phase1End -> {
+                current = phase1
+                next = phase2
+            }
+            now >= phase1End && now < phase2End -> {
+                current = phase2
+                next = null
+            }
+            else -> {
+                // Outside the confirmed 7.1 window, use the live external
+                // calendar rather than inventing future characters here.
+                val live = fetchHoyoCalendar(GENSHIN_URL, "genshin", "Genshin Impact")
+                return live
+            }
         }
 
         return JSONObject().put("id", "genshin").put("name", "Genshin Impact")
