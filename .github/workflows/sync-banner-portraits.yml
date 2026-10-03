@@ -1,0 +1,36 @@
+name: Sync banner portraits
+
+on:
+  push:
+    paths:
+      - "data/banner_feed.json"
+      - "scripts/sync_banner_portraits.py"
+      - ".github/workflows/sync-banner-portraits.yml"
+  workflow_dispatch:
+  schedule:
+    - cron: "17 */6 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  portraits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Download current and next 5-star portraits
+        run: python scripts/sync_banner_portraits.py
+      - name: Commit portrait changes
+        run: |
+          git config user.name "G-Codus Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add app/src/main/res/drawable-nodpi
+          if git diff --cached --quiet; then
+            echo "No portrait changes"
+            exit 0
+          fi
+          git commit -m "Sync current and next banner portraits"
+          git push
