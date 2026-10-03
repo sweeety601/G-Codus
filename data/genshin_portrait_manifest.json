@@ -1,853 +1,922 @@
 {
   "game": "Genshin Impact",
   "source_character_list": "https://www.prydwen.gg/genshin-impact/characters",
-  "portrait_source": "https://library.keqingmains.com/resources/tools/portraits",
+  "portrait_source": "Prydwen CDN character full-art images, cropped locally into square transparent portraits",
   "last_synced": "2026-10-03",
   "character_count": 129,
-  "downloaded": 95,
+  "downloaded": 125,
   "missing": [
-    "Albedo",
-    "Arataki Itto",
-    "Barbara",
-    "Beidou",
-    "Bennett",
-    "Chongyun",
-    "Diluc",
-    "Diona",
-    "Hu Tao",
-    "Kaedehara Kazuha",
-    "Kaeya",
-    "Kamisato Ayaka",
-    "Kamisato Ayato",
-    "Keqing",
-    "Kujou Sara",
-    "Kuki Shinobu",
-    "Lan Yan",
     "Mitya7.2",
-    "Mona",
-    "Ningguang",
-    "Qiqi",
-    "Raiden Shogun",
-    "Razor",
-    "Sangonomiya Kokomi",
-    "Shikanoin Heizou",
     "Valeriy7.2",
-    "Venti",
     "VesnaNew",
-    "VodyanitsaNew",
-    "Xiao",
-    "Yae Miko",
-    "Yumemizuki Mizuki",
-    "Yun Jin",
-    "Zhongli"
+    "VodyanitsaNew"
   ],
   "characters": [
     {
       "name": "Aino",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/aino",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/aino_full.webp",
       "local_path": "assets/genshin/portraits/aino.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aino.png",
       "status": "downloaded"
     },
     {
       "name": "Albedo",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Albedo.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/albedo",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/albedo_full.webp",
+      "local_path": "assets/genshin/portraits/albedo.png",
+      "status": "downloaded"
     },
     {
       "name": "Alhaitham",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/alhaitham",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/alhaitham_full.webp",
       "local_path": "assets/genshin/portraits/alhaitham.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Alhaitham.png",
       "status": "downloaded"
     },
     {
       "name": "Aloy",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/aloy",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/aloy_full.webp",
       "local_path": "assets/genshin/portraits/aloy.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aloy.png",
       "status": "downloaded"
     },
     {
       "name": "Alyosha",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/alyosha",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/alyosha_full.webp",
       "local_path": "assets/genshin/portraits/alyosha.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Alyosha.png",
       "status": "downloaded"
     },
     {
       "name": "Amber",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/amber",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/amber_full.webp",
       "local_path": "assets/genshin/portraits/amber.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Amber.png",
       "status": "downloaded"
     },
     {
       "name": "Arataki Itto",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Arataki%20Itto.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/arataki-itto",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/arataki-itto_full.webp",
+      "local_path": "assets/genshin/portraits/arataki-itto.png",
+      "status": "downloaded"
     },
     {
       "name": "Arlecchino",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/arlecchino",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/arlecchino_full.webp",
       "local_path": "assets/genshin/portraits/arlecchino.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Arlecchino.png",
       "status": "downloaded"
     },
     {
       "name": "Baizhu",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/baizhu",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/baizhu_full.webp",
       "local_path": "assets/genshin/portraits/baizhu.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Baizhu.png",
       "status": "downloaded"
     },
     {
       "name": "Barbara",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Barbara.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/barbara",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/barbara_full.webp",
+      "local_path": "assets/genshin/portraits/barbara.png",
+      "status": "downloaded"
     },
     {
       "name": "Beidou",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Beidou.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/beidou",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/beidou_full.webp",
+      "local_path": "assets/genshin/portraits/beidou.png",
+      "status": "downloaded"
     },
     {
       "name": "Bennett",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Bennett.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/bennett",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/bennett_full.webp",
+      "local_path": "assets/genshin/portraits/bennett.png",
+      "status": "downloaded"
     },
     {
       "name": "Candace",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/candace",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/candace_full.webp",
       "local_path": "assets/genshin/portraits/candace.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Candace.png",
       "status": "downloaded"
     },
     {
       "name": "Charlotte",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/charlotte",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/charlotte_full.webp",
       "local_path": "assets/genshin/portraits/charlotte.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Charlotte.png",
       "status": "downloaded"
     },
     {
       "name": "Chasca",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/chasca",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/chasca_full.webp",
       "local_path": "assets/genshin/portraits/chasca.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Chasca.png",
       "status": "downloaded"
     },
     {
       "name": "Chevreuse",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/chevreuse",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/chevreuse_full.webp",
       "local_path": "assets/genshin/portraits/chevreuse.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Chevreuse.png",
       "status": "downloaded"
     },
     {
       "name": "Chiori",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/chiori",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/chiori_full.webp",
       "local_path": "assets/genshin/portraits/chiori.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Chiori.png",
       "status": "downloaded"
     },
     {
       "name": "Chongyun",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Chongyun.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/chongyun",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/chongyun_full.webp",
+      "local_path": "assets/genshin/portraits/chongyun.png",
+      "status": "downloaded"
     },
     {
       "name": "Citlali",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/citlali",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/citlali_full.webp",
       "local_path": "assets/genshin/portraits/citlali.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Citlali.png",
       "status": "downloaded"
     },
     {
       "name": "Clorinde",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/clorinde",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/clorinde_full.webp",
       "local_path": "assets/genshin/portraits/clorinde.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Clorinde.png",
       "status": "downloaded"
     },
     {
       "name": "Collei",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/collei",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/collei_full.webp",
       "local_path": "assets/genshin/portraits/collei.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Collei.png",
       "status": "downloaded"
     },
     {
       "name": "Columbina",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/columbina",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/columbina_full.webp",
       "local_path": "assets/genshin/portraits/columbina.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Columbina.png",
       "status": "downloaded"
     },
     {
       "name": "Cyno",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/cyno",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/cyno_full.webp",
       "local_path": "assets/genshin/portraits/cyno.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Cyno.png",
       "status": "downloaded"
     },
     {
       "name": "Dahlia",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/dahlia",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/dahlia_full.webp",
       "local_path": "assets/genshin/portraits/dahlia.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Dahlia.png",
       "status": "downloaded"
     },
     {
       "name": "Dehya",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/dehya",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/dehya_full.webp",
       "local_path": "assets/genshin/portraits/dehya.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Dehya.png",
       "status": "downloaded"
     },
     {
       "name": "Diluc",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Diluc.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/diluc",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/diluc_full.webp",
+      "local_path": "assets/genshin/portraits/diluc.png",
+      "status": "downloaded"
     },
     {
       "name": "Diona",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Diona.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/diona",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/diona_full.webp",
+      "local_path": "assets/genshin/portraits/diona.png",
+      "status": "downloaded"
     },
     {
       "name": "Dori",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/dori",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/dori_full.webp",
       "local_path": "assets/genshin/portraits/dori.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Dori.png",
       "status": "downloaded"
     },
     {
       "name": "Durin",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/durin",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/durin_full.webp",
       "local_path": "assets/genshin/portraits/durin.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Durin.png",
       "status": "downloaded"
     },
     {
       "name": "Emilie",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/emilie",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/emilie_full.webp",
       "local_path": "assets/genshin/portraits/emilie.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Emilie.png",
       "status": "downloaded"
     },
     {
       "name": "Escoffier",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/escoffier",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/escoffier_full.webp",
       "local_path": "assets/genshin/portraits/escoffier.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Escoffier.png",
       "status": "downloaded"
     },
     {
       "name": "Eula",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/eula",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/eula_full.webp",
       "local_path": "assets/genshin/portraits/eula.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Eula.png",
       "status": "downloaded"
     },
     {
       "name": "Faruzan",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/faruzan",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/faruzan_full.webp",
       "local_path": "assets/genshin/portraits/faruzan.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Faruzan.png",
       "status": "downloaded"
     },
     {
       "name": "Fischl",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/fischl",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/fischl_full.webp",
       "local_path": "assets/genshin/portraits/fischl.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Fischl.png",
       "status": "downloaded"
     },
     {
       "name": "Flins",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/flins",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/flins_full.webp",
       "local_path": "assets/genshin/portraits/flins.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Flins.png",
       "status": "downloaded"
     },
     {
       "name": "Freminet",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/freminet",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/freminet_full.webp",
       "local_path": "assets/genshin/portraits/freminet.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Freminet.png",
       "status": "downloaded"
     },
     {
       "name": "Furina",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/furina",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/furina_full.webp",
       "local_path": "assets/genshin/portraits/furina.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Furina.png",
       "status": "downloaded"
     },
     {
       "name": "Gaming",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/gaming",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/gaming_full.webp",
       "local_path": "assets/genshin/portraits/gaming.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Gaming.png",
       "status": "downloaded"
     },
     {
       "name": "Ganyu",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/ganyu",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/ganyu_full.webp",
       "local_path": "assets/genshin/portraits/ganyu.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Ganyu.png",
       "status": "downloaded"
     },
     {
       "name": "Gorou",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/gorou",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/gorou_full.webp",
       "local_path": "assets/genshin/portraits/gorou.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Gorou.png",
       "status": "downloaded"
     },
     {
       "name": "Hu Tao",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Hu%20Tao.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/hu-tao",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/hu-tao_full.webp",
+      "local_path": "assets/genshin/portraits/hu-tao.png",
+      "status": "downloaded"
     },
     {
       "name": "Iansan",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/iansan",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/iansan_full.webp",
       "local_path": "assets/genshin/portraits/iansan.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Iansan.png",
       "status": "downloaded"
     },
     {
       "name": "Ifa",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/ifa",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/ifa_full.webp",
       "local_path": "assets/genshin/portraits/ifa.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Ifa.png",
       "status": "downloaded"
     },
     {
       "name": "Illuga",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/illuga",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/illuga_full.webp",
       "local_path": "assets/genshin/portraits/illuga.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Illuga.png",
       "status": "downloaded"
     },
     {
       "name": "Ineffa",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/ineffa",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/ineffa_full.webp",
       "local_path": "assets/genshin/portraits/ineffa.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Ineffa.png",
       "status": "downloaded"
     },
     {
       "name": "Jahoda",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/jahoda",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/jahoda_full.webp",
       "local_path": "assets/genshin/portraits/jahoda.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Jahoda.png",
       "status": "downloaded"
     },
     {
       "name": "Jean",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/jean",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/jean_full.webp",
       "local_path": "assets/genshin/portraits/jean.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Jean.png",
       "status": "downloaded"
     },
     {
       "name": "Kachina",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kachina",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kachina_full.webp",
       "local_path": "assets/genshin/portraits/kachina.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kachina.png",
       "status": "downloaded"
     },
     {
       "name": "Kaedehara Kazuha",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kaedehara%20Kazuha.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kaedehara-kazuha",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kaedehara-kazuha_full.webp",
+      "local_path": "assets/genshin/portraits/kaedehara-kazuha.png",
+      "status": "downloaded"
     },
     {
       "name": "Kaeya",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kaeya.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kaeya",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kaeya_full.webp",
+      "local_path": "assets/genshin/portraits/kaeya.png",
+      "status": "downloaded"
     },
     {
       "name": "Kamisato Ayaka",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kamisato%20Ayaka.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kamisato-ayaka",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kamisato-ayaka_full.webp",
+      "local_path": "assets/genshin/portraits/kamisato-ayaka.png",
+      "status": "downloaded"
     },
     {
       "name": "Kamisato Ayato",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kamisato%20Ayato.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kamisato-ayato",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kamisato-ayato_full.webp",
+      "local_path": "assets/genshin/portraits/kamisato-ayato.png",
+      "status": "downloaded"
     },
     {
       "name": "Kaveh",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kaveh",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kaveh_full.webp",
       "local_path": "assets/genshin/portraits/kaveh.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kaveh.png",
       "status": "downloaded"
     },
     {
       "name": "Keqing",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Keqing.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/keqing",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/keqing_full.webp",
+      "local_path": "assets/genshin/portraits/keqing.png",
+      "status": "downloaded"
     },
     {
       "name": "Kinich",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kinich",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kinich_full.webp",
       "local_path": "assets/genshin/portraits/kinich.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kinich.png",
       "status": "downloaded"
     },
     {
       "name": "Kirara",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kirara",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kirara_full.webp",
       "local_path": "assets/genshin/portraits/kirara.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kirara.png",
       "status": "downloaded"
     },
     {
       "name": "Klee",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/klee",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/klee_full.webp",
       "local_path": "assets/genshin/portraits/klee.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Klee.png",
       "status": "downloaded"
     },
     {
       "name": "Kujou Sara",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kujou%20Sara.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kujou-sara",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kujou-sara_full.webp",
+      "local_path": "assets/genshin/portraits/kujou-sara.png",
+      "status": "downloaded"
     },
     {
       "name": "Kuki Shinobu",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Kuki%20Shinobu.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/kuki-shinobu",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/kuki-shinobu_full.webp",
+      "local_path": "assets/genshin/portraits/kuki-shinobu.png",
+      "status": "downloaded"
     },
     {
       "name": "Lan Yan",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lan%20Yan.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lan-yan",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lan-yan_full.webp",
+      "local_path": "assets/genshin/portraits/lan-yan.png",
+      "status": "downloaded"
     },
     {
       "name": "Lauma",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lauma",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lauma_full.webp",
       "local_path": "assets/genshin/portraits/lauma.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lauma.png",
       "status": "downloaded"
     },
     {
       "name": "Layla",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/layla",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/layla_full.webp",
       "local_path": "assets/genshin/portraits/layla.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Layla.png",
       "status": "downloaded"
     },
     {
       "name": "Linnea",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/linnea",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/linnea_full.webp",
       "local_path": "assets/genshin/portraits/linnea.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Linnea.png",
       "status": "downloaded"
     },
     {
       "name": "Lisa",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lisa",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lisa_full.webp",
       "local_path": "assets/genshin/portraits/lisa.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lisa.png",
       "status": "downloaded"
     },
     {
       "name": "Lohen",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lohen",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lohen_full.webp",
       "local_path": "assets/genshin/portraits/lohen.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lohen.png",
       "status": "downloaded"
     },
     {
       "name": "Lynette",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lynette",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lynette_full.webp",
       "local_path": "assets/genshin/portraits/lynette.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lynette.png",
       "status": "downloaded"
     },
     {
       "name": "Lyney",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/lyney",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/lyney_full.webp",
       "local_path": "assets/genshin/portraits/lyney.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Lyney.png",
       "status": "downloaded"
     },
     {
       "name": "Mavuika",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/mavuika",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/mavuika_full.webp",
       "local_path": "assets/genshin/portraits/mavuika.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Mavuika.png",
       "status": "downloaded"
     },
     {
       "name": "Mika",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/mika",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/mika_full.webp",
       "local_path": "assets/genshin/portraits/mika.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Mika.png",
       "status": "downloaded"
     },
     {
       "name": "Mitya7.2",
+      "page_url": null,
+      "portrait_url": null,
       "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Mitya7.2.png",
       "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "error": "character page was not found on Prydwen"
     },
     {
       "name": "Mona",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Mona.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/mona",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/mona_full.webp",
+      "local_path": "assets/genshin/portraits/mona.png",
+      "status": "downloaded"
     },
     {
       "name": "Mualani",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/mualani",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/mualani_full.webp",
       "local_path": "assets/genshin/portraits/mualani.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Mualani.png",
       "status": "downloaded"
     },
     {
       "name": "Nahida",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/nahida",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/nahida_full.webp",
       "local_path": "assets/genshin/portraits/nahida.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Nahida.png",
       "status": "downloaded"
     },
     {
       "name": "Navia",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/navia",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/navia_full.webp",
       "local_path": "assets/genshin/portraits/navia.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Navia.png",
       "status": "downloaded"
     },
     {
       "name": "Nefer",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/nefer",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/nefer_full.webp",
       "local_path": "assets/genshin/portraits/nefer.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Nefer.png",
       "status": "downloaded"
     },
     {
       "name": "Neuvillette",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/neuvillette",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/neuvillette_full.webp",
       "local_path": "assets/genshin/portraits/neuvillette.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Neuvillette.png",
       "status": "downloaded"
     },
     {
       "name": "Nicole",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/nicole",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/nicole_full.webp",
       "local_path": "assets/genshin/portraits/nicole.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Nicole.png",
       "status": "downloaded"
     },
     {
       "name": "Nilou",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/nilou",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/nilou_full.webp",
       "local_path": "assets/genshin/portraits/nilou.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Nilou.png",
       "status": "downloaded"
     },
     {
       "name": "Ningguang",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Ningguang.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/ningguang",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/ningguang_full.webp",
+      "local_path": "assets/genshin/portraits/ningguang.png",
+      "status": "downloaded"
     },
     {
       "name": "Noelle",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/noelle",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/noelle_full.webp",
       "local_path": "assets/genshin/portraits/noelle.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Noelle.png",
       "status": "downloaded"
     },
     {
       "name": "Odette",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/odette",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/odette_full.webp",
       "local_path": "assets/genshin/portraits/odette.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Odette.png",
       "status": "downloaded"
     },
     {
       "name": "Ororon",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/ororon",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/ororon_full.webp",
       "local_path": "assets/genshin/portraits/ororon.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Ororon.png",
       "status": "downloaded"
     },
     {
       "name": "Prune",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/prune",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/prune_full.webp",
       "local_path": "assets/genshin/portraits/prune.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Prune.png",
       "status": "downloaded"
     },
     {
       "name": "Qiqi",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Qiqi.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/qiqi",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/qiqi_full.webp",
+      "local_path": "assets/genshin/portraits/qiqi.png",
+      "status": "downloaded"
     },
     {
       "name": "Raiden Shogun",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Raiden%20Shogun.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/raiden-shogun",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/raiden-shogun_full.webp",
+      "local_path": "assets/genshin/portraits/raiden-shogun.png",
+      "status": "downloaded"
     },
     {
       "name": "Razor",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Razor.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/razor",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/razor_full.webp",
+      "local_path": "assets/genshin/portraits/razor.png",
+      "status": "downloaded"
     },
     {
       "name": "Rosaria",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/rosaria",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/rosaria_full.webp",
       "local_path": "assets/genshin/portraits/rosaria.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Rosaria.png",
       "status": "downloaded"
     },
     {
       "name": "Sandrone",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sandrone",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sandrone_full.webp",
       "local_path": "assets/genshin/portraits/sandrone.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sandrone.png",
       "status": "downloaded"
     },
     {
       "name": "Sangonomiya Kokomi",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sangonomiya%20Kokomi.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sangonomiya-kokomi",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sangonomiya-kokomi_full.webp",
+      "local_path": "assets/genshin/portraits/sangonomiya-kokomi.png",
+      "status": "downloaded"
     },
     {
       "name": "Sayu",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sayu",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sayu_full.webp",
       "local_path": "assets/genshin/portraits/sayu.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sayu.png",
       "status": "downloaded"
     },
     {
       "name": "Sethos",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sethos",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sethos_full.webp",
       "local_path": "assets/genshin/portraits/sethos.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sethos.png",
       "status": "downloaded"
     },
     {
       "name": "Shenhe",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/shenhe",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/shenhe_full.webp",
       "local_path": "assets/genshin/portraits/shenhe.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Shenhe.png",
       "status": "downloaded"
     },
     {
       "name": "Shikanoin Heizou",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Shikanoin%20Heizou.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/shikanoin-heizou",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/shikanoin-heizou_full.webp",
+      "local_path": "assets/genshin/portraits/shikanoin-heizou.png",
+      "status": "downloaded"
     },
     {
       "name": "Sigewinne",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sigewinne",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sigewinne_full.webp",
       "local_path": "assets/genshin/portraits/sigewinne.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sigewinne.png",
       "status": "downloaded"
     },
     {
       "name": "Skirk",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/skirk",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/skirk_full.webp",
       "local_path": "assets/genshin/portraits/skirk.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Skirk.png",
       "status": "downloaded"
     },
     {
       "name": "Sucrose",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/sucrose",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/sucrose_full.webp",
       "local_path": "assets/genshin/portraits/sucrose.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Sucrose.png",
       "status": "downloaded"
     },
     {
       "name": "Tartaglia",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/tartaglia",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/tartaglia_full.webp",
       "local_path": "assets/genshin/portraits/tartaglia.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Tartaglia.png",
       "status": "downloaded"
     },
     {
       "name": "Thoma",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/thoma",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/thoma_full.webp",
       "local_path": "assets/genshin/portraits/thoma.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Thoma.png",
       "status": "downloaded"
     },
     {
       "name": "Tighnari",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/tighnari",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/tighnari_full.webp",
       "local_path": "assets/genshin/portraits/tighnari.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Tighnari.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Anemo",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-anemo",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-anemo_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-anemo.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Cryo",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-cryo",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-cryo_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-cryo.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Dendro",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-dendro",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-dendro_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-dendro.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Electro",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-electro",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-electro_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-electro.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Geo",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-geo",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-geo_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-geo.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Hydro",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-hydro",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-hydro_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-hydro.png",
       "status": "downloaded"
     },
     {
       "name": "Traveler Pyro",
-      "local_path": "assets/genshin/portraits/aether.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Aether.png",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/traveler-pyro",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/traveler-pyro_full.webp",
+      "local_path": "assets/genshin/portraits/traveler-pyro.png",
       "status": "downloaded"
     },
     {
       "name": "Valeriy7.2",
+      "page_url": null,
+      "portrait_url": null,
       "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Valeriy7.2.png",
       "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "error": "character page was not found on Prydwen"
     },
     {
       "name": "Varesa",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/varesa",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/varesa_full.webp",
       "local_path": "assets/genshin/portraits/varesa.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Varesa.png",
       "status": "downloaded"
     },
     {
       "name": "Varka",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/varka",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/varka_full.webp",
       "local_path": "assets/genshin/portraits/varka.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Varka.png",
       "status": "downloaded"
     },
     {
       "name": "Venti",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Venti.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/venti",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/venti_full.webp",
+      "local_path": "assets/genshin/portraits/venti.png",
+      "status": "downloaded"
     },
     {
       "name": "VesnaNew",
+      "page_url": null,
+      "portrait_url": null,
       "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/VesnaNew.png",
       "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "error": "character page was not found on Prydwen"
     },
     {
       "name": "VodyanitsaNew",
+      "page_url": null,
+      "portrait_url": null,
       "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/VodyanitsaNew.png",
       "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "error": "character page was not found on Prydwen"
     },
     {
       "name": "Wanderer",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/wanderer",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/wanderer_full.webp",
       "local_path": "assets/genshin/portraits/wanderer.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Wanderer.png",
       "status": "downloaded"
     },
     {
       "name": "Wriothesley",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/wriothesley",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/wriothesley_full.webp",
       "local_path": "assets/genshin/portraits/wriothesley.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Wriothesley.png",
       "status": "downloaded"
     },
     {
       "name": "Xiangling",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xiangling",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xiangling_full.webp",
       "local_path": "assets/genshin/portraits/xiangling.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xiangling.png",
       "status": "downloaded"
     },
     {
       "name": "Xianyun",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xianyun",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xianyun_full.webp",
       "local_path": "assets/genshin/portraits/xianyun.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xianyun.png",
       "status": "downloaded"
     },
     {
       "name": "Xiao",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xiao.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xiao",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xiao_full.webp",
+      "local_path": "assets/genshin/portraits/xiao.png",
+      "status": "downloaded"
     },
     {
       "name": "Xilonen",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xilonen",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xilonen_full.webp",
       "local_path": "assets/genshin/portraits/xilonen.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xilonen.png",
       "status": "downloaded"
     },
     {
       "name": "Xingqiu",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xingqiu",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xingqiu_full.webp",
       "local_path": "assets/genshin/portraits/xingqiu.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xingqiu.png",
       "status": "downloaded"
     },
     {
       "name": "Xinyan",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/xinyan",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/xinyan_full.webp",
       "local_path": "assets/genshin/portraits/xinyan.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Xinyan.png",
       "status": "downloaded"
     },
     {
       "name": "Yae Miko",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yae%20Miko.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yae-miko",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yae-miko_full.webp",
+      "local_path": "assets/genshin/portraits/yae-miko.png",
+      "status": "downloaded"
     },
     {
       "name": "Yanfei",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yanfei",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yanfei_full.webp",
       "local_path": "assets/genshin/portraits/yanfei.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yanfei.png",
       "status": "downloaded"
     },
     {
       "name": "Yaoyao",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yaoyao",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yaoyao_full.webp",
       "local_path": "assets/genshin/portraits/yaoyao.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yaoyao.png",
       "status": "downloaded"
     },
     {
       "name": "Yelan",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yelan",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yelan_full.webp",
       "local_path": "assets/genshin/portraits/yelan.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yelan.png",
       "status": "downloaded"
     },
     {
       "name": "Yoimiya",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yoimiya",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yoimiya_full.webp",
       "local_path": "assets/genshin/portraits/yoimiya.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yoimiya.png",
       "status": "downloaded"
     },
     {
       "name": "Yumemizuki Mizuki",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yumemizuki%20Mizuki.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yumemizuki-mizuki",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yumemizuki-mizuki_full.webp",
+      "local_path": "assets/genshin/portraits/yumemizuki-mizuki.png",
+      "status": "downloaded"
     },
     {
       "name": "Yun Jin",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Yun%20Jin.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/yun-jin",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/yun-jin_full.webp",
+      "local_path": "assets/genshin/portraits/yun-jin.png",
+      "status": "downloaded"
     },
     {
       "name": "Zhongli",
-      "local_path": null,
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Zhongli.png",
-      "status": "missing",
-      "error": "HTTP Error 404: Not Found"
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/zhongli",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/zhongli_full.webp",
+      "local_path": "assets/genshin/portraits/zhongli.png",
+      "status": "downloaded"
     },
     {
       "name": "Zibai",
+      "page_url": "https://www.prydwen.gg/genshin-impact/characters/zibai",
+      "portrait_url": "https://cdn.prydwen.gg/images/genshin-impact/characters/zibai_full.webp",
       "local_path": "assets/genshin/portraits/zibai.png",
-      "portrait_url": "https://library.keqingmains.com/img/characters/round-icon/Zibai.png",
       "status": "downloaded"
     }
   ]
