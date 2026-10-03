@@ -1,0 +1,35 @@
+name: Sync promo codes
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "7 * * * *"
+  push:
+    paths:
+      - "scripts/sync_codes.py"
+      - ".github/workflows/sync-codes.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Sync codes
+        run: python scripts/sync_codes.py
+      - name: Commit feed
+        run: |
+          git config user.name "G-Codus Bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add app/src/main/assets/codes_feed.json
+          if git diff --cached --quiet; then
+            echo "No code feed changes"
+            exit 0
+          fi
+          git commit -m "Sync promo codes"
+          git push
