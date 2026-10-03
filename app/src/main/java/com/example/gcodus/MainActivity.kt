@@ -166,17 +166,26 @@ class MainActivity : AppCompatActivity() {
             background = roundedDrawable(gameAccent(gameId), 18f)
             clipToOutline = true
         }
-        val artText = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            gravity = Gravity.CENTER
-            setPadding(dp(12), dp(12), dp(12), dp(12))
+        val image = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_CROP
+            setBackgroundColor(gameAccent(gameId))
+            clipToOutline = true
         }
-        artText.addView(label("5★", 30f, Color.WHITE, true).apply { gravity = Gravity.CENTER })
-        artText.addView(label(banner.characters.firstOrNull() ?: "—", 18f, Color.WHITE, true).apply {
-            gravity = Gravity.CENTER
+        art.addView(image, FrameLayout.LayoutParams(-1, -1))
+
+        val overlay = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.BOTTOM
+            setPadding(dp(12), dp(12), dp(12), dp(12))
+            setBackgroundColor(Color.argb(95, 0, 0, 0))
+        }
+        overlay.addView(label("5★", 28f, Color.WHITE, true))
+        overlay.addView(label(banner.characters.firstOrNull() ?: "—", 18f, Color.WHITE, true).apply {
             maxLines = 2
         })
-        art.addView(artText, FrameLayout.LayoutParams(-1, -1))
+        art.addView(overlay, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
+
+        loadPortrait(image, banner.characters.firstOrNull().orEmpty(), gameId)
         card.addView(art, LinearLayout.LayoutParams(dp(178), dp(349)))
 
         val info = LinearLayout(this).apply {
@@ -221,6 +230,48 @@ class MainActivity : AppCompatActivity() {
             holder.container.addView(factory(items[position]))
         }
         override fun getItemCount() = items.size
+    }
+
+    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
+        val slug = character.lowercase()
+            .replace("’", "")
+            .replace("'", "")
+            .replace(":", "")
+            .replace("&", "and")
+            .replace(Regex("[^a-z0-9]+"), "-")
+            .trim('-')
+
+        val localName = when (gameId) {
+            "genshin" -> "banner_genshin_" + slug.replace("-", "_")
+            "wuwa" -> "banner_wuthering_waves_" + slug.replace("-", "_")
+            "zzz" -> "banner_zenless_zone_zero_" + slug.replace("-", "_")
+            else -> ""
+        }
+
+        val localId = if (localName.isNotEmpty()) resources.getIdentifier(localName, "drawable", packageName) else 0
+        if (localId != 0) {
+            image.setImageResource(localId)
+            return
+        }
+
+        val url = "https://cdn.prydwen.gg/images/" +
+            when (gameId) {
+                "genshin" -> "genshin-impact"
+                "wuwa" -> "wuthering-waves"
+                "zzz" -> "zenless-zone-zero"
+                else -> gameId
+            } + "/characters/" + slug + "_full.webp"
+
+        executor.execute {
+            try {
+                val connection = java.net.URL(url).openConnection()
+                connection.connectTimeout = 12000
+                connection.readTimeout = 20000
+                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                val bitmap = android.graphics.BitmapFactory.decodeStream(connection.getInputStream())
+                if (bitmap != null) runOnUiThread { image.setImageBitmap(bitmap) }
+            } catch (_: Exception) { }
+        }
     }
 
     private fun startCountdownTicker() {
