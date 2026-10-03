@@ -1,0 +1,11 @@
+<resources>
+    <color name="bg">#0D0E13</color>
+    <color name="surface">#151720</color>
+    <color name="surface2">#1C1E29</color>
+    <color name="text">#F5F5F7</color>
+    <color name="muted">#A5A7B1</color>
+    <color name="purple">#8A63E8</color>
+    <color name="genshin">#9B72FF</color>
+    <color name="wuwa">#4FA8FF</color>
+    <color name="zzz">#F0B64D</color>
+</resources>
