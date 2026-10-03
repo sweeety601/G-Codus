@@ -828,6 +828,7 @@ class MainActivity : AppCompatActivity() {
             "__wuwa-aemeath" to "Aemeath",
             "__wuwa-hiyuki" to "Hiyuki",
             "lucy-alt" to "Lucy",
+            "aug" to "Augusta",
             "arataki-itto" to "Arataki Itto",
             "al-haitham" to "Alhaitham",
             "yumemizuki-mizuki" to "Yumemizuki Mizuki",
