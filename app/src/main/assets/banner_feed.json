@@ -9,7 +9,7 @@
         "start": "2026-09-23T11:00:00+03:00",
         "end": "2026-10-13T17:59:59+03:00",
         "five_star": ["Vesna", "Vodyanitsa"],
-        "four_star": [],
+        "four_star": ["Diona", "Faruzan", "Chongyun"],
         "status": "live"
       },
       "next": {
@@ -17,7 +17,7 @@
         "start": "2026-10-13T18:00:00+03:00",
         "end": "2026-11-03T17:59:59+03:00",
         "five_star": ["Escoffier", "Skirk"],
-        "four_star": [],
+        "four_star": ["Buling", "Taoqi", "Youhu"],
         "status": "next"
       }
     },
@@ -29,7 +29,7 @@
         "start": "2026-09-30T04:00:00+03:00",
         "end": "2026-10-22T04:59:59+03:00",
         "five_star": ["Hsin", "Chisa", "Iuno"],
-        "four_star": [],
+        "four_star": ["Corin", "Billy"],
         "status": "live"
       },
       "next": {
