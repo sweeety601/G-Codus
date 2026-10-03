@@ -104,14 +104,14 @@ class NotificationSyncWorker(
         val newNames = nextChars.joinToString(", ")
 
         when {
-            newUnconfirmed && (oldParts.size < 6 || oldSignature.isBlank()) -> {
+            newUnconfirmed && oldSignature != nextSignature(next) -> {
                 showNotification(
                     ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
                     gameName(gameId),
                     "Следующая фаза: Неподтвержденная информация обновлена"
                 )
             }
-            newUnconfirmed && oldUnconfirmed && oldSignature != nextSignature(next) -> {
+            false -> {
                 showNotification(
                     ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
                     gameName(gameId),
