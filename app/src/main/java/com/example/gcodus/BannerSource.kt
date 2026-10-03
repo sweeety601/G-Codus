@@ -153,7 +153,7 @@ object BannerSource {
         return when (gameId) {
             "wuwa" -> when (normalizeForHistory(name)) { "hsin" -> 1; "chisa" -> 2; "iuno" -> 2; "suoming" -> 1; "lucilla" -> 2; "lynae" -> 3; else -> null }
             "zzz" -> when (normalizeForHistory(name)) { "roxy" -> 1; "promeia" -> 2; else -> null }
-            "genshin" -> when (normalizeForHistory(name)) { "vesna", "vodyanitsa", "skirk", "escoffier", "mitya", "valeriy" -> 1; else -> null }
+            "genshin" -> when (normalizeForHistory(name)) { "vesna", "vodyanitsa", "mitya", "valeriy" -> 1; "skirk", "escoffier" -> 2; else -> null }
             else -> null
         }
     }
