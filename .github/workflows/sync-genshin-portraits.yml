@@ -23,14 +23,65 @@ jobs:
         run: python -m pip install --disable-pip-version-check pillow
       - name: Download portraits from Prydwen
         run: python scripts/download_genshin_portraits.py
-      - name: Commit portraits
+      - name: Patch app to use bundled portraits only
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
+          s = p.read_text()
+          start = s.index('    private fun loadPortrait(')
+          end = s.index('    private fun startCountdownTicker', start)
+          fn = '''    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
+        // All banner art is bundled in the APK. No CDN/network image is ever used here.
+        if (gameId.equals("genshin", ignoreCase = true)) {
+            val slug = character.trim().lowercase()
+                .replace("’", "")
+                .replace("'", "")
+                .replace("&", "and")
+                .replace(Regex("[^a-z0-9]+"), "-")
+                .trim('-')
+            try {
+                assets.open("genshin/portraits/$slug.png").use { input ->
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                    if (bitmap != null) {
+                        image.setImageBitmap(bitmap)
+                        return
+                    }
+                }
+            } catch (_: Exception) { }
+            image.setImageDrawable(null)
+            return
+        }
+
+        val key = gameId.trim().lowercase() + ":" + character.trim().lowercase()
+        val localName = when (key) {
+            "wuwa:hsin" -> "banner_wuthering_waves_hsin"
+            "wuwa:chisa" -> "banner_wuthering_waves_chisa"
+            "wuwa:iuno" -> "banner_wuthering_waves_iuno"
+            "wuwa:suoming" -> "banner_wuthering_waves_suoming"
+            "wuwa:lucilla" -> "banner_wuthering_waves_lucilla"
+            "wuwa:lynae" -> "banner_wuthering_waves_lynae"
+            "zzz:roxy" -> "banner_zenless_zone_zero_roxy"
+            "zzz:promeia" -> "banner_zenless_zone_zero_promeia"
+            else -> ""
+        }
+        val localId = if (localName.isNotEmpty()) resources.getIdentifier(localName, "drawable", packageName) else 0
+        if (localId != 0) image.setImageResource(localId) else image.setImageDrawable(null)
+    }
+
+'''
+          p.write_text(s[:start] + fn + s[end:])
+          PY
+      - name: Commit portraits and app mapping
         run: |
           git config user.name 'G-Codus Bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add assets/genshin/portraits data/genshin_portrait_manifest.json
+          git add assets/genshin/portraits data/genshin_portrait_manifest.json app/src/main/java/com/example/gcodus/MainActivity.kt
           if git diff --cached --quiet; then
-            echo 'No portrait changes.'
+            echo 'No changes.'
           else
-            git commit -m 'Add Genshin Impact character portraits'
+            git commit -m 'Use bundled Prydwen portraits in banner info'
             git push
           fi
