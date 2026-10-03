@@ -100,6 +100,9 @@ class MainActivity : AppCompatActivity() {
     private fun showGame(gameId: String) {
         countdownViews.clear()
         val game = loadFeed().firstOrNull { it.id == gameId } ?: return
+        // Always reload the latest persisted/bundled promo feed when entering a game.
+        // This prevents an old empty SharedPreferences cache from hiding valid codes.
+        codesFeed = loadCachedCodes()
         val root = findViewById<FrameLayout>(R.id.root)
         root.removeAllViews()
 
@@ -187,6 +190,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun showCodePage() {
+            // Re-read the feed before rendering the promo-code page so the page
+            // never depends on the value captured at application startup.
+            codesFeed = loadCachedCodes()
             content.removeAllViews()
             selectedButton(bannerButton, false)
             selectedButton(codeButton, true)
@@ -453,7 +459,11 @@ class MainActivity : AppCompatActivity() {
         val cached = prefs.getString("codes_feed", null)
         if (!cached.isNullOrBlank()) {
             try {
-                return parseCodesFeed(cached)
+                val parsed = parseCodesFeed(cached)
+                // An old empty cache must never hide a valid bundled feed.
+                if (parsed.active.isNotEmpty() || parsed.expired.isNotEmpty()) {
+                    return parsed
+                }
             } catch (_: Exception) {
                 // Continue to the bundled feed.
             }
