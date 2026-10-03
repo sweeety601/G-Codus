@@ -1,0 +1,1 @@
+Expired-code history is maintained by scripts/sync_codes.py. The sync must preserve the previous generated feed and move entries from active to expired when they disappear or reach expires_at. This marker file documents the requirement.
