@@ -325,7 +325,7 @@ class MainActivity : AppCompatActivity() {
         wrapper.addView(icons)
 
         val wishlist = TextView(this).apply {
-            text = "♡  Мой вишлист"
+            text = "Мой вишлист"
             textSize = 15f
             gravity = Gravity.CENTER
             setTextColor(this@MainActivity.text)
@@ -755,7 +755,7 @@ class MainActivity : AppCompatActivity() {
         loadTrackingPortrait(image, character.file, character.gameId)
 
         val heart = TextView(this).apply {
-            text = "♥"
+            text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
             textSize = 17f
             gravity = Gravity.CENTER
             includeFontPadding = false
@@ -768,7 +768,7 @@ class MainActivity : AppCompatActivity() {
             }
             setOnClickListener {
                 toggleTracked(character.gameId, character.file)
-                text = "♥"
+                text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
                 setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
             }
         }
@@ -787,7 +787,7 @@ class MainActivity : AppCompatActivity() {
 
         cell.setOnClickListener {
             toggleTracked(character.gameId, character.file)
-            heart.text = "♥"
+            heart.text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
             heart.setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
         }
         return cell
