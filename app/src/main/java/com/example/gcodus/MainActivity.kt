@@ -498,7 +498,8 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, dp(4), 0, dp(2))
             maxLines = 2
         })
-        info.addView(label(banner.version, 13f, muted, false))        val rerun = banner.rerunLabels[fiveName]
+        info.addView(label(banner.version, 13f, muted, false))
+        val rerun = banner.rerunLabels[fiveName]
         if (rerun != null) {
             info.addView(label(rerun, 13f, muted, true))
         }
