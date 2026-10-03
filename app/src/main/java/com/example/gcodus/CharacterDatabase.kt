@@ -64,7 +64,7 @@ object CharacterDatabase {
                 .replace(Regex("<[^>]+>"), " ")
                 .replace("&amp;", "&")
                 .replace("&#39;", "'")
-                .replace("&quot;", """)
+                .replace("&quot;", "\"")
                 .replace(Regex("\\s+"), " ")
                 .trim()
             val name = cleanName(rawName)
