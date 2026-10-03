@@ -897,7 +897,8 @@ class MainActivity : AppCompatActivity() {
             marginEnd = dp(8)
         })
         cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
-        val announced = onlineCharacterFor(character.gameId, character.file)?.announced == true
+        val announced = (onlineCharacterFor(character.gameId, character.file)?.announced == true) ||
+            onlineCharacters.any { it.gameId == character.gameId && normalizeCharacterForMatch(it.name) == normalizeCharacterForMatch(character.name) && it.announced }
         if (announced) {
             val badge = TextView(this).apply {
                 text = "✦  АНОНСИРОВАН"
@@ -1281,6 +1282,7 @@ class MainActivity : AppCompatActivity() {
         val url = when (gameId) {
             "wuwa" -> "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
             "zzz" -> "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
+            "genshin" -> "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
             else -> return
         }
         loadRemotePortrait(image, url)
