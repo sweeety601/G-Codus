@@ -87,13 +87,39 @@ class NotificationSyncWorker(
             for (file in trackedFiles(gameId)) {
                 val characterName = displayName(file)
                 val bannerName = bannerCharacterName(currentChars, nextChars, file) ?: characterName
+
+                // If the user starts tracking a character while its banner is
+                // already live, notify immediately on the next sync. The same
+                // persisted appearance key prevents duplicate alerts.
+                notifyCurrentBannerAppearance(prefs, gameId, file, bannerName, currentChars)
+
                 when (gameId) {
-                    "genshin" -> notifyGenshinAppearance(prefs, gameId, file, bannerName, currentChars)
+                    "genshin" -> Unit
                     "zzz" -> notifyZzzDate(prefs, gameId, file, bannerName, next)
                     "wuwa" -> notifyWuwaEnding(prefs, gameId, file, bannerName, current)
                 }
             }
         }
+    }
+
+    private fun notifyCurrentBannerAppearance(
+        prefs: android.content.SharedPreferences,
+        gameId: String,
+        file: String,
+        name: String,
+        currentChars: List<String>
+    ) {
+        val present = currentChars.any { sameCharacter(it, file) }
+        val key = "appearance_" + gameId + "_" + file
+        val old = prefs.getBoolean(key, false)
+        if (present && !old) {
+            showNotification(
+                ("current_" + gameId + "_" + file).hashCode() and 0x7fffffff,
+                gameName(gameId),
+                "$name доступен для призыва!"
+            )
+        }
+        prefs.edit().putBoolean(key, present).apply()
     }
 
     private fun notifyGenshinAppearance(prefs: android.content.SharedPreferences, gameId: String, file: String, name: String, currentChars: List<String>) {
