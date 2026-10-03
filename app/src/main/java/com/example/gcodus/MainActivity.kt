@@ -446,8 +446,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadCachedCodes(): CodesFeed {
-        val json = prefs.getString("codes_feed", null) ?: return CodesFeed.empty()
-        return try { parseCodesFeed(json) } catch (_: Exception) { CodesFeed.empty() }
+        // Prefer the last successfully downloaded feed. On a fresh install there
+        // is no SharedPreferences entry yet, so immediately fall back to the
+        // codes_feed.json bundled into the APK. This guarantees that the code
+        // page is populated even before the first background HTTP refresh.
+        val cached = prefs.getString("codes_feed", null)
+        if (!cached.isNullOrBlank()) {
+            try {
+                return parseCodesFeed(cached)
+            } catch (_: Exception) {
+                // Continue to the bundled feed.
+            }
+        }
+
+        return try {
+            val bundled = assets.open("codes_feed.json").bufferedReader().use { it.readText() }
+            parseCodesFeed(bundled)
+        } catch (_: Exception) {
+            CodesFeed.empty()
+        }
     }
 
     private fun parseCodesFeed(json: String): CodesFeed {
@@ -468,8 +485,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun codeSection(gameId: String): View {
         val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        val active = codesFeed.active.filter { it.game == gameId }
-        val expired = codesFeed.expired.filter { it.game == gameId }
+        fun sameGame(value: String): Boolean {
+            val normalized = value.trim().lowercase()
+            return when (gameId.lowercase()) {
+                "genshin" -> normalized in setOf("genshin", "genshinimpact", "genshin impact")
+                "wuwa" -> normalized in setOf("wuwa", "wutheringwaves", "wuthering waves", "wutheringwave")
+                "zzz" -> normalized in setOf("zzz", "zenless", "zenlesszonezero", "zenless zone zero")
+                else -> normalized == gameId.lowercase()
+            }
+        }
+        val active = codesFeed.active.filter { sameGame(it.game) }
+        val expired = codesFeed.expired.filter { sameGame(it.game) }
 
         box.addView(sectionLabel("ДЕЙСТВУЮЩИЕ").apply {
             setPadding(dp(4), dp(4), 0, dp(8))
