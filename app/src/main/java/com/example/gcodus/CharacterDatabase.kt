@@ -31,36 +31,86 @@ object CharacterDatabase {
         result += fetchGame("wuwa", WUWA_CHARACTERS, WUWA_HISTORY)
         result += fetchGame("zzz", ZZZ_CHARACTERS, ZZZ_HISTORY)
         result += fetchGame("genshin", GENSHIN_CHARACTERS, GENSHIN_HISTORY)
-        result += OnlineCharacter("wuwa", "Lumi", "lumi", false, wuwaPortrait("lumi"))
-        result += OnlineCharacter("wuwa", "Youhu", "youhu", false, wuwaPortrait("youhu"))
-        return result.distinctBy { it.gameId + "|" + it.slug }
+
+        // Prydwen uses "Billy" for the ordinary playable agent. In G-Codus
+        // this is displayed as the official character name "Billy Kid".
+        if (result.none { it.gameId == "zzz" && normalize(it.slug) == "billy" }) {
+            result += OnlineCharacter("zzz", "Billy Kid", "billy", false, portraitUrl("zzz", "billy"))
+        } else {
+            for (i in result.indices) {
+                val c = result[i]
+                if (c.gameId == "zzz" && normalize(c.slug) == "billy") {
+                    result[i] = c.copy(name = "Billy Kid")
+                }
+            }
+        }
+
+        return result.distinctBy { it.gameId + "|" + normalize(it.slug) }
     }
 
     private fun fetchGame(gameId: String, listUrl: String, historyUrl: String): List<OnlineCharacter> {
         val html = get(listUrl)
         val history = try { get(historyUrl) } catch (_: Exception) { "" }
         val historyKnown = normalize(history)
-        val pattern = Regex("href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"]+)[\\\"][^>]*>(.*?)</a>", RegexOption.IGNORE_CASE)
+        val pattern = Regex(
+            "href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"?#/]+)[\\\"][^>]*>(.*?)</a>",
+            RegexOption.IGNORE_CASE
+        )
         val result = mutableListOf<OnlineCharacter>()
+
         for (m in pattern.findAll(html)) {
-            val slug = m.groupValues[1].substringBefore("?").trim('/').lowercase()
-            val rawName = m.groupValues[2].replace(Regex("<[^>]+>"), " ").replace("&amp;", "&").trim()
+            val slug = m.groupValues[1].trim('/').lowercase()
+            val rawName = m.groupValues[2]
+                .replace(Regex("<[^>]+>"), " ")
+                .replace("&amp;", "&")
+                .replace("&#39;", "'")
+                .replace("&quot;", """)
+                .replace(Regex("\\s+"), " ")
+                .trim()
             val name = cleanName(rawName)
-            if (slug.isBlank() || name.isBlank() || name.length > 80) continue
+
+            // Prydwen's character page contains navigation/metadata links too.
+            // Accept only short, human-readable character names; this removes
+            // the junk that previously leaked into the Genshin roster.
+            if (!isValidCharacterEntry(slug, name)) continue
             if (isProtagonist(gameId, slug, name)) continue
+
             val released = historyKnown.isNotEmpty() && (
                 historyKnown.contains(normalize(name)) ||
                 historyKnown.contains(normalize(slug.replace("-", " ")))
             )
             val announced = historyKnown.isNotEmpty() && !released
-            result += OnlineCharacter(gameId, name, slug, announced, portraitUrl(gameId, slug))
+            result += OnlineCharacter(
+                gameId,
+                if (gameId == "zzz" && normalize(slug) == "billy") "Billy Kid" else name,
+                slug,
+                announced,
+                portraitUrl(gameId, slug)
+            )
         }
+
         return result
             .groupBy { canonicalKey(it.gameId, it.slug, it.name) }
             .values
             .map { it.first() }
     }
 
+    private fun isValidCharacterEntry(slug: String, name: String): Boolean {
+        if (slug.isBlank() || name.isBlank() || slug.length > 48 || name.length > 60) return false
+        if (!slug.matches(Regex("[a-z0-9]+(?:-[a-z0-9]+)*"))) return false
+        if (name.split(Regex("\\s+")).size > 5) return false
+        if (!name.matches(Regex("[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9 .:'&()\\-]*"))) return false
+
+        val bad = listOf(
+            "tier list", "build", "guide", "teams", "team", "stats", "overview",
+            "weapons", "weapon", "artifacts", "echoes", "materials", "talents",
+            "skills", "constellations", "abilities", "best", "review", "database",
+            "characters", "characters list", "news", "home", "login"
+        )
+        val n = name.lowercase()
+        if (bad.any { n == it || n.contains(it) }) return false
+        return true
+    }
 
     private fun isProtagonist(gameId: String, slug: String, name: String): Boolean {
         val normalizedSlug = normalize(slug)
@@ -70,15 +120,8 @@ object CharacterDatabase {
         }
     }
 
-    private fun canonicalKey(gameId: String, slug: String, name: String): String {
-        val s = normalize(slug)
-        val n = normalize(name)
-        return when {
-            gameId == "zzz" && (s == "billykid" || n == "billykid" || s == "billy" || n == "billy") ->
-                "$gameId|billykid"
-            else -> "$gameId|" + if (s.isNotBlank()) s else n
-        }
-    }
+    private fun canonicalKey(gameId: String, slug: String, name: String): String =
+        "$gameId|" + normalize(slug).ifBlank { normalize(name) }
 
     private fun portraitUrl(gameId: String, slug: String): String =
         when (gameId) {
@@ -93,12 +136,13 @@ object CharacterDatabase {
 
     private fun cleanName(value: String): String {
         var s = value.replace(Regex("\\s+"), " ").trim()
-        s = s.replace(Regex("(New|[0-9]+\\.[0-9]+)$"), "").trim()
+        s = s.replace(Regex("\\b(New|[0-9]+\\.[0-9]+)\\b"), "").trim()
         return s
     }
 
     private fun normalize(value: String): String =
-        value.lowercase().replace("’", "").replace("'", "").replace("&", "and").replace(Regex("[^a-z0-9]+"), "")
+        value.lowercase().replace("’", "").replace("'", "")
+            .replace("&", "and").replace(Regex("[^a-z0-9]+"), "")
 
     private fun get(url: String): String {
         val c = URL(url).openConnection() as HttpURLConnection
