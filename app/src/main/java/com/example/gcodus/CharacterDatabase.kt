@@ -52,9 +52,7 @@ object CharacterDatabase {
     }
 
     private fun fetchGame(gameId: String, listUrl: String): List<OnlineCharacter> {
-        val html = get(listUrl)
-        val history = try { get(historyUrl) } catch (_: Exception) { "" }
-        val historyKnown = normalize(history)
+        val html = try { get(listUrl) } catch (_: Exception) { return emptyList() }
         val pattern = Regex(
             "href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"?#/]+)[\\\"][^>]*>(.*?)</a>",
             RegexOption.IGNORE_CASE
