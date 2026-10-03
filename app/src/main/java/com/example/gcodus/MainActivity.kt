@@ -10,6 +10,7 @@ import android.widget.*
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +39,7 @@ data class Banner(
     val start: String?,
     val end: String?,
     val characters: List<String>,
+    val fourStars: List<String>,
     val next: Boolean
 )
 
@@ -491,6 +493,26 @@ class MainActivity : AppCompatActivity() {
             maxLines = 2
         })
         info.addView(label(banner.version, 13f, muted, false))
+
+        if (!isNext && banner.fourStars.isNotEmpty()) {
+            val fourStarRow = LinearLayout(this).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, dp(10), 0, dp(4))
+            }
+            banner.fourStars.take(3).forEach { character ->
+                val portrait = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    background = roundedDrawable(Color.rgb(42, 44, 54), 8f)
+                    clipToOutline = true
+                }
+                loadPortrait(portrait, character, gameId)
+                fourStarRow.addView(portrait, LinearLayout.LayoutParams(dp(34), dp(34)).apply {
+                    marginEnd = dp(6)
+                })
+            }
+            info.addView(fourStarRow)
+        }
+
         info.addView(Space(this), LinearLayout.LayoutParams(1, 0, 1f))
 
         val time = label("", if (isNext) 15f else 19f, text, true)
@@ -933,7 +955,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun trackingKey(gameId: String, file: String) = "tracked_" + gameId + "_" + file
     private fun isTracked(gameId: String, file: String): Boolean = prefs.getBoolean(trackingKey(gameId, file), false)
-    private fun toggleTracked(gameId: String, file: String) { prefs.edit().putBoolean(trackingKey(gameId, file), !isTracked(gameId, file)).apply() }
+    private fun toggleTracked(gameId: String, file: String) {
+        val enabled = !isTracked(gameId, file)
+        prefs.edit().putBoolean(trackingKey(gameId, file), enabled).apply()
+        if (enabled) {
+            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()
+                .setConstraints(
+                    Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build()
+                )
+                .build()
+            WorkManager.getInstance(this).enqueue(request)
+        }
+    }
 
     private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
         val folder = gameFolder(gameId) ?: return
@@ -1110,6 +1145,8 @@ class MainActivity : AppCompatActivity() {
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
         val b = game.getJSONObject(key)
         val arr: JSONArray = b.optJSONArray("five_star") ?: JSONArray()
+        val fourStarArr: JSONArray = b.optJSONArray("four_star") ?: JSONArray()
+        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.getString(it) }
         val result = mutableListOf<Banner>()
         for (i in 0 until arr.length()) {
             result += Banner(
@@ -1119,6 +1156,7 @@ class MainActivity : AppCompatActivity() {
                 b.optString("start").takeIf { it.isNotBlank() && it != "null" },
                 b.optString("end").takeIf { it.isNotBlank() && it != "null" },
                 listOf(arr.getString(i)),
+                fourStars,
                 key == "next"
             )
         }
