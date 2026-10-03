@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "primary": {
+    "provider": "Prydwen",
+    "role": "Primary banner schedule source for all three games. It publishes current/next banners and server-region countdowns.",
+    "urls": {
+      "genshin": "https://www.prydwen.gg/genshin-impact/banners",
+      "wuthering_waves": "https://www.prydwen.gg/wuthering-waves/banners",
+      "zenless_zone_zero": "https://www.prydwen.gg/zenless/banners"
+    },
+    "update_policy": "Sync frequently; Prydwen states it waits for official confirmation and aims to update within 24 hours."
+  },
+  "secondary": [
+    {
+      "game": "Genshin Impact",
+      "provider": "HoYoverse official notices",
+      "url": "https://www.hoyolab.com/circles/2/57/feed"
+    },
+    {
+      "game": "Wuthering Waves",
+      "provider": "Kuro Games official notices",
+      "url": "https://wutheringwaves.kurogames.com/"
+    },
+    {
+      "game": "Zenless Zone Zero",
+      "provider": "HoYoverse official notices",
+      "url": "https://zenless.hoyoverse.com/en-us/news/"
+    }
+  ],
+  "fallback": {
+    "provider": "GachaData",
+    "role": "Optional API fallback/validation. It requires an API key and its free tier can lag by about 24 hours, so it is not used as the primary live source.",
+    "url": "https://gacha-data.com/api/"
+  },
+  "app_contract": {
+    "feed_file": "data/banner_feed.json",
+    "countdown": "Calculated locally from end_at; the app does not store a ticking countdown.",
+    "statuses": [
+      "live",
+      "next",
+      "upcoming",
+      "expired"
+    ],
+    "server_regions": [
+      "EU",
+      "NA",
+      "ASIA"
+    ]
+  }
+}
