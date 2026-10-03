@@ -17,11 +17,14 @@ object CharacterDatabase {
     private const val ZZZ_CHARACTERS = "https://www.prydwen.gg/zenless/characters"
     private const val WUWA_HISTORY = "https://bannerhistory.app/en/wuwa-pickup-history"
     private const val ZZZ_HISTORY = "https://bannerhistory.app/en/zzz-pickup-history"
+    private const val GENSHIN_CHARACTERS = "https://www.prydwen.gg/genshin-impact/characters"
+    private const val GENSHIN_HISTORY = "https://bannerhistory.app/en/genshin-banners?std=0&v=1"
 
     fun fetch(context: Context): List<OnlineCharacter> {
         val result = mutableListOf<OnlineCharacter>()
         result += fetchGame("wuwa", WUWA_CHARACTERS, WUWA_HISTORY)
         result += fetchGame("zzz", ZZZ_CHARACTERS, ZZZ_HISTORY)
+        result += fetchGame("genshin", GENSHIN_CHARACTERS, GENSHIN_HISTORY)
         result += OnlineCharacter("wuwa", "Lumi", "lumi", false, wuwaPortrait("lumi"))
         result += OnlineCharacter("wuwa", "Youhu", "youhu", false, wuwaPortrait("youhu"))
         return result.distinctBy { it.gameId + "|" + it.slug }
@@ -45,8 +48,12 @@ NaN
     }
 
     private fun portraitUrl(gameId: String, slug: String): String =
-        if (gameId == "wuwa") wuwaPortrait(slug)
-        else "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
+        when (gameId) {
+            "wuwa" -> wuwaPortrait(slug)
+            "zzz" -> "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
+            "genshin" -> "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
+            else -> ""
+        }
 
     private fun wuwaPortrait(slug: String): String =
         "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
