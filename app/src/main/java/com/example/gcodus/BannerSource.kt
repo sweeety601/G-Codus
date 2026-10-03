@@ -315,11 +315,22 @@ object BannerSource {
             ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
         val next = unique.firstOrNull { epoch(it.optString("start")) > now }
         return JSONObject().put("id", "wuwa").put("name", "Wuthering Waves")
-            .put("current", normalizeSinglePhase(cur))
-            .put("next", if (next != null) normalizeSinglePhase(next) else JSONObject())
+            .put("current", normalizeWuwaPhase(cur))
+            .put("next", if (next != null) normalizeWuwaPhase(next) else JSONObject())
     }
 
-    private fun extractFourStars(tab: JSONObject): JSONArray {
+    private fun normalizeWuwaPhase(phase: JSONObject): JSONObject {
+        val out = normalizeSinglePhase(phase)
+        val start = epoch(out.optString("start"))
+        if (start >= epoch("2026-09-30T00:00:00Z") && start < epoch("2026-10-22T02:00:00Z")) {
+            out.put("four_star", JSONArray(listOf("Buling", "Taoqi", "Youhu")))
+        } else if (start >= epoch("2026-10-22T02:00:00Z") && start < epoch("2026-11-12T00:00:00Z")) {
+            out.put("four_star", JSONArray(listOf("Lumi", "Danjin", "Chixia")))
+        }
+        return out
+    }
+
+    private fun extractFourStars(tab: JSONObject) {
         val names = linkedSetOf<String>()
         fun walk(v: Any?) {
             when (v) {
