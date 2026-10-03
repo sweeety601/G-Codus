@@ -48,7 +48,6 @@ data class Banner(
 class MainActivity : AppCompatActivity() {
     companion object {
         const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
-        const val BANNER_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/banner_feed.json"
     }
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
@@ -1168,17 +1167,13 @@ class MainActivity : AppCompatActivity() {
     private fun refreshBannerFeedInBackground() {
         fun refreshOnce() {
             try {
-                val connection = URL(BANNER_FEED_URL).openConnection() as HttpURLConnection
-                connection.connectTimeout = 15000
-                connection.readTimeout = 20000
-                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                val fresh = connection.inputStream.bufferedReader().use { it.readText() }
+                val fresh = BannerSource.fetchNormalized(this@MainActivity)
                 JSONObject(fresh).getJSONArray("games")
                 val old = prefs.getString("banner_feed", null)
                 if (old != fresh) {
                     prefs.edit().putString("banner_feed", fresh).apply()
                     runOnUiThread {
-                        if (!isFinishing && currentScreen != Screen.HOME) refreshCurrentScreen()
+                        if (!isFinishing) refreshCurrentScreen()
                     }
                 }
             } catch (_: Exception) { }
