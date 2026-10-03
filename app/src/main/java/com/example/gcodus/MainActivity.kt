@@ -28,6 +28,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private var previousScreen = Screen.HOME
     private var previousGameId: String? = null
     private var currentGameId: String? = null
+    private var onlineCharacters: List<OnlineCharacter> = emptyList()
 
     private val bg = Color.rgb(13, 14, 19)
     private val surface = Color.rgb(21, 23, 32)
@@ -111,6 +113,8 @@ class MainActivity : AppCompatActivity() {
         scheduleCodeSync()
         scheduleNotificationSync()
         refreshCodesInBackground()
+        refreshBannerFeedInBackground()
+        refreshCharacterDatabaseInBackground()
         showHome()
         startCountdownTicker()
     }
@@ -488,7 +492,7 @@ class MainActivity : AppCompatActivity() {
         })
         art.addView(overlay, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
 
-        loadPortrait(image, banner.characters.firstOrNull().orEmpty(), gameId, isNext)
+        loadPortrait(image, banner.characters.firstOrNull().orEmpty(), gameId)
         card.addView(art, LinearLayout.LayoutParams(dp(178), dp(349)))
 
         val info = LinearLayout(this).apply {
@@ -524,7 +528,7 @@ class MainActivity : AppCompatActivity() {
                     background = roundedDrawable(Color.rgb(42, 44, 54), 8f)
                     clipToOutline = true
                 }
-                loadPortrait(portrait, character, gameId, isNext)
+                loadPortrait(portrait, character, gameId)
                 fourStarRow.addView(portrait, LinearLayout.LayoutParams(dp(34), dp(34)).apply {
                     marginEnd = dp(6)
                 })
@@ -890,6 +894,22 @@ class MainActivity : AppCompatActivity() {
             marginEnd = dp(8)
         })
         cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
+        val announced = (onlineCharacterFor(character.gameId, character.file)?.announced == true) ||
+            onlineCharacters.any { it.gameId == character.gameId && normalizeCharacterForMatch(it.name) == normalizeCharacterForMatch(character.name) && it.announced }
+        if (announced) {
+            val badge = TextView(this).apply {
+                text = "✦  АНОНСИРОВАН"
+                textSize = 8.5f
+                setTextColor(Color.rgb(255, 205, 110))
+                gravity = Gravity.CENTER
+                setPadding(dp(5), dp(3), dp(5), dp(3))
+                background = roundedDrawable(Color.argb(85, 20, 18, 12), 10f)
+            }
+            imageFrame.addView(badge, FrameLayout.LayoutParams(-2, dp(24), Gravity.BOTTOM or Gravity.START).apply {
+                bottomMargin = dp(8)
+                marginStart = dp(8)
+            })
+        }
         cell.addView(label(character.name, 11.5f, text, true).apply {
             gravity = Gravity.CENTER
             maxLines = 3
@@ -955,6 +975,14 @@ class MainActivity : AppCompatActivity() {
         value.lowercase().replace("’", "").replace("'", "").replace("&", "and")
             .replace(Regex("[^a-z0-9]+"), "")
 
+    private fun onlineCharacterFor(gameId: String, file: String): OnlineCharacter? {
+        if (!file.startsWith("__online_")) return null
+        val prefix = "__online_" + gameId + "_"
+        if (!file.startsWith(prefix)) return null
+        val slug = file.removePrefix(prefix).removeSuffix(".webp")
+        return onlineCharacters.firstOrNull { it.gameId == gameId && it.slug == slug }
+    }
+
     private fun characterDisplayName(file: String): String {
         val base = file.substringBeforeLast(".")
         val overrides = mapOf(
@@ -1002,6 +1030,13 @@ class MainActivity : AppCompatActivity() {
         val folder = gameFolder(gameId) ?: return
         image.setImageDrawable(null)
 
+        val online = onlineCharacterFor(gameId, file)
+        if (online != null) {
+            // Prydwen is the second-priority portrait source for online-only entries.
+            loadPortrait(image, online.name, gameId)
+            return
+        }
+
         // Some supplied portraits have filenames inherited from an earlier
         // mapping. Resolve those aliases to the exact user-supplied local assets.
         val specialAssetPath = when (file) {
@@ -1034,6 +1069,31 @@ class MainActivity : AppCompatActivity() {
                 if (bitmap != null) image.setImageBitmap(bitmap)
             }
         } catch (_: Exception) { }
+    }
+
+    private fun refreshCharacterDatabaseInBackground() {
+        executor.execute {
+            try {
+                val fresh = CharacterDatabase.fetch(this@MainActivity)
+                if (fresh.isNotEmpty()) {
+                    onlineCharacters = fresh
+                    runOnUiThread {
+                        if (!isFinishing) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+        executor.scheduleAtFixedRate({
+            try {
+                val fresh = CharacterDatabase.fetch(this@MainActivity)
+                if (fresh.isNotEmpty()) {
+                    onlineCharacters = fresh
+                    runOnUiThread {
+                        if (!isFinishing && currentScreen != Screen.GAME) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }, 60, 60, TimeUnit.MINUTES)
     }
 
     private fun refreshCurrentScreen() {
@@ -1097,37 +1157,7 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount() = items.size
     }
 
-    private val localCharacterKeys: Set<String> by lazy {
-        try {
-            val root = JSONObject(assets.open("gacha_character_manifest.json").bufferedReader().use(BufferedReader::readText))
-            val images = root.optJSONArray("images") ?: JSONArray()
-            buildSet {
-                for (i in 0 until images.length()) {
-                    val item = images.optJSONObject(i) ?: continue
-                    val game = when (item.optString("game")) {
-                        "Genshin Impact" -> "genshin"
-                        "Wuthering Waves" -> "wuwa"
-                        "Zenless Zone Zero" -> "zzz"
-                        else -> continue
-                    }
-                    val name = item.optString("character")
-                    if (name.isNotBlank()) add(game + "|" + normalizeCharacterForMatch(name))
-                }
-            }
-        } catch (_: Exception) { emptySet() }
-    }
-
-    private fun isKnownLocalCharacter(gameId: String, character: String): Boolean {
-        val key = gameId + "|" + normalizeCharacterForMatch(character)
-        if (key in localCharacterKeys) return true
-        val aliases = when (gameId) {
-            "zzz" -> mapOf("billy" to "billykid", "billykid" to "billykid", "corinwickes" to "corinwickes")
-            "wuwa" -> mapOf("augusta" to "augusta")
-            else -> emptyMap()
-        }
-        return aliases[normalizeCharacterForMatch(character)]?.let { gameId + "|" + it in localCharacterKeys } ?: false
-    }
-    private fun loadPortrait(image: ImageView, character: String, gameId: String, allowRemote: Boolean = false) {
+    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
         // Portraits are STRICTLY LOCAL. The only source is the user-provided
         // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
@@ -1227,7 +1257,7 @@ class MainActivity : AppCompatActivity() {
                             (compact.startsWith(a) || a.startsWith(compact)))
                 }
             } ?: run {
-                if (allowRemote && !isKnownLocalCharacter(gameId, character)) loadPrydwenPortrait(image, gameId, normalized)
+                loadPrydwenPortrait(image, gameId, normalized)
                 return
             }
 
@@ -1250,6 +1280,23 @@ class MainActivity : AppCompatActivity() {
             "zzz" -> n in setOf("belle", "wise", "proxy") || f in setOf("belle", "wise", "proxy")
             else -> false
         }
+    }
+
+    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
+        val a = normalizeCharacterForMatch(localName)
+        val b = normalizeCharacterForMatch(onlineName)
+        val slug = normalizeCharacterForMatch(onlineSlug)
+        val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
+        if (gameId == "zzz") {
+            val localStarlight = a.contains("starlight") || file.contains("starlight")
+            val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
+            if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
+            val ordinary = setOf("billy", "billykid")
+            val localBilly = a in ordinary || file in ordinary
+            val onlineBilly = b in ordinary || slug in ordinary
+            if (localBilly || onlineBilly) return localBilly && onlineBilly
+        }
+        return a == b || file == slug
     }
 
     private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
@@ -1315,26 +1362,65 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFeed(): List<GameFeed> {
+        fun parseSource(source: String): List<GameFeed> {
+            val games = JSONObject(source).optJSONArray("games") ?: JSONArray()
+            val result = mutableListOf<GameFeed>()
+            for (i in 0 until games.length()) {
+                val g = games.optJSONObject(i) ?: continue
+                val id = g.optString("id")
+                val name = g.optString("name")
+                if (id.isBlank() || name.isBlank()) continue
+                try {
+                    result += GameFeed(
+                        id,
+                        name,
+                        parseBanners(g, "current"),
+                        parseBanners(g, "next")
+                    )
+                } catch (_: Exception) {
+                    // One broken game's online payload must never prevent the
+                    // other games (or the game selector) from opening.
+                }
+            }
+            return result
+        }
+
         val bundled = try {
             assets.open("banner_feed.json").bufferedReader().use(BufferedReader::readText)
         } catch (_: Exception) {
             "{\"games\":[]}"
         }
-        val games = JSONObject(bundled).optJSONArray("games") ?: JSONArray()
-        val result = mutableListOf<GameFeed>()
-        for (i in 0 until games.length()) {
-            val g = games.optJSONObject(i) ?: continue
-            val id = g.optString("id")
-            val name = g.optString("name")
-            if (id.isBlank() || name.isBlank()) continue
-            try {
-                result += GameFeed(id, name, parseBanners(g, "current"), parseBanners(g, "next"))
-            } catch (_: Exception) { }
+
+        val cached = prefs.getString("banner_feed", null)
+        val onlineGames = if (!cached.isNullOrBlank()) parseSource(cached) else emptyList()
+        val bundledGames = parseSource(bundled)
+
+        // Prefer online banner data, but fall back per game to the bundled
+        // snapshot. This is especially important for WuWa if the Kuro API
+        // changes its response format temporarily.
+        return gameMeta.mapNotNull { meta ->
+            onlineGames.firstOrNull { it.id == meta.id }
+                ?: bundledGames.firstOrNull { it.id == meta.id }
         }
-        return gameMeta.mapNotNull { meta -> result.firstOrNull { it.id == meta.id } }
     }
 
-    private fun refreshBannerFeedInBackground() { }
+    private fun refreshBannerFeedInBackground() {
+        fun refreshOnce() {
+            try {
+                val fresh = BannerSource.fetchNormalized(this@MainActivity)
+                JSONObject(fresh).getJSONArray("games")
+                val old = prefs.getString("banner_feed", null)
+                if (old != fresh) {
+                    prefs.edit().putString("banner_feed", fresh).apply()
+                    runOnUiThread {
+                        if (!isFinishing) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+        executor.execute { refreshOnce() }
+        executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
+    }
 
     private fun parseRerunLabels(b: JSONObject): Map<String, String> {
         val obj = b.optJSONObject("rerun_labels") ?: return emptyMap()
