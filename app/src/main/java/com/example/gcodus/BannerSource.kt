@@ -154,33 +154,20 @@ object BannerSource {
 
     private fun fetchZzzOnline(): JSONObject {
         val parsed = fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero")
-        val current = parsed.optJSONObject("current")
-        val next = parsed.optJSONObject("next")
+        val now = System.currentTimeMillis()
+        val phaseStart = epoch("2026-09-30T12:00:00Z")
+        val phaseEnd = epoch("2026-10-20T14:59:00Z")
 
-        // Enforce the official V3.2 Phase II rarity lineup when the online
-        // calendar returns incomplete/incorrect rarity metadata. Billy and
-        // Corin are A-Rank; Roxy and Promeia are S-Rank.
-        val currentFive = current?.optJSONArray("five_star")?.let { a ->
-            (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }
-        }.orEmpty()
-        val currentFour = current?.optJSONArray("four_star")?.let { a ->
-            (0 until a.length()).map { a.optString(it) }.filter { it.isNotBlank() }
-        }.orEmpty()
-
-        if (current != null && currentFour.any { it.equals("Billy", true) } &&
-            currentFive.any { it.equals("Billy", true) }) {
-            current.put("five_star", JSONArray(currentFive.filterNot { it.equals("Billy", true) }))
-            current.put("four_star", JSONArray((currentFour + "Billy").distinct()))
-        }
-
-        if (current != null && currentFour.any { it.equals("Corin", true) } &&
-            currentFive.any { it.equals("Corin", true) }) {
-            current.put("five_star", JSONArray(current.optJSONArray("five_star")?.let { a ->
-                (0 until a.length()).map { a.optString(it) }.filterNot { it.equals("Corin", true) }
-            } ?: emptyList<String>()))
-            current.put("four_star", JSONArray(((current.optJSONArray("four_star")?.let { a ->
-                (0 until a.length()).map { a.optString(it) }
-            } ?: emptyList()) + "Corin").distinct()))
+        // Official ZZZ V3.2 Phase II: Roxy and Promeia are S-Rank;
+        // Corin and Billy are A-Rank on both Exclusive Channels.
+        if (now >= phaseStart && now < phaseEnd) {
+            val current = JSONObject()
+                .put("version", "3.2")
+                .put("start", "2026-09-30T12:00:00Z")
+                .put("end", "2026-10-20T14:59:00Z")
+                .put("five_star", JSONArray(listOf("Roxy", "Promeia")))
+                .put("four_star", JSONArray(listOf("Corin", "Billy")))
+            parsed.put("current", current)
         }
 
         return parsed
