@@ -932,7 +932,7 @@ class MainActivity : AppCompatActivity() {
                     "__wuwa-hiyuki.webp").sorted()
                 "zzz" -> files.filterNot {
                     it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
-                }.plus("lucy_alt.webp").distinct().sorted()
+                }.plus("lucy_alt.webp").plus("billy-kid.webp").distinct().sorted()
                 else -> files
             }
         } catch (_: Exception) { emptyList() }
@@ -961,7 +961,9 @@ class MainActivity : AppCompatActivity() {
             "anby-demara-soldier-0" to "Anby: Soldier 0",
             "orhpie-and-magus" to "Orphie & Magus",
             "orhpie-magus" to "Orphie & Magus",
-            "luuk-herssen" to "Luuk Herssen"
+            "luuk-herssen" to "Luuk Herssen",
+            "billy-kid" to "Billy Kid",
+            "billy" to "Billy Kid"
         )
         overrides[base]?.let { return it }
         return base.split("-").joinToString(" ") { word ->
@@ -989,6 +991,11 @@ class MainActivity : AppCompatActivity() {
     private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
         val folder = gameFolder(gameId) ?: return
         image.setImageDrawable(null)
+
+        if (gameId == "zzz" && (file == "billy-kid.webp" || file == "billy.webp")) {
+            loadRemotePortrait(image, "https://img.altema.jp/zenless/chara/prof/12.jpg")
+            return
+        }
 
         // Some supplied portraits have filenames inherited from an earlier
         // mapping. Resolve those aliases to the exact user-supplied local assets.
@@ -1090,6 +1097,14 @@ class MainActivity : AppCompatActivity() {
         // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
 
+        val normalizedForRemote = character.trim().lowercase()
+            .replace("’", "").replace("'", "")
+            .replace(Regex("[^a-z0-9]+"), "-").trim('-')
+        if (gameId == "zzz" && normalizedForRemote == "billy") {
+            loadRemotePortrait(image, "https://img.altema.jp/zenless/chara/prof/12.jpg")
+            return
+        }
+
         // Kuro's WuWa endpoint can return Chinese display names even when the
         // app UI is English/Russian. Convert only those names to the existing
         // local portrait filenames; never download or substitute a portrait.
@@ -1121,11 +1136,23 @@ class MainActivity : AppCompatActivity() {
         // Resolve against the ACTUAL bundled filenames. This is important for
         // 4-star portraits because their source filenames can differ from the
         // display name (spaces, punctuation, alternate naming, etc.).
+        val exactAssetByCharacter = when {
+            gameId == "wuwa" && normalized == "buling" -> "buling.webp"
+            gameId == "wuwa" && normalized == "taoqi" -> "taoqi.webp"
+            gameId == "wuwa" && normalized == "youhu" -> "youhu.webp"
+            gameId == "wuwa" && normalized == "lumi" -> "lumi.webp"
+            gameId == "wuwa" && normalized == "danjin" -> "danjin.webp"
+            gameId == "wuwa" && normalized == "chixia" -> "chixia.webp"
+            gameId == "zzz" && normalized == "corin" -> "corin.webp"
+            gameId == "zzz" && normalized == "billy-starlight" -> "billy-starlight.webp"
+            else -> null
+        }
+
         val aliases = when (normalized) {
             "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" ->
                 listOf("anby-demara-soldier-0", "anby-soldier-0")
             "billy", "billy-kid" ->
-                listOf("billy", "billy-kid")
+                listOf("billy-kid")
             "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
                 listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
             "corin", "corin-wickes" ->
@@ -1147,7 +1174,8 @@ class MainActivity : AppCompatActivity() {
 
         try {
             val files = assets.list(gameFolder)?.toList().orEmpty()
-            val exact = specialFile?.takeIf { files.contains(it) }
+            val exact = exactAssetByCharacter?.takeIf { files.contains(it) }
+                ?: specialFile?.takeIf { files.contains(it) }
             val target = exact ?: files.firstOrNull { file ->
                 val stem = file.substringBeforeLast('.').lowercase()
                     .replace("’", "")
@@ -1171,6 +1199,21 @@ class MainActivity : AppCompatActivity() {
             }
         } catch (_: Exception) {
             // Missing mapping = blank image. Never substitute another character.
+        }
+    }
+
+    private fun loadRemotePortrait(image: ImageView, url: String) {
+        executor.execute {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connectTimeout = 12000
+                connection.readTimeout = 20000
+                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                val bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
+                if (bitmap != null) runOnUiThread {
+                    if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
+                }
+            } catch (_: Exception) { }
         }
     }
 
