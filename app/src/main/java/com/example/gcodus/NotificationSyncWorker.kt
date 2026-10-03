@@ -166,6 +166,7 @@ class NotificationSyncWorker(
             "anby-soldier-0" to "anby-demara-soldier-0",
             "soldier-0-anby" to "anby-demara-soldier-0",
             "anby-demara-soldier-0" to "anby-demara-soldier-0",
+            "augusta" to "aug",
             "orphie-and-magus" to "orhpie-and-magus"
         )
         return aliases[a] == b
@@ -185,6 +186,7 @@ class NotificationSyncWorker(
             "__wuwa-aemeath" to "Aemeath",
             "__wuwa-hiyuki" to "Hiyuki",
             "lucy-alt" to "Lucy",
+            "aug" to "Augusta",
             "arataki-itto" to "Arataki Itto",
             "yumemizuki-mizuki" to "Yumemizuki Mizuki",
             "yae-miko" to "Yae Miko",
