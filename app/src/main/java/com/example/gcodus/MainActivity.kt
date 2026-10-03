@@ -480,7 +480,7 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(Color.argb(95, 0, 0, 0))
         }
         overlay.addView(label("5★", 28f, Color.WHITE, true))
-        overlay.addView(label(banner.characters.firstOrNull() ?: "—", 18f, Color.WHITE, true).apply {
+        overlay.addView(label(banner.characters.joinToString(" • ").ifBlank { "—" }, 18f, Color.WHITE, true).apply {
             maxLines = 2
         })
         art.addView(overlay, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
@@ -493,13 +493,13 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(14), dp(8), dp(8), dp(4))
         }
         info.addView(label("5★", 17f, Color.rgb(255, 211, 76), true))
-        val fiveName = banner.characters.firstOrNull() ?: "Баннер"
+        val fiveName = banner.characters.joinToString(" • ").ifBlank { "Баннер" }
         info.addView(label(fiveName, 22f, text, true).apply {
             setPadding(0, dp(4), 0, dp(2))
             maxLines = 2
         })
         info.addView(label(banner.version, 13f, muted, false))
-        val rerun = banner.rerunLabels[fiveName]
+        val rerun = banner.characters.mapNotNull { banner.rerunLabels[it] }.distinct().joinToString(" • ").ifBlank { null }
         if (rerun != null) {
             info.addView(label(rerun, 13f, muted, true))
         }
@@ -1117,7 +1117,6 @@ class MainActivity : AppCompatActivity() {
             "zzz" -> "zenless_zone_zero"
             else -> return
         }
-        val assetFolder = "images_big/$gameFolder"
 
         // Resolve against the ACTUAL bundled filenames. This is important for
         // 4-star portraits because their source filenames can differ from the
@@ -1139,7 +1138,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         try {
-            val files = assets.list(assetFolder)?.toList().orEmpty()
+            val files = assets.list(gameFolder)?.toList().orEmpty()
             val exact = specialFile?.takeIf { files.contains(it) }
             val target = exact ?: files.firstOrNull { file ->
                 val stem = file.substringBeforeLast('.').lowercase()
@@ -1158,7 +1157,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } ?: return
 
-            assets.open("$assetFolder/$target").use { input ->
+            assets.open("$gameFolder/$target").use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
                 if (bitmap != null) image.setImageBitmap(bitmap)
             }
@@ -1256,26 +1255,26 @@ class MainActivity : AppCompatActivity() {
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
         val b = game.getJSONObject(key)
-        val arr: JSONArray = b.optJSONArray("five_star") ?: JSONArray()
-        val fourStarArr: JSONArray = b.optJSONArray("four_star") ?: JSONArray()
-        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.getString(it) }.distinct()
-        val phaseFiveStars = (0 until arr.length()).map { arr.getString(it) }.distinct()
-        val result = mutableListOf<Banner>()
-        for (i in phaseFiveStars.indices) {
-            result += Banner(
+        val arr = b.optJSONArray("five_star") ?: JSONArray()
+        val fourStarArr = b.optJSONArray("four_star") ?: JSONArray()
+        val fiveStars = (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }.distinct()
+        val fourStars = (0 until fourStarArr.length()).map { fourStarArr.optString(it) }.filter { it.isNotBlank() }.distinct().take(3)
+        if (fiveStars.isEmpty()) return emptyList()
+
+        return listOf(
+            Banner(
                 game.getString("id"),
                 game.getString("name"),
                 b.optString("version"),
                 b.optString("start").takeIf { it.isNotBlank() && it != "null" },
                 b.optString("end").takeIf { it.isNotBlank() && it != "null" },
-                listOf(phaseFiveStars[i]),
+                fiveStars,
                 fourStars,
                 key == "next",
                 b.optBoolean("unconfirmed", false),
                 parseRerunLabels(b)
             )
-        }
-        return result
+        )
     }
 
     private fun isFavorite(gameId: String): Boolean =
