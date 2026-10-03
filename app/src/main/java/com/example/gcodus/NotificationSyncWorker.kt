@@ -45,11 +45,34 @@ class NotificationSyncWorker(
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
             // Character tracking is user-selected, so it may notify even on the
             // first sync if the tracked character is already in the relevant state.
+            notifyFollowedGames(prefs, bannerJson, initialized)
             notifyTrackedCharacters(prefs, bannerJson)
             if (initialized) notifyNewCodes(prefs, codeJson)
             prefs.edit().putBoolean(KEY_INITIALIZED, true).apply()
             Result.success()
         } catch (_: Exception) { Result.retry() }
+    }
+
+    private fun notifyFollowedGames(prefs: android.content.SharedPreferences, json: String, initialized: Boolean) {
+        val games = JSONObject(json).optJSONArray("games") ?: JSONArray()
+        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        for (i in 0 until games.length()) {
+            val game = games.getJSONObject(i)
+            val gameId = game.optString("id")
+            if (gameId.isBlank() || !appPrefs.getBoolean("favorite_" + gameId, false)) continue
+            val current = game.optJSONObject("current") ?: JSONObject()
+            val next = game.optJSONObject("next") ?: JSONObject()
+            val signature = listOf(current.optString("version"), current.optString("start"), current.optString("end"),
+                readChars(current.optJSONArray("five_star")).joinToString(","),
+                next.optString("version"), next.optString("start"), next.optString("end"),
+                readChars(next.optJSONArray("five_star")).joinToString(",")).joinToString("|")
+            val key = "game_" + gameId
+            val old = prefs.getString(key, null)
+            if (initialized && old != null && old != signature) {
+                showNotification(("game_" + gameId).hashCode() and 0x7fffffff, gameName(gameId), "Появились изменения в баннерах.")
+            }
+            prefs.edit().putString(key, signature).apply()
+        }
     }
 
     private fun notifyTrackedCharacters(prefs: android.content.SharedPreferences, json: String) {
@@ -119,14 +142,25 @@ class NotificationSyncWorker(
         }
         return try {
             val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
-            applicationContext.assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }
+            val files = applicationContext.assets.list(folder).orEmpty()
+                .filter { it.endsWith(".webp", true) }
                 .filter { appPrefs.getBoolean("tracked_" + gameId + "_" + it, false) }
+                .toMutableList()
+            if (gameId == "wuwa") {
+                listOf("__wuwa-lucy.webp", "__wuwa-aemeath.webp", "__wuwa-hiyuki.webp").forEach {
+                    if (appPrefs.getBoolean("tracked_wuwa_" + it, false)) files += it
+                }
+            }
+            files.distinct()
         } catch (_: Exception) { emptyList() }
     }
 
     private fun sameCharacter(name: String, file: String): Boolean {
         val a = slug(name)
         val b = file.substringBeforeLast(".").lowercase()
+        if (b == "__wuwa-lucy" && a == "lucy") return true
+        if (b == "__wuwa-aemeath" && a == "aemeath") return true
+        if (b == "__wuwa-hiyuki" && a == "hiyuki") return true
         if (a == b) return true
         val aliases = mapOf(
             "anby-soldier-0" to "anby-demara-soldier-0",
@@ -147,6 +181,10 @@ class NotificationSyncWorker(
     private fun displayName(file: String): String {
         val base = file.substringBeforeLast(".")
         val overrides = mapOf(
+            "__wuwa-lucy" to "Lucy",
+            "__wuwa-aemeath" to "Aemeath",
+            "__wuwa-hiyuki" to "Hiyuki",
+            "lucy-alt" to "Lucy",
             "arataki-itto" to "Arataki Itto",
             "yumemizuki-mizuki" to "Yumemizuki Mizuki",
             "yae-miko" to "Yae Miko",
