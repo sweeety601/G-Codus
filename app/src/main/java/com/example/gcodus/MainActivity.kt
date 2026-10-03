@@ -206,6 +206,7 @@ class MainActivity : AppCompatActivity() {
             text = "ОТСЛЕЖИВАНИЕ"
             textSize = 11f
             gravity = Gravity.CENTER
+            setTextColor(Color.WHITE)
             setPadding(dp(8), dp(13), dp(8), dp(13))
         }
         pageButtons.addView(bannerButton, LinearLayout.LayoutParams(0, -2, 1f))
@@ -224,7 +225,9 @@ class MainActivity : AppCompatActivity() {
                 if (selected) gameAccent(game.id) else Color.TRANSPARENT,
                 13f
             )
-            button.setTextColor(if (selected) Color.WHITE else muted)
+            button.setTextColor(
+                if (selected || button === trackingButton) Color.WHITE else muted
+            )
         }
 
         fun showTrackingPage() {
@@ -729,7 +732,7 @@ class MainActivity : AppCompatActivity() {
                 row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.TOP }
                 holder.addView(row, LinearLayout.LayoutParams(-1, -2))
             }
-            row?.addView(trackingCharacterCell(character), LinearLayout.LayoutParams(0, dp(178), 1f).apply {
+            row?.addView(trackingCharacterCell(character), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
                 marginStart = if (index % 3 == 0) 0 else dp(3)
                 marginEnd = dp(3)
                 bottomMargin = dp(8)
@@ -743,31 +746,54 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             background = roundedDrawable(surface, 16f)
             clipToOutline = true
-            setOnClickListener { toggleTracked(character.gameId, character.file); refreshCurrentScreen() }
+            setOnClickListener {
+                toggleTracked(character.gameId, character.file)
+                updateTrackingHeart()
+            }
         }
         val imageFrame = FrameLayout(this)
         val image = ImageView(this).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
         imageFrame.addView(image, FrameLayout.LayoutParams(-1, dp(136)))
         loadTrackingPortrait(image, character.file, character.gameId)
+
         val heart = TextView(this).apply {
             text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
-            textSize = 22f
+            textSize = 18f
             gravity = Gravity.CENTER
+            includeFontPadding = false
             setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
-            background = roundedDrawable(Color.argb(145, 0, 0, 0), 99f)
-            setOnClickListener { toggleTracked(character.gameId, character.file); refreshCurrentScreen() }
+            background = android.graphics.drawable.GradientDrawable().apply {
+                setColor(Color.argb(175, 10, 11, 16))
+                cornerRadius = dp(18).toFloat()
+                setStroke(dp(1), Color.argb(120, 255, 255, 255))
+            }
+            setOnClickListener {
+                toggleTracked(character.gameId, character.file)
+                updateTrackingHeart()
+            }
         }
-        imageFrame.addView(heart, FrameLayout.LayoutParams(dp(36), dp(36), Gravity.TOP or Gravity.END).apply {
-            topMargin = dp(7)
-            marginEnd = dp(7)
+        imageFrame.addView(heart, FrameLayout.LayoutParams(dp(34), dp(34), Gravity.TOP or Gravity.END).apply {
+            topMargin = dp(8)
+            marginEnd = dp(8)
         })
         cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
-        cell.addView(label(character.name, 12f, text, true).apply {
+        cell.addView(label(character.name, 11.5f, text, true).apply {
             gravity = Gravity.CENTER
-            maxLines = 2
+            maxLines = 3
             ellipsize = android.text.TextUtils.TruncateAt.END
-            setPadding(dp(4), dp(7), dp(4), dp(7))
-        }, LinearLayout.LayoutParams(-1, dp(42)))
+            includeFontPadding = true
+            setPadding(dp(4), dp(5), dp(4), dp(5))
+        }, LinearLayout.LayoutParams(-1, dp(58)))
+
+        fun updateTrackingHeart() {
+            val tracked = isTracked(character.gameId, character.file)
+            heart.text = if (tracked) "♥" else "♡"
+            heart.setTextColor(if (tracked) Color.rgb(255, 91, 123) else Color.WHITE)
+            if (currentScreen == Screen.WISHLIST) {
+                refreshCurrentScreen()
+            }
+        }
+
         return cell
     }
 
