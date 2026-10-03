@@ -20,6 +20,12 @@ object CharacterDatabase {
     private const val GENSHIN_CHARACTERS = "https://www.prydwen.gg/genshin-impact/characters"
     private const val GENSHIN_HISTORY = "https://bannerhistory.app/en/genshin-banners?std=0&v=1"
 
+    private val PROTAGONIST_SLUGS = mapOf(
+        "genshin" to setOf("traveler", "aether", "lumine", "traveller"),
+        "wuwa" to setOf("rover"),
+        "zzz" to setOf("belle", "wise", "proxy")
+    )
+
     fun fetch(context: Context): List<OnlineCharacter> {
         val result = mutableListOf<OnlineCharacter>()
         result += fetchGame("wuwa", WUWA_CHARACTERS, WUWA_HISTORY)
@@ -41,10 +47,37 @@ object CharacterDatabase {
             val rawName = m.groupValues[2].replace(Regex("<[^>]+>"), " ").replace("&amp;", "&").trim()
             val name = cleanName(rawName)
             if (slug.isBlank() || name.isBlank() || name.length > 80) continue
-            val announced = historyKnown.isNotEmpty() && !historyKnown.contains(normalize(name))
+            if (isProtagonist(gameId, slug, name)) continue
+            val released = historyKnown.isNotEmpty() && (
+                historyKnown.contains(normalize(name)) ||
+                historyKnown.contains(normalize(slug.replace("-", " ")))
+            )
+            val announced = historyKnown.isNotEmpty() && !released
             result += OnlineCharacter(gameId, name, slug, announced, portraitUrl(gameId, slug))
         }
-        return result.distinctBy { it.slug }
+        return result
+            .groupBy { canonicalKey(it.gameId, it.slug, it.name) }
+            .values
+            .map { it.first() }
+    }
+
+
+    private fun isProtagonist(gameId: String, slug: String, name: String): Boolean {
+        val normalizedSlug = normalize(slug)
+        val normalizedName = normalize(name)
+        return PROTAGONIST_SLUGS[gameId].orEmpty().any {
+            normalizedSlug == normalize(it) || normalizedName == normalize(it)
+        }
+    }
+
+    private fun canonicalKey(gameId: String, slug: String, name: String): String {
+        val s = normalize(slug)
+        val n = normalize(name)
+        return when {
+            gameId == "zzz" && (s == "billykid" || n == "billykid" || s == "billy" || n == "billy") ->
+                "$gameId|billykid"
+            else -> "$gameId|" + if (s.isNotBlank()) s else n
+        }
     }
 
     private fun portraitUrl(gameId: String, slug: String): String =
