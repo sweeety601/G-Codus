@@ -28,7 +28,6 @@ class NotificationSyncWorker(
         private const val CHANNEL_ID = "g_codus_updates"
         private const val PREFS = "g_codus_notifications"
         private const val APP_PREFS = "g_codus"
-        private const val BANNER_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/banner_feed.json"
         private const val CODES_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
         private const val KEY_INITIALIZED = "initialized"
         private const val KEY_CODES_PREFIX = "codes_"
@@ -40,7 +39,7 @@ class NotificationSyncWorker(
         createChannel()
         val prefs = applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         return try {
-            val bannerJson = fetch(BANNER_URL)
+            val bannerJson = BannerSource.fetchNormalized(applicationContext)
             val codeJson = fetch(CODES_URL)
             applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
                 .edit().putString("banner_feed", bannerJson).apply()
