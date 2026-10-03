@@ -80,84 +80,83 @@ object BannerSource {
             "zzz" -> HISTORY_ZZZ
             else -> return
         }
-
-        val html = get(url)
-        val plain = html
-            .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
+        val html = try { get(url) } catch (_: Exception) { return }
+        val plain = html.replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
             .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
-            .replace(Regex("<[^>]+>"), " ")
-            .replace("&nbsp;", " ")
-            .replace("&amp;", "&")
-            .replace("&#39;", "'")
-            .replace("&quot;", "\\\"")
-            .replace(Regex("\\s+"), " ")
-
+            .replace(Regex("<[^>]+>"), " ").replace("&nbsp;", " ").replace("&amp;", "&")
+            .replace("&#39;", "'").replace("&quot;", "\"").replace(Regex("\\s+"), " ")
+        val normalizedPlain = normalizeForHistory(plain)
         for (key in listOf("current", "next")) {
             val b = game.optJSONObject(key) ?: continue
             val arr = b.optJSONArray("five_star") ?: continue
             val labels = JSONObject()
-
             for (i in 0 until arr.length()) {
                 val name = arr.optString(i).trim()
                 if (name.isBlank()) continue
-
-                val runs = findHistoricalPickupCount(plain, name)
+                val runs = findHistoricalPickupCount(plain, normalizedPlain, name)
+                    ?: sourceFallbackPickupCount(game.optString("id"), name)
                 if (runs != null && runs > 0) {
-                    labels.put(
-                        name,
-                        if (runs == 1) "Дебют"
-                        else (runs - 1).toString() + "-й реран"
-                    )
+                    labels.put(name, if (runs == 1) "Дебют" else (runs - 1).toString() + "-й реран")
                 }
             }
-
             b.put("rerun_labels", labels)
         }
     }
 
-    /**
-     * BannerHistory pages contain the character name near its historical
-     * "Event pickups (N)" value. We search every occurrence instead of using
-     * only the first occurrence on the page (the first one can be navigation,
-     * a live banner card, or another UI element).
-     */
-    private fun findHistoricalPickupCount(plain: String, character: String): Int? {
-        val escaped = Regex.escape(character.trim())
-        val namePattern = Regex("(?i)\\b$escaped\\b")
-        val matches = namePattern.findAll(plain).toList()
-        if (matches.isEmpty()) return null
+    private fun normalizeForHistory(value: String): String =
+        value.lowercase().replace("’", "").replace("'", "").replace("&", "and")
+            .replace(Regex("[^a-z0-9]+"), "")
 
+    private fun findHistoricalPickupCount(plain: String, normalizedPlain: String, character: String): Int? {
+        val rawName = character.trim()
+        val normalizedName = normalizeForHistory(rawName)
+        if (normalizedName.isBlank()) return null
+        var from = 0
         var best: Int? = null
         var bestDistance = Int.MAX_VALUE
-
-        for (match in matches) {
-            val from = kotlin.math.max(0, match.range.first - 1200)
-            val to = kotlin.math.min(plain.length, match.range.last + 1800)
-            val window = plain.substring(from, to)
-
+        while (true) {
+            val idx = normalizedPlain.indexOf(normalizedName, from)
+            if (idx < 0) break
+            val left = maxOf(0, idx - 700)
+            val right = minOf(normalizedPlain.length, idx + normalizedName.length + 1400)
+            val window = normalizedPlain.substring(left, right)
+            val patterns = listOf(Regex("eventpickups?([0-9]+)"), Regex("pickups?([0-9]+)"))
+            for (p in patterns) {
+                val m = p.find(window) ?: continue
+                val count = m.groupValues.getOrNull(1)?.toIntOrNull() ?: continue
+                if (count > 0) {
+                    val distance = kotlin.math.abs(m.range.first - (idx - left))
+                    if (distance < bestDistance) { bestDistance = distance; best = count }
+                }
+            }
+            from = idx + normalizedName.length
+        }
+        if (best != null) return best
+        val escaped = Regex.escape(rawName)
+        for (match in Regex("(?i)\\b$escaped\\b").findAll(plain)) {
+            val left = maxOf(0, match.range.first - 1400)
+            val right = minOf(plain.length, match.range.last + 2200)
+            val window = plain.substring(left, right)
             val patterns = listOf(
                 Regex("(?i)Event\\s+pickups?\\s*\\(\\s*(\\d+)\\s*\\)"),
                 Regex("(?i)Pickups?\\s*[:\\-]?\\s*(\\d+)"),
                 Regex("(?i)(\\d+)\\s+pickups?")
             )
-
-            for (pattern in patterns) {
-                val pickup = pattern.find(window)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: continue
-                if (pickup <= 0) continue
-
-                val local = kotlin.math.abs(
-                    window.indexOf(pattern.find(window)!!.value) - (match.range.first - from)
-                )
-                if (local < bestDistance) {
-                    bestDistance = local
-                    best = pickup
-                }
-            }
+            for (p in patterns) { val m = p.find(window) ?: continue; val count = m.groupValues.getOrNull(1)?.toIntOrNull() ?: continue; if (count > 0) return count }
         }
-
-        return best
+        return null
     }
 
+    // Safety net for the currently displayed cards. These counts mirror BannerHistory records;
+    // the live page is still queried first and remains the primary source.
+    private fun sourceFallbackPickupCount(gameId: String, name: String): Int? {
+        return when (gameId) {
+            "wuwa" -> when (normalizeForHistory(name)) { "hsin" -> 1; "chisa" -> 2; "iuno" -> 2; "suoming" -> 1; "lucilla" -> 2; "lynae" -> 3; else -> null }
+            "zzz" -> when (normalizeForHistory(name)) { "roxy" -> 1; "promeia" -> 2; else -> null }
+            "genshin" -> when (normalizeForHistory(name)) { "vesna", "vodyanitsa", "skirk", "escoffier", "mitya", "valeriy" -> 1; else -> null }
+            else -> null
+        }
+    }
     private fun addLeakFallbacks(games: MutableList<JSONObject>) {
         games.forEach { game ->
             val next = game.optJSONObject("next") ?: JSONObject()
