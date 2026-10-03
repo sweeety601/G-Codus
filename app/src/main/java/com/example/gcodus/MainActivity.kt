@@ -624,8 +624,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showWishlist() {
-        previousScreen = currentScreen
-        previousGameId = currentGameId
+        if (currentScreen != Screen.WISHLIST) {
+            previousScreen = currentScreen
+            previousGameId = currentGameId
+        }
         currentScreen = Screen.WISHLIST
         currentGameId = null
         countdownViews.clear()
@@ -834,8 +836,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTracking(gameId: String) {
-        previousScreen = currentScreen
-        previousGameId = currentGameId
+        if (currentScreen != Screen.TRACKING) {
+            previousScreen = currentScreen
+            previousGameId = currentGameId
+        }
         currentScreen = Screen.TRACKING
         currentGameId = gameId
         countdownViews.clear()
