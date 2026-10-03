@@ -1038,12 +1038,8 @@ class MainActivity : AppCompatActivity() {
 
         val online = onlineCharacterFor(gameId, file)
         if (online != null) {
-            loadRemotePortrait(image, online.portraitUrl)
-            return
-        }
-
-        if (gameId == "zzz" && (file == "billy-kid.webp" || file == "billy.webp")) {
-            loadRemotePortrait(image, "https://img.altema.jp/zenless/chara/prof/12.jpg")
+            // Prydwen is the second-priority portrait source for online-only entries.
+            loadPortrait(image, online.name, gameId)
             return
         }
 
