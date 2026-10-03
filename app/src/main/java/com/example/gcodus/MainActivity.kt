@@ -756,13 +756,14 @@ class MainActivity : AppCompatActivity() {
 
         val heart = TextView(this).apply {
             text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
-            textSize = 18f
+            textSize = 17f
             gravity = Gravity.CENTER
             includeFontPadding = false
+            setPadding(0, 0, 0, 0)
             setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
             background = android.graphics.drawable.GradientDrawable().apply {
                 setColor(Color.argb(175, 10, 11, 16))
-                cornerRadius = dp(18).toFloat()
+                cornerRadius = dp(17).toFloat()
                 setStroke(dp(1), Color.argb(120, 255, 255, 255))
             }
             setOnClickListener {
