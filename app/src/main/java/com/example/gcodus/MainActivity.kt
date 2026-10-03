@@ -791,8 +791,22 @@ class MainActivity : AppCompatActivity() {
     }
     private fun listCharacterFiles(gameId: String): List<String> {
         val folder = gameFolder(gameId) ?: return emptyList()
-        return try { assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted() }
-        catch (_: Exception) { emptyList() }
+        return try {
+            val files = assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted()
+            when (gameId) {
+                // The supplied portrait set contains WuWa Lucy under the generic
+                // ZZZ-side filename lucy.webp, and the ZZZ Lucy portrait as lucy_alt.webp.
+                // Keep both user-supplied images, but expose each in the correct game.
+                "wuwa" -> (files.filterNot { it == "lucy.webp" } +
+                    "__wuwa_lucy.webp" +
+                    "__wuwa_aemeath.webp").sorted()
+                "zzz" -> files.filterNot { it == "lucy.webp" || it == "math.webp" }
+                    .plus("lucy_alt.webp")
+                    .distinct()
+                    .sorted()
+                else -> files
+            }
+        } catch (_: Exception) { emptyList() }
     }
 
     private fun gameFolder(gameId: String): String? = when (gameId) {
@@ -805,6 +819,9 @@ class MainActivity : AppCompatActivity() {
     private fun characterDisplayName(file: String): String {
         val base = file.substringBeforeLast(".")
         val overrides = mapOf(
+            "__wuwa-lucy" to "Lucy",
+            "__wuwa-aemeath" to "Aemeath",
+            "lucy-alt" to "Lucy",
             "arataki-itto" to "Arataki Itto",
             "al-haitham" to "Alhaitham",
             "yumemizuki-mizuki" to "Yumemizuki Mizuki",
@@ -828,6 +845,24 @@ class MainActivity : AppCompatActivity() {
     private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
         val folder = gameFolder(gameId) ?: return
         image.setImageDrawable(null)
+
+        // Some supplied portraits have filenames inherited from an earlier
+        // mapping. Resolve those aliases to the exact user-supplied local assets.
+        val specialAssetPath = when (file) {
+            "__wuwa-lucy.webp" -> "zenless_zone_zero/lucy.webp"
+            "__wuwa-aemeath.webp" -> "zenless_zone_zero/math.webp"
+            else -> null
+        }
+        if (specialAssetPath != null) {
+            try {
+                assets.open(specialAssetPath).use { input ->
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                    if (bitmap != null) image.setImageBitmap(bitmap)
+                }
+            } catch (_: Exception) { }
+            return
+        }
+
         val trackingPath = "tracking/" + folder + "/" + file
         val legacyPath = folder + "/" + file
         try {
