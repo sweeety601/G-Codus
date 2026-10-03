@@ -795,13 +795,17 @@ class MainActivity : AppCompatActivity() {
             val localFiles = listCharacterFiles(meta.id)
             localFiles.forEach { file ->
                 val name = characterDisplayName(file)
+                if (isMainProtagonist(meta.id, file, name)) continue
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
                     entries += TrackedCharacter(meta.id, meta.name, name, file)
                 }
             }
             onlineCharacters.filter { it.gameId == meta.id }.forEach { online ->
-                val alreadyLocal = localFiles.any { normalizeCharacterForMatch(characterDisplayName(it)) == normalizeCharacterForMatch(online.name) }
+                val alreadyLocal = localFiles.any {
+                    !isMainProtagonist(meta.id, it, characterDisplayName(it)) &&
+                        sameCharacterIdentity(meta.id, characterDisplayName(it), online.name, online.slug, it)
+                }
                 val virtualFile = "__online_" + meta.id + "_" + online.slug + ".webp"
                 val tracked = isTracked(meta.id, virtualFile)
                 if (!alreadyLocal && (gameId != null || tracked) &&
@@ -908,8 +912,8 @@ class MainActivity : AppCompatActivity() {
                 setPadding(dp(5), dp(3), dp(5), dp(3))
                 background = roundedDrawable(Color.argb(85, 20, 18, 12), 10f)
             }
-            imageFrame.addView(badge, FrameLayout.LayoutParams(-2, dp(24), Gravity.TOP or Gravity.START).apply {
-                topMargin = dp(8)
+            imageFrame.addView(badge, FrameLayout.LayoutParams(-2, dp(24), Gravity.BOTTOM or Gravity.START).apply {
+                bottomMargin = dp(8)
                 marginStart = dp(8)
             })
         }
@@ -960,7 +964,7 @@ class MainActivity : AppCompatActivity() {
                     "__wuwa-hiyuki.webp").sorted()
                 "zzz" -> files.filterNot {
                     it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
-                }.plus("lucy_alt.webp").plus("billy-kid.webp").distinct().sorted()
+                }.plus("lucy_alt.webp").distinct().sorted()
                 else -> files
             }
         } catch (_: Exception) { emptyList() }
@@ -1171,10 +1175,10 @@ class MainActivity : AppCompatActivity() {
         val normalizedForRemote = character.trim().lowercase()
             .replace("’", "").replace("'", "")
             .replace(Regex("[^a-z0-9]+"), "-").trim('-')
-        if (gameId == "zzz" && normalizedForRemote == "billy") {
-            loadRemotePortrait(image, "https://img.altema.jp/zenless/chara/prof/12.jpg")
-            return
-        }
+        // Local bundled portrait has priority. If it is absent, Prydwen is
+        // the second priority for every character, including ordinary Billy.
+        // Never substitute a portrait from another site/character.
+
 
         // Kuro's WuWa endpoint can return Chinese display names even when the
         // app UI is English/Russian. Convert only those names to the existing
@@ -1274,6 +1278,32 @@ class MainActivity : AppCompatActivity() {
         } catch (_: Exception) {
             // Missing mapping = blank image. Never substitute another character.
         }
+    }
+
+    private fun isMainProtagonist(gameId: String, file: String, name: String): Boolean {
+        val n = normalizeCharacterForMatch(name)
+        val f = normalizeCharacterForMatch(file.substringBeforeLast("."))
+        return when (gameId) {
+            "genshin" -> n in setOf("traveler", "traveller", "aether", "lumine") ||
+                f in setOf("traveler", "traveller", "aether", "lumine")
+            "wuwa" -> n == "rover" || f == "rover"
+            "zzz" -> n in setOf("belle", "wise", "proxy") || f in setOf("belle", "wise", "proxy")
+            else -> false
+        }
+    }
+
+    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
+        val a = normalizeCharacterForMatch(localName)
+        val b = normalizeCharacterForMatch(onlineName)
+        val slug = normalizeCharacterForMatch(onlineSlug)
+        val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
+        if (a == b || file == slug) return true
+        if (gameId == "zzz") {
+            val billyA = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
+            val billyB = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
+            if (billyA && billyB) return true
+        }
+        return false
     }
 
     private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
