@@ -235,37 +235,67 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        var pageAnimationRunning = false
+
+        fun animatePageChange(build: () -> Unit) {
+            if (pageAnimationRunning) return
+            pageAnimationRunning = true
+            content.animate().cancel()
+            content.animate()
+                .alpha(0f)
+                .translationY(dp(8).toFloat())
+                .setDuration(110)
+                .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .withEndAction {
+                    content.removeAllViews()
+                    build()
+                    content.alpha = 0f
+                    content.translationY = dp(-8).toFloat()
+                    content.animate()
+                        .alpha(1f)
+                        .translationY(0f)
+                        .setDuration(210)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .withEndAction { pageAnimationRunning = false }
+                        .start()
+                }
+                .start()
+        }
+
         fun showTrackingPage() {
-            content.removeAllViews()
             selectedButton(bannerButton, false)
             selectedButton(codeButton, false)
             selectedButton(trackingButton, true)
-            content.addView(trackingSection(game.id))
+            animatePageChange {
+                content.addView(trackingSection(game.id))
+            }
         }
 
         fun showBannerPage() {
-            content.removeAllViews()
             selectedButton(bannerButton, true)
             selectedButton(codeButton, false)
             selectedButton(trackingButton, false)
-            content.addView(sectionLabel("БАННЕРЫ СЕЙЧАС"))
-            content.addView(bannerPager(game.current, false, game.id))
-            content.addView(sectionLabel("СЛЕДУЮЩИЕ БАННЕРЫ").apply {
-                setPadding(0, dp(22), 0, dp(8))
-            })
-            content.addView(bannerPager(game.next, true, game.id))
+            animatePageChange {
+                content.addView(sectionLabel("БАННЕРЫ СЕЙЧАС"))
+                content.addView(bannerPager(game.current, false, game.id))
+                content.addView(sectionLabel("СЛЕДУЮЩИЕ БАННЕРЫ").apply {
+                    setPadding(0, dp(22), 0, dp(8))
+                })
+                content.addView(bannerPager(game.next, true, game.id))
+            }
         }
 
         fun showCodePage() {
             // Re-read the feed before rendering the promo-code page so the page
             // never depends on the value captured at application startup.
             codesFeed = loadCachedCodes()
-            content.removeAllViews()
             selectedButton(bannerButton, false)
             selectedButton(codeButton, true)
             selectedButton(trackingButton, false)
-            content.addView(sectionLabel("ПРОМОКОДЫ"))
-            content.addView(codeSection(game.id))
+            animatePageChange {
+                content.addView(sectionLabel("ПРОМОКОДЫ"))
+                content.addView(codeSection(game.id))
+            }
         }
 
         bannerButton.setOnClickListener { showBannerPage() }
@@ -1162,16 +1192,37 @@ class MainActivity : AppCompatActivity() {
             when (event.actionMasked) {
                 android.view.MotionEvent.ACTION_DOWN -> {
                     v.animate().cancel()
-                    v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(80).start()
+                    v.animate()
+                        .scaleX(0.92f)
+                        .scaleY(0.92f)
+                        .setDuration(75)
+                        .setInterpolator(android.view.animation.DecelerateInterpolator())
+                        .start()
+                    true
                 }
-                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_UP -> {
+                    v.animate().cancel()
+                    v.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
+                        .withEndAction { v.performClick() }
+                        .start()
+                    true
+                }
                 android.view.MotionEvent.ACTION_CANCEL -> {
                     v.animate().cancel()
-                    v.animate().scaleX(1f).scaleY(1f).setDuration(120)
-                        .setInterpolator(android.view.animation.OvershootInterpolator(1.5f)).start()
+                    v.animate()
+                        .scaleX(1f)
+                        .scaleY(1f)
+                        .setDuration(150)
+                        .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
+                        .start()
+                    true
                 }
+                else -> true
             }
-            false
         }
     }
 
