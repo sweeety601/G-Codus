@@ -1092,6 +1092,15 @@ class MainActivity : AppCompatActivity() {
         // Resolve against the ACTUAL bundled filenames. This is important for
         // 4-star portraits because their source filenames can differ from the
         // display name (spaces, punctuation, alternate naming, etc.).
+        val aliases = when (normalized) {
+            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" ->
+                listOf("anby-demara-soldier-0")
+            "buling" -> listOf("buling", "bulin")
+            "youhu" -> listOf("youhu", "you-hu")
+            "komano-manato" -> listOf("komano-manato", "manato")
+            else -> listOf(normalized)
+        }
+
         val specialFile = when (normalized) {
             "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" -> "anby-demara-soldier-0.webp"
             else -> null
@@ -1108,7 +1117,7 @@ class MainActivity : AppCompatActivity() {
                     .replace("&", "and")
                     .replace(Regex("[^a-z0-9]+"), "-")
                     .trim('-')
-                stem == normalized
+                aliases.any { it == stem }
             } ?: return
 
             assets.open("$gameFolder/$target").use { input ->
