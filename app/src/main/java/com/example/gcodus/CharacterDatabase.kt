@@ -34,7 +34,7 @@ object CharacterDatabase {
         val html = get(listUrl)
         val history = try { get(historyUrl) } catch (_: Exception) { "" }
         val historyKnown = normalize(history)
-        val pattern = Regex("href=[\\\"]/(?:wuthering-waves|zenless)/characters/([^\\\"]+)[\\\"][^>]*>(.*?)</a>", RegexOption.IGNORE_CASE)
+        val pattern = Regex("href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"]+)[\\\"][^>]*>(.*?)</a>", RegexOption.IGNORE_CASE)
         val result = mutableListOf<OnlineCharacter>()
         for (m in pattern.findAll(html)) {
 NaN
