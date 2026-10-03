@@ -49,7 +49,9 @@ object BannerSource {
         val normalizedGames = games.distinctBy { it.optString("id") }.toMutableList()
         normalizedGames.forEach { game ->
             try { enrichRerunLabels(game) } catch (_: Exception) { }
-            applyKnownRerunLabels(game)
+            // Static labels are intentionally NOT used as the primary source.
+            // If BannerHistory has no usable record, the character simply has
+            // no label rather than receiving a potentially stale hardcoded one.
         }
         addLeakFallbacks(normalizedGames)
         val result = JSONObject().put("games", JSONArray(normalizedGames)).toString()
@@ -57,36 +59,20 @@ object BannerSource {
         return result
     }
 
-    private fun applyKnownRerunLabels(game: JSONObject) {
-        val id = game.optString("id")
-        val known = when (id) {
-            "wuwa" -> mapOf(
-                "Hsin" to "Дебют",
-                "Chisa" to "Реран",
-                "Iuno" to "Реран",
-                "Suoming" to "Дебют",
-                "Lucilla" to "Реран",
-                "Lynae" to "Реран"
-            )
-            "zzz" -> mapOf(
-                "Roxy" to "Дебют",
-                "Promeia" to "Реран"
-            )
-            else -> emptyMap()
-        }
-        if (known.isEmpty()) return
-        for (key in listOf("current", "next")) {
-            val b = game.optJSONObject(key) ?: continue
-            val arr = b.optJSONArray("five_star") ?: continue
-            val labels = b.optJSONObject("rerun_labels") ?: JSONObject()
-            for (i in 0 until arr.length()) {
-                val name = arr.optString(i)
-                known[name]?.let { labels.put(name, it) }
-            }
-            b.put("rerun_labels", labels)
-        }
-    }
-
+    /**
+     * Enriches banner cards from BannerHistory's historical pickup record.
+     *
+     * Rules:
+     * - only pickups that have actually started are counted by BannerHistory;
+     * - 1 pickup = "Дебют";
+     * - 2 pickups = "1-й реран";
+     * - 3 pickups = "2-й реран", etc.
+     *
+     * We deliberately do not hardcode individual characters here. BannerHistory
+     * states that its pickup/rerun statistics are calculated from recorded
+     * official notices, with future scheduled pickups excluded from historical
+     * counts. This keeps the app's rerun labels source-driven.
+     */
     private fun enrichRerunLabels(game: JSONObject) {
         val url = when (game.optString("id")) {
             "genshin" -> HISTORY_GENSHIN
@@ -94,23 +80,82 @@ object BannerSource {
             "zzz" -> HISTORY_ZZZ
             else -> return
         }
+
         val html = get(url)
-        val plain = html.replace(Regex("<[^>]+>"), " ").replace("&nbsp;", " ").replace("&amp;", "&").replace(Regex("\\s+"), " ")
+        val plain = html
+            .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
+            .replace(Regex("<[^>]+>"), " ")
+            .replace("&nbsp;", " ")
+            .replace("&amp;", "&")
+            .replace("&#39;", "'")
+            .replace("&quot;", "\\\"")
+            .replace(Regex("\\s+"), " ")
+
         for (key in listOf("current", "next")) {
             val b = game.optJSONObject(key) ?: continue
             val arr = b.optJSONArray("five_star") ?: continue
             val labels = JSONObject()
+
             for (i in 0 until arr.length()) {
-                val name = arr.optString(i)
-                val pos = plain.indexOf(name, ignoreCase = true)
-                if (pos < 0) continue
-                val tail = plain.substring(pos, kotlin.math.min(plain.length, pos + 1800))
-                val m = Regex("Event pickups \\(\\s*(\\d+)\\s*\\)").find(tail) ?: continue
-                val runs = m.groupValues[1].toIntOrNull() ?: continue
-                labels.put(name, if (runs <= 1) "Дебют" else (runs - 1).toString() + "-й реран")
+                val name = arr.optString(i).trim()
+                if (name.isBlank()) continue
+
+                val runs = findHistoricalPickupCount(plain, name)
+                if (runs != null && runs > 0) {
+                    labels.put(
+                        name,
+                        if (runs == 1) "Дебют"
+                        else (runs - 1).toString() + "-й реран"
+                    )
+                }
             }
+
             b.put("rerun_labels", labels)
         }
+    }
+
+    /**
+     * BannerHistory pages contain the character name near its historical
+     * "Event pickups (N)" value. We search every occurrence instead of using
+     * only the first occurrence on the page (the first one can be navigation,
+     * a live banner card, or another UI element).
+     */
+    private fun findHistoricalPickupCount(plain: String, character: String): Int? {
+        val escaped = Regex.escape(character.trim())
+        val namePattern = Regex("(?i)\\b$escaped\\b")
+        val matches = namePattern.findAll(plain).toList()
+        if (matches.isEmpty()) return null
+
+        var best: Int? = null
+        var bestDistance = Int.MAX_VALUE
+
+        for (match in matches) {
+            val from = kotlin.math.max(0, match.range.first - 1200)
+            val to = kotlin.math.min(plain.length, match.range.last + 1800)
+            val window = plain.substring(from, to)
+
+            val patterns = listOf(
+                Regex("(?i)Event\\s+pickups?\\s*\\(\\s*(\\d+)\\s*\\)"),
+                Regex("(?i)Pickups?\\s*[:\\-]?\\s*(\\d+)"),
+                Regex("(?i)(\\d+)\\s+pickups?")
+            )
+
+            for (pattern in patterns) {
+                val pickup = pattern.find(window)?.groupValues?.getOrNull(1)?.toIntOrNull() ?: continue
+                if (pickup <= 0) continue
+
+                val local = kotlin.math.abs(
+                    window.indexOf(pattern.find(window)!!.value) - (match.range.first - from)
+                )
+                if (local < bestDistance) {
+                    bestDistance = local
+                    best = pickup
+                }
+            }
+        }
+
+        return best
     }
 
     private fun addLeakFallbacks(games: MutableList<JSONObject>) {
