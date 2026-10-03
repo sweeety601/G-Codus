@@ -15,13 +15,14 @@ SOURCES = {
     ],
     "wuwa": [
         ("OpenGachaCodes", "https://api.ennead.cc/codes/wuwa"),
+        ("game-codes", "https://game-codes.wisp.uno/codes/wuwa"),
         ("OpenGachaCodes fallback", "https://api.ennead.cc/codes/wutheringwaves"),
     ],
 }
 
 
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "G-Codus-Code-Sync/2.0", "Accept": "application/json"})
+    req = urllib.request.Request(url, headers={"User-Agent": "G-Codus-Code-Sync/2.1", "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode())
 
@@ -53,20 +54,12 @@ def normalize(game, item, source):
     elif isinstance(rewards, dict):
         rewards = ", ".join(f"{k}: {v}" for k, v in rewards.items())
 
-    expires = (
-        item.get("expires_at")
-        or item.get("expires")
-        or item.get("expiry")
-        or item.get("expiration")
-        or ""
-    )
-    source_name = str(item.get("source") or source)
-
+    expires = item.get("expires_at") or item.get("expires") or item.get("expiry") or item.get("expiration") or ""
     return {
         "game": game,
         "code": code,
         "rewards": str(rewards or ""),
-        "source": source_name,
+        "source": str(item.get("source") or source),
         "expires_at": str(expires or ""),
     }
 
@@ -82,12 +75,8 @@ def collect_game(game):
                 value = normalize(game, item, source)
                 if value:
                     collected.append(value)
-            if items:
-                # Keep the first successful source, but use later sources to fill gaps.
-                continue
         except Exception as exc:
             errors.append(f"{source}: {exc}")
-
     if not collected and errors:
         print(f"{game}: all sources failed: {' | '.join(errors)}")
     return collected
@@ -97,7 +86,6 @@ def collect():
     result = []
     for game in SOURCES:
         result.extend(collect_game(game))
-
     unique = {}
     for value in result:
         key = (value["game"], value["code"].upper())
@@ -131,7 +119,6 @@ def is_expired(item, now):
 def main():
     now = datetime.now(timezone.utc).replace(microsecond=0)
     now_text = now.isoformat().replace("+00:00", "Z")
-
     try:
         current = collect()
     except Exception as exc:
@@ -151,10 +138,7 @@ def main():
     for item in current:
         key = (item["game"], item["code"].upper())
         if is_expired(item, now):
-            previous_expired[key] = {
-                **item,
-                "expired_at": previous_expired.get(key, {}).get("expired_at", now_text),
-            }
+            previous_expired[key] = {**item, "expired_at": previous_expired.get(key, {}).get("expired_at", now_text)}
         else:
             active.append(item)
             previous_expired.pop(key, None)
@@ -177,8 +161,7 @@ def main():
         "expired": sorted(previous_expired.values(), key=lambda x: x.get("expired_at", ""), reverse=True)[:500],
     }
 
-    # Never replace a known non-empty feed with an empty feed when every source failed.
-    if not active and not previous_expired and previous.get("active"):
+    if not current and previous.get("active"):
         print("All sources returned no usable codes; keeping previous feed")
         return
 
