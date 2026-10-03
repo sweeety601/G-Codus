@@ -906,11 +906,11 @@ class MainActivity : AppCompatActivity() {
                 setTextColor(Color.rgb(255, 205, 110))
                 gravity = Gravity.CENTER
                 setPadding(dp(5), dp(3), dp(5), dp(3))
-                background = roundedDrawable(Color.argb(70, 255, 190, 80), 10f)
+                background = roundedDrawable(Color.argb(85, 20, 18, 12), 10f)
             }
-            cell.addView(badge, LinearLayout.LayoutParams(-2, dp(24)).apply {
-                gravity = Gravity.CENTER_HORIZONTAL
-                topMargin = dp(2)
+            imageFrame.addView(badge, FrameLayout.LayoutParams(-2, dp(24), Gravity.TOP or Gravity.START).apply {
+                topMargin = dp(8)
+                marginStart = dp(8)
             })
         }
         cell.addView(label(character.name, 11.5f, text, true).apply {
@@ -919,7 +919,7 @@ class MainActivity : AppCompatActivity() {
             ellipsize = android.text.TextUtils.TruncateAt.END
             includeFontPadding = true
             setPadding(dp(4), dp(5), dp(4), dp(5))
-        }, LinearLayout.LayoutParams(-1, if (announced) dp(34) else dp(58)))
+        }, LinearLayout.LayoutParams(-1, dp(58)))
 
         cell.setOnClickListener {
             toggleTracked(character.gameId, character.file)
