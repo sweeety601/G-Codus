@@ -275,6 +275,8 @@ class NotificationSyncWorker(
         if (a == b) return true
         val aliases = mapOf(
             "anby-soldier-0" to "anby-demara-soldier-0",
+            "billy-kid" to "billy",
+            "corin-wickes" to "corin",
             "soldier-0-anby" to "anby-demara-soldier-0",
             "anby-demara-soldier-0" to "anby-demara-soldier-0",
             "augusta" to "aug",
