@@ -586,10 +586,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPortrait(image: ImageView, character: String, gameId: String) {
-        // Portraits are LOCAL ONLY. No URL/CDN/network fallback is allowed here.
+        // Portraits are STRICTLY LOCAL. The only source is the user-provided
+        // G-Codus/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
 
-        val slug = character.lowercase()
+        val normalized = character.lowercase()
             .replace("’", "")
             .replace("'", "")
             .replace(":", "")
@@ -597,38 +598,29 @@ class MainActivity : AppCompatActivity() {
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')
 
-        val assetPath = when (gameId) {
-            // These are the exact portrait files already present in the repository.
-            "genshin" -> "genshin/portraits/$slug.png"
-            "wuwa" -> "wuwa/portraits/$slug.png"
-            "zzz" -> "zzz/portraits/$slug.png"
+        val characterFile = when (normalized) {
+            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" -> "anby-demara-soldier-0.webp"
+            else -> "$normalized.webp"
+        }
+
+        val gameFolder = when (gameId) {
+            "genshin" -> "genshin"
+            "wuwa" -> "wuthering_waves"
+            "zzz" -> "zenless_zone_zero"
             else -> return
         }
+
+        val assetPath = "G-Codus/$gameFolder/$characterFile"
 
         try {
             assets.open(assetPath).use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
                 if (bitmap != null) {
                     image.setImageBitmap(bitmap)
-                    return
                 }
             }
         } catch (_: Exception) {
-            // Asset does not exist: leave the image blank.
-        }
-
-        // Legacy bundled drawable is also LOCAL, never downloaded.
-        // It is used only for WuWa/ZZZ if their already-bundled assets are stored there.
-        if (gameId != "genshin") {
-            val localName = when (gameId) {
-                "wuwa" -> "banner_wuthering_waves_" + slug.replace("-", "_")
-                "zzz" -> "banner_zenless_zone_zero_" + slug.replace("-", "_")
-                else -> ""
-            }
-            if (localName.isNotEmpty()) {
-                val localId = resources.getIdentifier(localName, "drawable", packageName)
-                if (localId != 0) image.setImageResource(localId)
-            }
+            // Missing mapping = blank image. Never substitute another character.
         }
     }
 
