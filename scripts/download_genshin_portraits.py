@@ -1,70 +1,127 @@
 #!/usr/bin/env python3
+import html
 import json
-import urllib.parse
+import re
+import time
 import urllib.request
+from io import BytesIO
 from pathlib import Path
 
+from PIL import Image
+
 ROOT = Path(__file__).resolve().parents[1]
-manifest_path = ROOT / "data/genshin_characters.json"
-manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-out = ROOT / "assets/genshin/portraits"
-out.mkdir(parents=True, exist_ok=True)
-
-missing = []
-downloaded = 0
-entries = []
+CHARACTERS_FILE = ROOT / "data/genshin_characters.json"
+OUT = ROOT / "assets/genshin/portraits"
+MANIFEST_OUT = ROOT / "data/genshin_portrait_manifest.json"
+BASE = "https://www.prydwen.gg"
+INDEX_URL = f"{BASE}/genshin-impact/characters"
+USER_AGENT = "G-Codus/1.0 (Genshin portrait asset sync)"
 
 
-def download(key: str):
-    url = "https://library.keqingmains.com/img/characters/round-icon/" + urllib.parse.quote(key) + ".png"
-    filename = key.lower().replace(" ", "_") + ".png"
-    dest = out / filename
-    req = urllib.request.Request(url, headers={"User-Agent": "G-Codus-portrait-sync/1.0"})
-    with urllib.request.urlopen(req, timeout=30) as response:
-        data = response.read()
-    if not data.startswith(b"\x89PNG"):
-        raise ValueError("response is not PNG")
-    dest.write_bytes(data)
-    return str(dest.relative_to(ROOT)), url
+def fetch(url: str) -> bytes:
+    req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    with urllib.request.urlopen(req, timeout=45) as response:
+        return response.read()
 
 
-for name in manifest["characters"]:
-    key = "Aether" if name.startswith("Traveler ") else name
-    try:
-        local_path, url = download(key)
-        entries.append({"name": name, "local_path": local_path, "portrait_url": url, "status": "downloaded"})
-        downloaded += 1
-    except Exception as exc:
-        url = "https://library.keqingmains.com/img/characters/round-icon/" + urllib.parse.quote(key) + ".png"
-        entries.append({"name": name, "local_path": None, "portrait_url": url, "status": "missing", "error": str(exc)})
-        missing.append(name)
+def clean_text(value: str) -> str:
+    value = re.sub(r"<[^>]+>", " ", value)
+    value = html.unescape(value)
+    return re.sub(r"\s+", " ", value).strip()
 
-for key in ("Aether", "Lumine"):
-    try:
-        download(key)
-    except Exception:
-        pass
 
-out_manifest = ROOT / "data/genshin_portrait_manifest.json"
-out_manifest.write_text(
-    json.dumps(
-        {
-            "game": "Genshin Impact",
-            "source_character_list": manifest["source_url"],
-            "portrait_source": "https://library.keqingmains.com/resources/tools/portraits",
-            "last_synced": "2026-10-03",
-            "character_count": len(entries),
-            "downloaded": downloaded,
-            "missing": missing,
-            "characters": entries,
-        },
-        ensure_ascii=False,
-        indent=2,
+def norm(value: str) -> str:
+    return re.sub(r"\s+", " ", value.strip().lower())
+
+
+def slug_from_href(href: str) -> str:
+    return href.rstrip("/").split("/")[-1]
+
+
+def parse_character_links(page: str):
+    links = {}
+    pattern = re.compile(
+        r'<a[^>]+href=["\'](/genshin-impact/characters/[^"\']+)["\'][^>]*>(.*?)</a>',
+        re.I | re.S,
     )
-    + "\n",
+    for href, body in pattern.findall(page):
+        name = clean_text(body)
+        if name:
+            links.setdefault(norm(name), BASE + href)
+    return links
+
+
+def find_full_art(page: str):
+    urls = re.findall(
+        r'https://cdn\.prydwen\.gg/images/genshin-impact/characters/[^"\'<> ]+_full\.webp',
+        page,
+        flags=re.I,
+    )
+    return html.unescape(urls[0]) if urls else None
+
+
+def save_portrait(data: bytes, dest: Path):
+    image = Image.open(BytesIO(data)).convert("RGBA")
+    bbox = image.getbbox()
+    if bbox:
+        image = image.crop(bbox)
+    image.thumbnail((720, 720), Image.Resampling.LANCZOS)
+    canvas = Image.new("RGBA", (768, 768), (0, 0, 0, 0))
+    x = (canvas.width - image.width) // 2
+    y = (canvas.height - image.height) // 2
+    canvas.alpha_composite(image, (x, y))
+    canvas.save(dest, "PNG", optimize=True)
+
+
+manifest = json.loads(CHARACTERS_FILE.read_text(encoding="utf-8"))
+characters = manifest["characters"]
+OUT.mkdir(parents=True, exist_ok=True)
+
+index_html = fetch(INDEX_URL).decode("utf-8", errors="replace")
+links = parse_character_links(index_html)
+entries = []
+missing = []
+
+for index, name in enumerate(characters, start=1):
+    page_url = links.get(norm(name))
+    entry = {"name": name, "page_url": page_url, "portrait_url": None, "local_path": None}
+    try:
+        if not page_url:
+            raise RuntimeError("character page was not found on Prydwen")
+        page_html = fetch(page_url).decode("utf-8", errors="replace")
+        portrait_url = find_full_art(page_html)
+        if not portrait_url:
+            raise RuntimeError("Prydwen page has no character full-art image")
+        data = fetch(portrait_url)
+        dest = OUT / (slug_from_href(page_url) + ".png")
+        save_portrait(data, dest)
+        entry.update({
+            "portrait_url": portrait_url,
+            "local_path": str(dest.relative_to(ROOT)),
+            "status": "downloaded",
+        })
+    except Exception as exc:
+        entry.update({"status": "missing", "error": str(exc)})
+        missing.append(name)
+    entries.append(entry)
+    print(f"[{index}/{len(characters)}] {name}: {entry['status']}")
+    time.sleep(0.15)
+
+MANIFEST_OUT.write_text(
+    json.dumps({
+        "game": "Genshin Impact",
+        "source_character_list": INDEX_URL,
+        "portrait_source": "Prydwen character profile full-art images, cropped locally into square transparent portraits",
+        "last_synced": time.strftime("%Y-%m-%d"),
+        "character_count": len(entries),
+        "downloaded": sum(e["status"] == "downloaded" for e in entries),
+        "missing": missing,
+        "characters": entries,
+    }, ensure_ascii=False, indent=2) + "\n",
     encoding="utf-8",
 )
 
-print(f"downloaded={downloaded}; missing={len(missing)}")
+print(f"Downloaded: {len(entries) - len(missing)} / {len(entries)}")
 if missing:
     print("Missing:", ", ".join(missing))
+    raise SystemExit(1)
