@@ -796,16 +796,18 @@ class MainActivity : AppCompatActivity() {
         return try {
             val files = assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted()
             when (gameId) {
-                // The supplied portrait set contains WuWa Lucy under the generic
-                // ZZZ-side filename lucy.webp, and the ZZZ Lucy portrait as lucy_alt.webp.
-                // Keep both user-supplied images, but expose each in the correct game.
-                "wuwa" -> (files.filterNot { it == "lucy.webp" } +
-                    "__wuwa_lucy.webp" +
-                    "__wuwa_aemeath.webp").sorted()
-                "zzz" -> files.filterNot { it == "lucy.webp" || it == "math.webp" }
-                    .plus("lucy_alt.webp")
-                    .distinct()
-                    .sorted()
+                // These three supplied portraits belong to Wuthering Waves,
+                // although their original filenames are in the ZZZ asset set.
+                // Expose them in WuWa through stable aliases and never show them in ZZZ.
+                "wuwa" -> (files.filterNot {
+                    it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
+                } +
+                    "__wuwa-lucy.webp" +
+                    "__wuwa-aemeath.webp" +
+                    "__wuwa-hiyuki.webp").sorted()
+                "zzz" -> files.filterNot {
+                    it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
+                }.plus("lucy_alt.webp").distinct().sorted()
                 else -> files
             }
         } catch (_: Exception) { emptyList() }
@@ -823,6 +825,7 @@ class MainActivity : AppCompatActivity() {
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
             "__wuwa-aemeath" to "Aemeath",
+            "__wuwa-hiyuki" to "Hiyuki",
             "lucy-alt" to "Lucy",
             "arataki-itto" to "Arataki Itto",
             "al-haitham" to "Alhaitham",
@@ -853,6 +856,7 @@ class MainActivity : AppCompatActivity() {
         val specialAssetPath = when (file) {
             "__wuwa-lucy.webp" -> "zenless_zone_zero/lucy.webp"
             "__wuwa-aemeath.webp" -> "zenless_zone_zero/math.webp"
+            "__wuwa-hiyuki.webp" -> "zenless_zone_zero/hiyuki.webp"
             else -> null
         }
         if (specialAssetPath != null) {
