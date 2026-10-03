@@ -15,6 +15,10 @@ import androidx.work.WorkManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.activity.OnBackPressedCallback
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.viewpager2.widget.ViewPager2
 import org.json.JSONArray
 import org.json.JSONObject
@@ -45,6 +49,10 @@ class MainActivity : AppCompatActivity() {
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
     private val prefs by lazy { getSharedPreferences("g_codus", Context.MODE_PRIVATE) }
     private var codesFeed: CodesFeed = CodesFeed.empty()
+    private var currentScreen = Screen.HOME
+    private var previousScreen = Screen.HOME
+    private var previousGameId: String? = null
+    private var currentGameId: String? = null
 
     private val bg = Color.rgb(13, 14, 19)
     private val surface = Color.rgb(21, 23, 32)
@@ -60,7 +68,34 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.enableEdgeToEdge(window)
         setContentView(R.layout.activity_main)
+
+        val root = findViewById<FrameLayout>(R.id.root)
+        ViewCompat.setOnApplyWindowInsetsListener(root) { view, insets ->
+            val bars = insets.getInsets(
+                WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
+            )
+            view.setPadding(0, bars.top, 0, bars.bottom)
+            insets
+        }
+        ViewCompat.requestApplyInsets(root)
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightStatusBars = false
+        WindowCompat.getInsetsController(window, window.decorView).isAppearanceLightNavigationBars = false
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                when (currentScreen) {
+                    Screen.HOME -> finish()
+                    Screen.GAME -> showHome()
+                    Screen.TRACKING -> {
+                        val game = currentGameId
+                        if (previousScreen == Screen.GAME && game != null) showGame(game) else showHome()
+                    }
+                    Screen.WISHLIST -> showHome()
+                }
+            }
+        })
         codesFeed = loadCachedCodes()
         requestNotificationPermission()
         scheduleCodeSync()
@@ -71,6 +106,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showHome() {
+        previousScreen = currentScreen
+        previousGameId = currentGameId
+        currentScreen = Screen.HOME
+        currentGameId = null
         countdownViews.clear()
         val root = findViewById<FrameLayout>(R.id.root)
         root.removeAllViews()
@@ -98,6 +137,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showGame(gameId: String) {
+        previousScreen = currentScreen
+        previousGameId = currentGameId
+        currentScreen = Screen.GAME
+        currentGameId = gameId
         countdownViews.clear()
         val game = loadFeed().firstOrNull { it.id == gameId } ?: return
         // Always reload the latest persisted/bundled promo feed when entering a game.
@@ -159,8 +202,15 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER
             setPadding(dp(8), dp(13), dp(8), dp(13))
         }
+        val trackingButton = TextView(this).apply {
+            text = "ОТСЛЕЖИВАНИЕ"
+            textSize = 11f
+            gravity = Gravity.CENTER
+            setPadding(dp(8), dp(13), dp(8), dp(13))
+        }
         pageButtons.addView(bannerButton, LinearLayout.LayoutParams(0, -2, 1f))
         pageButtons.addView(codeButton, LinearLayout.LayoutParams(0, -2, 1f))
+        pageButtons.addView(trackingButton, LinearLayout.LayoutParams(0, -2, 1f))
         column.addView(pageButtons)
 
         val content = LinearLayout(this).apply {
@@ -175,6 +225,14 @@ class MainActivity : AppCompatActivity() {
                 13f
             )
             button.setTextColor(if (selected) Color.WHITE else muted)
+        }
+
+        fun showTrackingPage() {
+            content.removeAllViews()
+            selectedButton(bannerButton, false)
+            selectedButton(codeButton, false)
+            selectedButton(trackingButton, true)
+            content.addView(trackingSection(game.id))
         }
 
         fun showBannerPage() {
@@ -202,6 +260,7 @@ class MainActivity : AppCompatActivity() {
 
         bannerButton.setOnClickListener { showBannerPage() }
         codeButton.setOnClickListener { showCodePage() }
+        trackingButton.setOnClickListener { showTrackingPage() }
         showBannerPage()
 
         scroll.addView(column)
@@ -250,11 +309,7 @@ class MainActivity : AppCompatActivity() {
             item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))
 
             item.addView(label(
-                when (meta.id) {
-                    "genshin" -> "Genshin"
-                    "wuwa" -> "WuWa"
-                    else -> "ZZZ"
-                }, 11f, muted, true).apply {
+                meta.name, 11f, muted, true).apply {
                 gravity = Gravity.CENTER
                 setPadding(0, dp(5), 0, 0)
             })
@@ -263,6 +318,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         wrapper.addView(icons)
+
+        val wishlist = TextView(this).apply {
+            text = "♡  Мой вишлист"
+            textSize = 15f
+            gravity = Gravity.CENTER
+            setTextColor(this@MainActivity.text)
+            background = roundedDrawable(surface, 18f)
+            setPadding(dp(12), dp(15), dp(12), dp(15))
+            setOnClickListener { showWishlist() }
+        }
+        wrapper.addView(wishlist, LinearLayout.LayoutParams(-1, dp(52)).apply {
+            topMargin = dp(8)
+        })
         return wrapper
     }
 
@@ -540,16 +608,6 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, dp(6), 0, 0)
             maxLines = 3
         })
-        val expiry = if (code.expiresAt.isNotBlank()) {
-            "Действует до " + formatDate(code.expiresAt)
-        } else if (code.expiredAt.isNotBlank()) {
-            "Истёк " + formatDate(code.expiredAt)
-        } else {
-            "Точный срок не указан; статус проверяется автоматически"
-        }
-        card.addView(label(expiry, 11f, muted, false).apply {
-            setPadding(0, dp(7), 0, 0)
-        })
         card.addView(label("Источник: " + code.source, 10f, muted, false).apply {
             setPadding(0, dp(4), 0, 0)
         })
@@ -564,6 +622,245 @@ class MainActivity : AppCompatActivity() {
             layoutParams = LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) }
         }
     }
+
+    private fun showWishlist() {
+        previousScreen = currentScreen
+        previousGameId = currentGameId
+        currentScreen = Screen.WISHLIST
+        currentGameId = null
+        countdownViews.clear()
+        val root = findViewById<FrameLayout>(R.id.root)
+        root.removeAllViews()
+        val scroll = makeScroll()
+        val column = makeColumn()
+        val header = LinearLayout(this).apply {
+            gravity = Gravity.CENTER_VERTICAL
+            setPadding(0, 0, 0, dp(12))
+        }
+        val back = TextView(this).apply {
+            text = "‹"
+            textSize = 38f
+            setTextColor(this@MainActivity.text)
+            gravity = Gravity.CENTER
+            setOnClickListener { showHome() }
+        }
+        header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
+        header.addView(label("Мой вишлист", 24f, text, true), LinearLayout.LayoutParams(0, -2, 1f))
+        column.addView(header)
+        column.addView(sectionLabel("ОТСЛЕЖИВАЕМЫЕ ПЕРСОНАЖИ"))
+        val search = EditText(this).apply {
+            hint = "Поиск персонажа"
+            textSize = 15f
+            setSingleLine(true)
+            setTextColor(this@MainActivity.text)
+            setHintTextColor(muted)
+            background = roundedDrawable(surface, 16f)
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+        }
+        column.addView(search, LinearLayout.LayoutParams(-1, dp(52)).apply { bottomMargin = dp(12) })
+        val grid = FrameLayout(this)
+        column.addView(grid)
+        fun renderWishlist(query: String) {
+            grid.removeAllViews()
+            grid.addView(trackingGrid(null, query))
+        }
+        search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { renderWishlist(s?.toString().orEmpty()) }
+            override fun afterTextChanged(s: android.text.Editable?) = Unit
+        })
+        renderWishlist("")
+        scroll.addView(column)
+        root.addView(scroll)
+    }
+
+    private fun trackingSection(gameId: String): View {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        box.addView(sectionLabel("ОТСЛЕЖИВАЕМЫЕ ПЕРСОНАЖИ"))
+        val search = EditText(this).apply {
+            hint = "Поиск персонажа"
+            textSize = 15f
+            setSingleLine(true)
+            setTextColor(this@MainActivity.text)
+            setHintTextColor(muted)
+            background = roundedDrawable(surface, 16f)
+            setPadding(dp(14), dp(12), dp(14), dp(12))
+        }
+        box.addView(search, LinearLayout.LayoutParams(-1, dp(52)).apply { bottomMargin = dp(12) })
+        val grid = FrameLayout(this)
+        box.addView(grid)
+        fun render(query: String) {
+            grid.removeAllViews()
+            grid.addView(trackingGrid(gameId, query))
+        }
+        search.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { render(s?.toString().orEmpty()) }
+            override fun afterTextChanged(s: android.text.Editable?) = Unit
+        })
+        render("")
+        return box
+    }
+
+    private fun trackingGrid(gameId: String?, query: String?): View {
+        val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val games = if (gameId == null) gameMeta else gameMeta.filter { it.id == gameId }
+        val normalizedQuery = query?.trim()?.lowercase().orEmpty()
+        val entries = mutableListOf<TrackedCharacter>()
+        games.forEach { meta ->
+            listCharacterFiles(meta.id).forEach { file ->
+                val name = characterDisplayName(file)
+                if ((gameId != null || isTracked(meta.id, file)) &&
+                    (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
+                    entries += TrackedCharacter(meta.id, meta.name, name, file)
+                }
+            }
+        }
+        entries.sortWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.name.lowercase() })
+        if (entries.isEmpty()) {
+            holder.addView(emptyCard(if (normalizedQuery.isBlank()) "Персонажей пока нет" else "Ничего не найдено"))
+            return holder
+        }
+        var row: LinearLayout? = null
+        entries.forEachIndexed { index, character ->
+            if (index % 3 == 0) {
+                row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.TOP }
+                holder.addView(row, LinearLayout.LayoutParams(-1, -2))
+            }
+            row?.addView(trackingCharacterCell(character), LinearLayout.LayoutParams(0, dp(178), 1f).apply {
+                marginStart = if (index % 3 == 0) 0 else dp(3)
+                marginEnd = dp(3)
+                bottomMargin = dp(8)
+            })
+        }
+        return holder
+    }
+
+    private fun trackingCharacterCell(character: TrackedCharacter): View {
+        val cell = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            background = roundedDrawable(surface, 16f)
+            clipToOutline = true
+            setOnClickListener { toggleTracked(character.gameId, character.file); refreshCurrentScreen() }
+        }
+        val imageFrame = FrameLayout(this)
+        val image = ImageView(this).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
+        imageFrame.addView(image, FrameLayout.LayoutParams(-1, dp(136)))
+        loadTrackingPortrait(image, character.file, character.gameId)
+        val heart = TextView(this).apply {
+            text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+            textSize = 22f
+            gravity = Gravity.CENTER
+            setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
+            background = roundedDrawable(Color.argb(145, 0, 0, 0), 99f)
+            setOnClickListener { toggleTracked(character.gameId, character.file); refreshCurrentScreen() }
+        }
+        imageFrame.addView(heart, FrameLayout.LayoutParams(dp(36), dp(36), Gravity.TOP or Gravity.END).apply {
+            topMargin = dp(7)
+            marginEnd = dp(7)
+        })
+        cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
+        cell.addView(label(character.name, 12f, text, true).apply {
+            gravity = Gravity.CENTER
+            maxLines = 2
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            setPadding(dp(4), dp(7), dp(4), dp(7))
+        }, LinearLayout.LayoutParams(-1, dp(42)))
+        return cell
+    }
+
+    private fun listCharacterFiles(gameId: String): List<String> {
+        val folder = gameFolder(gameId) ?: return emptyList()
+        return try { assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted() }
+        catch (_: Exception) { emptyList() }
+    }
+
+    private fun gameFolder(gameId: String): String? = when (gameId) {
+        "genshin" -> "genshin"
+        "wuwa" -> "wuthering_waves"
+        "zzz" -> "zenless_zone_zero"
+        else -> null
+    }
+
+    private fun characterDisplayName(file: String): String {
+        val base = file.substringBeforeLast(".")
+        val overrides = mapOf(
+            "arataki-itto" to "Arataki Itto",
+            "al-haitham" to "Alhaitham",
+            "yumemizuki-mizuki" to "Yumemizuki Mizuki",
+            "yae-miko" to "Yae Miko",
+            "yun-jin" to "Yun Jin",
+            "anby-demara-soldier-0" to "Anby: Soldier 0",
+            "orhpie-and-magus" to "Orphie & Magus",
+            "orhpie-magus" to "Orphie & Magus",
+            "luuk-herssen" to "Luuk Herssen"
+        )
+        overrides[base]?.let { return it }
+        return base.split("-").joinToString(" ") { word ->
+            word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+    }
+
+    private fun trackingKey(gameId: String, file: String) = "tracked_" + gameId + "_" + file
+    private fun isTracked(gameId: String, file: String): Boolean = prefs.getBoolean(trackingKey(gameId, file), false)
+    private fun toggleTracked(gameId: String, file: String) { prefs.edit().putBoolean(trackingKey(gameId, file), !isTracked(gameId, file)).apply() }
+
+    private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
+        val folder = gameFolder(gameId) ?: return
+        image.setImageDrawable(null)
+        val trackingPath = "tracking/" + folder + "/" + file
+        val legacyPath = folder + "/" + file
+        try {
+            assets.open(trackingPath).use { input ->
+                val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                if (bitmap != null) { image.setImageBitmap(bitmap); return }
+            }
+        } catch (_: Exception) { }
+        try {
+            assets.open(legacyPath).use { input ->
+                val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                if (bitmap != null) image.setImageBitmap(bitmap)
+            }
+        } catch (_: Exception) { }
+    }
+
+    private fun refreshCurrentScreen() {
+        when (currentScreen) {
+            Screen.TRACKING -> currentGameId?.let { showTracking(it) } ?: showWishlist()
+            Screen.WISHLIST -> showWishlist()
+            Screen.GAME -> currentGameId?.let { showGame(it) }
+            Screen.HOME -> showHome()
+        }
+    }
+
+    private fun showTracking(gameId: String) {
+        previousScreen = currentScreen
+        previousGameId = currentGameId
+        currentScreen = Screen.TRACKING
+        currentGameId = gameId
+        countdownViews.clear()
+        val root = findViewById<FrameLayout>(R.id.root)
+        root.removeAllViews()
+        val scroll = makeScroll()
+        val column = makeColumn()
+        val header = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL; setPadding(0, 0, 0, dp(12)) }
+        val back = TextView(this).apply {
+            text = "‹"
+            textSize = 38f
+            setTextColor(this@MainActivity.text)
+            gravity = Gravity.CENTER
+            setOnClickListener { showGame(gameId) }
+        }
+        header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
+        header.addView(label(gameMeta.first { it.id == gameId }.name, 24f, text, true), LinearLayout.LayoutParams(0, -2, 1f))
+        column.addView(header)
+        column.addView(trackingSection(gameId))
+        scroll.addView(column)
+        root.addView(scroll)
+    }
+
+    private enum class Screen { HOME, GAME, TRACKING, WISHLIST }
+    data class TrackedCharacter(val gameId: String, val gameName: String, val name: String, val file: String)
 
     private inner class BannerPagerAdapter(
         private val items: List<Banner>,
@@ -690,7 +987,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun makeColumn() = LinearLayout(this).apply {
         orientation = LinearLayout.VERTICAL
-        setPadding(dp(16), dp(18), dp(16), dp(32))
+        setPadding(dp(16), dp(8), dp(16), dp(32))
     }
 
     private fun emptyCard(value: String) = TextView(this).apply {
