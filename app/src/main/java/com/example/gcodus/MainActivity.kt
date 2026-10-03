@@ -1082,11 +1082,6 @@ class MainActivity : AppCompatActivity() {
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')
 
-        val characterFile = when (normalized) {
-            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" -> "anby-demara-soldier-0.webp"
-            else -> "$normalized.webp"
-        }
-
         val gameFolder = when (gameId) {
             "genshin" -> "genshin"
             "wuwa" -> "wuthering_waves"
@@ -1094,16 +1089,31 @@ class MainActivity : AppCompatActivity() {
             else -> return
         }
 
-        // images_big is an external asset source directory; Android places its contents at the asset root.
-        // Therefore the bundled path is <gameFolder>/<characterFile>, not images_big/<...>.
-        val assetPath = "$gameFolder/$characterFile"
+        // Resolve against the ACTUAL bundled filenames. This is important for
+        // 4-star portraits because their source filenames can differ from the
+        // display name (spaces, punctuation, alternate naming, etc.).
+        val specialFile = when (normalized) {
+            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" -> "anby-demara-soldier-0.webp"
+            else -> null
+        }
 
         try {
-            assets.open(assetPath).use { input ->
+            val files = assets.list(gameFolder)?.toList().orEmpty()
+            val exact = specialFile?.takeIf { files.contains(it) }
+            val target = exact ?: files.firstOrNull { file ->
+                val stem = file.substringBeforeLast('.').lowercase()
+                    .replace("’", "")
+                    .replace("'", "")
+                    .replace(":", "")
+                    .replace("&", "and")
+                    .replace(Regex("[^a-z0-9]+"), "-")
+                    .trim('-')
+                stem == normalized
+            } ?: return
+
+            assets.open("$gameFolder/$target").use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
-                if (bitmap != null) {
-                    image.setImageBitmap(bitmap)
-                }
+                if (bitmap != null) image.setImageBitmap(bitmap)
             }
         } catch (_: Exception) {
             // Missing mapping = blank image. Never substitute another character.
