@@ -607,26 +607,10 @@ class MainActivity : AppCompatActivity() {
 
         if (localId != 0) {
             image.setImageResource(localId)
-            return
-        }
-
-        val url = "https://cdn.prydwen.gg/images/" +
-            when (gameId) {
-                "genshin" -> "genshin-impact"
-                "wuwa" -> "wuthering-waves"
-                "zzz" -> "zenless-zone-zero"
-                else -> gameId
-            } + "/characters/" + slug + "_full.webp"
-
-        executor.execute {
-            try {
-                val connection = java.net.URL(url).openConnection()
-                connection.connectTimeout = 12000
-                connection.readTimeout = 20000
-                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                val bitmap = android.graphics.BitmapFactory.decodeStream(connection.getInputStream())
-                if (bitmap != null) runOnUiThread { image.setImageBitmap(bitmap) }
-            } catch (_: Exception) { }
+        } else {
+            // IMPORTANT: banner art must come only from portraits bundled in the APK.
+            // Never download a substitute image from the network.
+            image.setImageDrawable(null)
         }
     }
 
