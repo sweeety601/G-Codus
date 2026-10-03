@@ -226,7 +226,7 @@ class MainActivity : AppCompatActivity() {
                 13f
             )
             button.setTextColor(
-                if (selected || button === trackingButton) Color.WHITE else muted
+                Color.WHITE
             )
         }
 
@@ -242,6 +242,7 @@ class MainActivity : AppCompatActivity() {
             content.removeAllViews()
             selectedButton(bannerButton, true)
             selectedButton(codeButton, false)
+            selectedButton(trackingButton, false)
             content.addView(sectionLabel("БАННЕРЫ СЕЙЧАС"))
             content.addView(bannerPager(game.current, false, game.id))
             content.addView(sectionLabel("СЛЕДУЮЩИЕ БАННЕРЫ").apply {
@@ -257,6 +258,7 @@ class MainActivity : AppCompatActivity() {
             content.removeAllViews()
             selectedButton(bannerButton, false)
             selectedButton(codeButton, true)
+            selectedButton(trackingButton, false)
             content.addView(sectionLabel("ПРОМОКОДЫ"))
             content.addView(codeSection(game.id))
         }
