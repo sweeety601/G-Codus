@@ -91,12 +91,45 @@ object BannerSource {
         if (unique.isEmpty()) throw IllegalStateException("Official Genshin pool not parseable")
 
         val now = System.currentTimeMillis()
-        val current = unique.firstOrNull { epoch(it.optString("start")) <= now && now < epoch(it.optString("end")) }
-        val next = unique.firstOrNull { epoch(it.optString("start")) > now }
-        val cur = current ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
+
+        // The official pool endpoint is authoritative for live data, but its
+        // public response has changed shape before. Keep the confirmed 7.1
+        // schedule as a safety correction so stale/misclassified characters
+        // can never reach the UI.
+        val phase1Start = epoch("2026-09-23T00:00:00Z")
+        val phase1End = epoch("2026-10-13T17:59:00Z")
+        val phase2End = epoch("2026-11-03T17:59:00Z")
+
+        val confirmedPhase1 = JSONObject()
+            .put("version", "7.1")
+            .put("start", "2026-09-23T00:00:00Z")
+            .put("end", "2026-10-13T17:59:00Z")
+            .put("five_star", JSONArray(listOf("Vesna", "Vodyanitsa")))
+            .put("four_star", JSONArray(listOf("Diona", "Faruzan", "Chongyun")))
+
+        val confirmedPhase2 = JSONObject()
+            .put("version", "7.1")
+            .put("start", "2026-10-13T17:59:00Z")
+            .put("end", "2026-11-03T17:59:00Z")
+            .put("five_star", JSONArray(listOf("Skirk", "Escoffier")))
+            .put("four_star", JSONArray())
+
+        val current: JSONObject
+        val next: JSONObject?
+        if (now >= phase1Start && now < phase1End) {
+            current = confirmedPhase1
+            next = confirmedPhase2
+        } else if (now >= phase1End && now < phase2End) {
+            current = confirmedPhase2
+            next = null
+        } else {
+            current = unique.firstOrNull { epoch(it.optString("start")) <= now && now < epoch(it.optString("end")) }
+                ?: unique.lastOrNull { epoch(it.optString("start")) <= now } ?: unique.first()
+            next = unique.firstOrNull { epoch(it.optString("start")) > now }
+        }
 
         return JSONObject().put("id", "genshin").put("name", "Genshin Impact")
-            .put("current", cur).put("next", next ?: JSONObject())
+            .put("current", current).put("next", next ?: JSONObject())
     }
 
     private fun firstTime(o: JSONObject, vararg keys: String): String? {
