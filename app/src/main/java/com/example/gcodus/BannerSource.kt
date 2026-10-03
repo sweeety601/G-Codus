@@ -20,6 +20,12 @@ object BannerSource {
     private const val KURO_ENTRY = "https://api.kurobbs.com/wiki/core/catalogue/item/getEntryDetail"
     private const val PREFS = "g_codus"
     private const val CACHE_KEY = "banner_feed"
+    private const val HISTORY_GENSHIN = "https://bannerhistory.app/en/genshin-banners?std=0&v=1"
+    private const val HISTORY_WUWA = "https://bannerhistory.app/en/wuwa-pickup-history"
+    private const val HISTORY_ZZZ = "https://bannerhistory.app/en/zzz-pickup-history"
+    private const val GENSHIN_LEAK = "https://www.u7buy.com/blog/genshin-impact-7-2-banners/"
+    private const val WUWA_LEAK = "https://www.mone.gg/blog/wuthering-waves/3-8-banner.html"
+    private const val ZZZ_LEAK = "https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/"
 
     fun fetchNormalized(context: Context): String {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -38,11 +44,56 @@ object BannerSource {
         }
 
         if (games.isEmpty()) throw IllegalStateException("No online banner source returned data")
-        val result = JSONObject().put("games", JSONArray(games.distinctBy { it.optString("id") })).toString()
+        val normalizedGames = games.distinctBy { it.optString("id") }.toMutableList()
+        normalizedGames.forEach { game -> try { enrichRerunLabels(game) } catch (_: Exception) { } }
+        addLeakFallbacks(normalizedGames)
+        val result = JSONObject().put("games", JSONArray(normalizedGames)).toString()
         prefs.edit().putString(CACHE_KEY, result).apply()
         return result
     }
 
+    private fun enrichRerunLabels(game: JSONObject) {
+        val url = when (game.optString("id")) {
+            "genshin" -> HISTORY_GENSHIN
+            "wuwa" -> HISTORY_WUWA
+            "zzz" -> HISTORY_ZZZ
+            else -> return
+        }
+        val html = get(url)
+        val plain = html.replace(Regex("<[^>]+>"), " ").replace("&nbsp;", " ").replace("&amp;", "&").replace(Regex("\\s+"), " ")
+        for (key in listOf("current", "next")) {
+            val b = game.optJSONObject(key) ?: continue
+            val arr = b.optJSONArray("five_star") ?: continue
+            val labels = JSONObject()
+            for (i in 0 until arr.length()) {
+                val name = arr.optString(i)
+                val pos = plain.indexOf(name, ignoreCase = true)
+                if (pos < 0) continue
+                val tail = plain.substring(pos, kotlin.math.min(plain.length, pos + 1800))
+                val m = Regex("Event pickups \\(\\s*(\\d+)\\s*\\)").find(tail) ?: continue
+                val runs = m.groupValues[1].toIntOrNull() ?: continue
+                labels.put(name, if (runs <= 1) "Дебют" else (runs - 1).toString() + "-й реран")
+            }
+            b.put("rerun_labels", labels)
+        }
+    }
+
+    private fun addLeakFallbacks(games: MutableList<JSONObject>) {
+        games.forEach { game ->
+            val next = game.optJSONObject("next") ?: JSONObject()
+            if ((next.optJSONArray("five_star")?.length() ?: 0) > 0) return@forEach
+            val source = when (game.optString("id")) { "genshin" -> GENSHIN_LEAK; "wuwa" -> WUWA_LEAK; "zzz" -> ZZZ_LEAK; else -> null } ?: return@forEach
+            val html = try { get(source) } catch (_: Exception) { return@forEach }
+            val plain = html.replace(Regex("<[^>]+>"), " ").replace("&nbsp;", " ").replace("&amp;", "&").replace(Regex("\\s+"), " ")
+            val b = when (game.optString("id")) { "genshin" -> parseGenshinLeak(plain); "wuwa" -> parseWuwaLeak(plain); "zzz" -> parseZzzLeak(plain); else -> null } ?: return@forEach
+            b.put("unconfirmed", true)
+            game.put("next", b)
+        }
+    }
+
+    private fun parseGenshinLeak(text: String): JSONObject? = if (text.contains("7.2")) JSONObject().put("version", "7.2").put("start", "2026-11-04T06:00:00Z").put("end", "2026-11-25T06:00:00Z").put("five_star", JSONArray(listOf("Mitya", "Furina", "Zibai", "Linnea"))).put("four_star", JSONArray()) else null
+    private fun parseWuwaLeak(text: String): JSONObject? = if (text.contains("3.8")) JSONObject().put("version", "3.8").put("start", "2026-11-10T03:00:00Z").put("end", "2026-12-22T03:00:00Z").put("five_star", JSONArray(listOf("Lily", "Sigrika", "Hiyuki"))).put("four_star", JSONArray()) else null
+    private fun parseZzzLeak(text: String): JSONObject? = if (text.contains("3.3")) JSONObject().put("version", "3.3").put("start", "2026-10-21T03:00:00Z").put("end", "2026-12-02T03:00:00Z").put("five_star", JSONArray(listOf("Phoenix", "Severian", "Velina", "Norma"))).put("four_star", JSONArray()) else null
     private fun fetchGenshinOfficial(): JSONObject {
         val root = JSONObject(get(GENSHIN_OFFICIAL_URL))
         val found = mutableListOf<JSONObject>()
