@@ -795,7 +795,7 @@ class MainActivity : AppCompatActivity() {
             val localFiles = listCharacterFiles(meta.id)
             localFiles.forEach { file ->
                 val name = characterDisplayName(file)
-                if (isMainProtagonist(meta.id, file, name)) continue
+                if (isMainProtagonist(meta.id, file, name)) return@forEach
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
                     entries += TrackedCharacter(meta.id, meta.name, name, file)
