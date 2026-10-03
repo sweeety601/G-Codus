@@ -15,10 +15,6 @@ data class OnlineCharacter(
 object CharacterDatabase {
     private const val WUWA_CHARACTERS = "https://www.prydwen.gg/wuthering-waves/characters"
     private const val ZZZ_CHARACTERS = "https://www.prydwen.gg/zenless/characters"
-    private const val WUWA_HISTORY = "https://bannerhistory.app/en/wuwa-pickup-history"
-    private const val ZZZ_HISTORY = "https://bannerhistory.app/en/zzz-pickup-history"
-    private const val GENSHIN_CHARACTERS = "https://www.prydwen.gg/genshin-impact/characters"
-    private const val GENSHIN_HISTORY = "https://bannerhistory.app/en/genshin-banners?std=0&v=1"
 
     private val PROTAGONIST_SLUGS = mapOf(
         "genshin" to setOf("traveler", "aether", "lumine", "traveller"),
@@ -26,11 +22,17 @@ object CharacterDatabase {
         "zzz" to setOf("belle", "wise", "proxy")
     )
 
+    private val ANNOUNCED_ONLY = mapOf(
+        "genshin" to setOf("mitya", "valeriy"),
+        "wuwa" to setOf("suoming"),
+        "zzz" to emptySet()
+    )
+
     fun fetch(context: Context): List<OnlineCharacter> {
         val result = mutableListOf<OnlineCharacter>()
-        result += fetchGame("wuwa", WUWA_CHARACTERS, WUWA_HISTORY)
-        result += fetchGame("zzz", ZZZ_CHARACTERS, ZZZ_HISTORY)
-        result += fetchGame("genshin", GENSHIN_CHARACTERS, GENSHIN_HISTORY)
+        result += fetchGame("wuwa", WUWA_CHARACTERS)
+        result += fetchGame("zzz", ZZZ_CHARACTERS)
+        result += fetchGame("genshin", GENSHIN_CHARACTERS)
 
         // Prydwen uses "Billy" for the ordinary playable agent. In G-Codus
         // this is displayed as the official character name "Billy Kid".
@@ -48,7 +50,7 @@ object CharacterDatabase {
         return result.distinctBy { it.gameId + "|" + normalize(it.slug) }
     }
 
-    private fun fetchGame(gameId: String, listUrl: String, historyUrl: String): List<OnlineCharacter> {
+    private fun fetchGame(gameId: String, listUrl: String): List<OnlineCharacter> {
         val html = get(listUrl)
         val history = try { get(historyUrl) } catch (_: Exception) { "" }
         val historyKnown = normalize(history)
@@ -75,11 +77,8 @@ object CharacterDatabase {
             if (!isValidCharacterEntry(slug, name)) continue
             if (isProtagonist(gameId, slug, name)) continue
 
-            val released = historyKnown.isNotEmpty() && (
-                historyKnown.contains(normalize(name)) ||
-                historyKnown.contains(normalize(slug.replace("-", " ")))
-            )
-            val announced = historyKnown.isNotEmpty() && !released
+            val announced = normalize(slug) in ANNOUNCED_ONLY[gameId].orEmpty() ||
+                normalize(name) in ANNOUNCED_ONLY[gameId].orEmpty()
             result += OnlineCharacter(
                 gameId,
                 if (gameId == "zzz" && normalize(slug) == "billy") "Billy Kid" else name,
@@ -115,9 +114,7 @@ object CharacterDatabase {
     private fun isProtagonist(gameId: String, slug: String, name: String): Boolean {
         val normalizedSlug = normalize(slug)
         val normalizedName = normalize(name)
-        return PROTAGONIST_SLUGS[gameId].orEmpty().any {
-            normalizedSlug == normalize(it) || normalizedName == normalize(it)
-        }
+        return PROTAGONIST_SLUGS[gameId].orEmpty().any { val p = normalize(it); normalizedSlug == p || normalizedName == p || normalizedSlug.startsWith(p) || normalizedName.startsWith(p) }
     }
 
     private fun canonicalKey(gameId: String, slug: String, name: String): String =
