@@ -57,47 +57,129 @@ class NotificationSyncWorker(
     private fun notifyFollowedGames(prefs: android.content.SharedPreferences, json: String, initialized: Boolean) {
         val games = JSONObject(json).optJSONArray("games") ?: JSONArray()
         val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+
         for (i in 0 until games.length()) {
             val game = games.getJSONObject(i)
             val gameId = game.optString("id")
             if (gameId.isBlank() || !appPrefs.getBoolean("favorite_" + gameId, false)) continue
+
             val current = game.optJSONObject("current") ?: JSONObject()
             val next = game.optJSONObject("next") ?: JSONObject()
-            val signature = listOf(current.optString("version"), current.optString("start"), current.optString("end"),
-                readChars(current.optJSONArray("five_star")).joinToString(","),
-                next.optString("version"), next.optString("start"), next.optString("end"),
-                readChars(next.optJSONArray("five_star")).joinToString(",")).joinToString("|")
-            val key = "game_" + gameId
+            val signature = nextSignature(next)
+            val key = "next_" + gameId
             val old = prefs.getString(key, null)
+
             if (initialized && old != null && old != signature) {
-                showNotification(("game_" + gameId).hashCode() and 0x7fffffff, gameName(gameId), "Появились изменения в баннерах.")
+                notifyNextPhaseChange(prefs, gameId, old, next, appPrefs)
             }
+
             prefs.edit().putString(key, signature).apply()
+        }
+    }
+
+    private fun nextSignature(next: JSONObject): String {
+        val chars5 = readChars(next.optJSONArray("five_star")).joinToString(",")
+        val chars4 = readChars(next.optJSONArray("four_star")).joinToString(",")
+        return listOf(
+            next.optString("version"),
+            next.optString("start"),
+            next.optString("end"),
+            chars5,
+            chars4,
+            next.optBoolean("unconfirmed", false).toString()
+        ).joinToString("|")
+    }
+
+    private fun notifyNextPhaseChange(
+        prefs: android.content.SharedPreferences,
+        gameId: String,
+        oldSignature: String,
+        next: JSONObject,
+        appPrefs: android.content.SharedPreferences
+    ) {
+        val oldParts = oldSignature.split("|")
+        val oldUnconfirmed = oldParts.getOrNull(5)?.toBooleanStrictOrNull() ?: false
+        val newUnconfirmed = next.optBoolean("unconfirmed", false)
+        val nextChars = readChars(next.optJSONArray("five_star")) + readChars(next.optJSONArray("four_star"))
+        val newNames = nextChars.joinToString(", ")
+
+        when {
+            newUnconfirmed && (oldParts.size < 6 || oldSignature.isBlank()) -> {
+                showNotification(
+                    ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
+                    gameName(gameId),
+                    "Следующая фаза: Неподтвержденная информация обновлена"
+                )
+            }
+            newUnconfirmed && oldUnconfirmed && oldSignature != nextSignature(next) -> {
+                showNotification(
+                    ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
+                    gameName(gameId),
+                    "Следующая фаза: Неподтвержденная информация обновлена"
+                )
+            }
+            !newUnconfirmed && oldUnconfirmed -> {
+                showNotification(
+                    ("next_confirmed_" + gameId).hashCode() and 0x7fffffff,
+                    gameName(gameId),
+                    "Следующая фаза подтверждена!"
+                )
+            }
+        }
+
+        // Wishlist/tracking alerts are emitted only for games the user marked
+        // as favourite. A character in a leaked next phase gets the softer
+        // wording; once that phase becomes official, the wording changes.
+        for (file in trackedFiles(gameId)) {
+            val name = displayName(file)
+            val present = nextChars.any { sameCharacter(it, file) }
+            val stateKey = "next_character_state_" + gameId + "_" + file
+            val state = prefs.getString(stateKey, null)
+
+            if (present) {
+                val desired = if (newUnconfirmed) "likely" else "confirmed"
+                if (state != desired) {
+                    val body = if (newUnconfirmed) {
+                        "$name вероятно будет в следующей фазе!"
+                    } else {
+                        "$name будет доступен для призыва в следующей фазе!"
+                    }
+                    showNotification(
+                        ("next_character_" + gameId + "_" + file + "_" + desired).hashCode() and 0x7fffffff,
+                        gameName(gameId),
+                        body
+                    )
+                    prefs.edit().putString(stateKey, desired).apply()
+                }
+            } else if (state != null) {
+                prefs.edit().remove(stateKey).apply()
+            }
         }
     }
 
     private fun notifyTrackedCharacters(prefs: android.content.SharedPreferences, json: String) {
         val games = JSONObject(json).optJSONArray("games") ?: JSONArray()
+        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+
         for (i in 0 until games.length()) {
             val game = games.getJSONObject(i)
             val gameId = game.optString("id")
+            if (!appPrefs.getBoolean("favorite_" + gameId, false)) continue
+
             val current = game.optJSONObject("current") ?: JSONObject()
             val next = game.optJSONObject("next") ?: JSONObject()
             val currentChars = readChars(current.optJSONArray("five_star")) +
                 readChars(current.optJSONArray("four_star"))
             val nextChars = readChars(next.optJSONArray("five_star")) +
                 readChars(next.optJSONArray("four_star"))
+
             for (file in trackedFiles(gameId)) {
                 val characterName = displayName(file)
                 val bannerName = bannerCharacterName(currentChars, nextChars, file) ?: characterName
 
-                // If the user starts tracking a character while its banner is
-                // already live, notify immediately on the next sync. The same
-                // persisted appearance key prevents duplicate alerts.
                 notifyCurrentBannerAppearance(prefs, gameId, file, bannerName, currentChars)
 
                 when (gameId) {
-                    "genshin" -> Unit
                     "zzz" -> notifyZzzDate(prefs, gameId, file, bannerName, next)
                     "wuwa" -> notifyWuwaEnding(prefs, gameId, file, bannerName, current)
                 }
