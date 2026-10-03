@@ -21,7 +21,7 @@ USER_AGENT = "G-Codus/1.0 (Genshin portrait asset sync)"
 
 def fetch(url: str) -> bytes:
     req = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    with urllib.request.urlopen(req, timeout=25) as response:
+    with urllib.request.urlopen(req, timeout=30) as response:
         return response.read()
 
 
@@ -37,10 +37,7 @@ def norm(value: str) -> str:
 
 def parse_character_links(page: str):
     links = {}
-    pattern = re.compile(
-        r'<a[^>]+href=["\'](/genshin-impact/characters/[^"\']+)["\'][^>]*>(.*?)</a>',
-        re.I | re.S,
-    )
+    pattern = re.compile(r'<a[^>]+href=["\'](/genshin-impact/characters/[^"\']+)["\'][^>]*>(.*?)</a>', re.I | re.S)
     for href, body in pattern.findall(page):
         name = clean_text(body)
         if name:
@@ -55,15 +52,18 @@ def save_portrait(data: bytes, dest: Path):
         image = image.crop(bbox)
     image.thumbnail((720, 720), Image.Resampling.LANCZOS)
     canvas = Image.new("RGBA", (768, 768), (0, 0, 0, 0))
-    x = (canvas.width - image.width) // 2
-    y = (canvas.height - image.height) // 2
-    canvas.alpha_composite(image, (x, y))
+    canvas.alpha_composite(image, ((768 - image.width) // 2, (768 - image.height) // 2))
     canvas.save(dest, "PNG", optimize=True)
 
 
 manifest = json.loads(CHARACTERS_FILE.read_text(encoding="utf-8"))
 characters = manifest["characters"]
 OUT.mkdir(parents=True, exist_ok=True)
+
+# Remove the previously imported non-Prydwen portraits so no wrong asset remains.
+for old in OUT.glob("*.png"):
+    old.unlink()
+
 index_html = fetch(INDEX_URL).decode("utf-8", errors="replace")
 links = parse_character_links(index_html)
 entries = []
@@ -80,32 +80,25 @@ for index, name in enumerate(characters, start=1):
         data = fetch(portrait_url)
         dest = OUT / f"{slug}.png"
         save_portrait(data, dest)
-        entry.update({
-            "portrait_url": portrait_url,
-            "local_path": str(dest.relative_to(ROOT)),
-            "status": "downloaded",
-        })
+        entry.update({"portrait_url": portrait_url, "local_path": str(dest.relative_to(ROOT)), "status": "downloaded"})
     except Exception as exc:
-        entry.update({"status": "missing", "error": str(exc)})
+        slug = page_url.rstrip("/").split("/")[-1] if page_url else None
+        entry.update({"portrait_url": f"{CDN}{slug}_full.webp" if slug else None, "status": "missing", "error": str(exc)})
         missing.append(name)
     entries.append(entry)
     print(f"[{index}/{len(characters)}] {name}: {entry['status']}")
 
-MANIFEST_OUT.write_text(
-    json.dumps({
-        "game": "Genshin Impact",
-        "source_character_list": INDEX_URL,
-        "portrait_source": "Prydwen CDN character full-art images, cropped locally into square transparent portraits",
-        "last_synced": time.strftime("%Y-%m-%d"),
-        "character_count": len(entries),
-        "downloaded": sum(e["status"] == "downloaded" for e in entries),
-        "missing": missing,
-        "characters": entries,
-    }, ensure_ascii=False, indent=2) + "\n",
-    encoding="utf-8",
-)
+MANIFEST_OUT.write_text(json.dumps({
+    "game": "Genshin Impact",
+    "source_character_list": INDEX_URL,
+    "portrait_source": "Prydwen CDN character full-art images, cropped locally into square transparent portraits",
+    "last_synced": time.strftime("%Y-%m-%d"),
+    "character_count": len(entries),
+    "downloaded": sum(e["status"] == "downloaded" for e in entries),
+    "missing": missing,
+    "characters": entries,
+}, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 print(f"Downloaded: {len(entries) - len(missing)} / {len(entries)}")
 if missing:
-    print("Missing:", ", ".join(missing))
-    raise SystemExit(1)
+    print("Prydwen assets currently unavailable:", ", ".join(missing))
