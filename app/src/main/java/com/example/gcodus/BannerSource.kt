@@ -26,7 +26,7 @@ object BannerSource {
         val games = mutableListOf<JSONObject>()
         try { games += fetchHoyoCalendar(GENSHIN_URL, "genshin", "Genshin Impact") } catch (_: Exception) { }
         try { games += fetchWuwa() } catch (_: Exception) { }
-        try { games += fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero") } catch (_: Exception) }
+        try { games += fetchHoyoCalendar(ZZZ_URL, "zzz", "Zenless Zone Zero") } catch (_: Exception) { }
 
         if (previous != null) {
             val oldGames = JSONObject(previous).optJSONArray("games") ?: JSONArray()
