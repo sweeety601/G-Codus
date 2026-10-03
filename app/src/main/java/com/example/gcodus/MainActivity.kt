@@ -494,7 +494,7 @@ class MainActivity : AppCompatActivity() {
         })
         info.addView(label(banner.version, 13f, muted, false))
 
-        if (!isNext && banner.fourStars.isNotEmpty()) {
+        if (banner.fourStars.isNotEmpty()) {
             val fourStarRow = LinearLayout(this).apply {
                 gravity = Gravity.CENTER_VERTICAL
                 setPadding(0, dp(10), 0, dp(4))
