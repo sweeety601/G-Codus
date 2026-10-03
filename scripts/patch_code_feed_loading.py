@@ -60,3 +60,4 @@ if old_filter in text:
 
 PATH.write_text(text, encoding="utf-8")
 print("Code feed loading patch applied")
+# Trigger note: this script is also a dependency of the hourly/push sync workflow.
