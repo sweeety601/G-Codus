@@ -22,20 +22,17 @@ SOURCES = {
 
 
 def fetch_json(url):
-    req = urllib.request.Request(url, headers={"User-Agent": "G-Codus-Code-Sync/3.0", "Accept": "application/json"})
+    req = urllib.request.Request(url, headers={"User-Agent": "G-Codus-Code-Sync/4.0", "Accept": "application/json"})
     with urllib.request.urlopen(req, timeout=30) as r:
         return json.loads(r.read().decode())
 
 
 def extract_items(data):
-    """Return (active_items, expired_items) while accepting several API shapes."""
     if isinstance(data, list):
         return data, []
     if not isinstance(data, dict):
         return [], []
-
-    active = []
-    expired = []
+    active, expired = [], []
     for key in ("codes", "active", "data", "results"):
         value = data.get(key)
         if isinstance(value, list):
@@ -55,13 +52,11 @@ def normalize(game, item, source):
     code = str(item.get("code", item.get("key", ""))).strip()
     if not code:
         return None
-
     rewards = item.get("rewards", item.get("reward", ""))
     if isinstance(rewards, list):
         rewards = ", ".join(map(str, rewards))
     elif isinstance(rewards, dict):
         rewards = ", ".join(f"{k}: {v}" for k, v in rewards.items())
-
     expires = item.get("expires_at") or item.get("expires") or item.get("expiry") or item.get("expiration") or ""
     status = str(item.get("status", "")).lower()
     return {
@@ -75,9 +70,7 @@ def normalize(game, item, source):
 
 
 def collect_game(game):
-    active_collected = []
-    expired_collected = []
-    errors = []
+    active_collected, expired_collected, errors = [], [], []
     for source, url in SOURCES[game]:
         try:
             data = fetch_json(url)
@@ -118,8 +111,7 @@ def merge_unique(items):
 
 
 def collect():
-    active = []
-    expired = []
+    active, expired = [], []
     for game in SOURCES:
         game_active, game_expired = collect_game(game)
         active.extend(game_active)
@@ -144,24 +136,19 @@ def is_expired(item, now):
 def main():
     now = datetime.now(timezone.utc).replace(microsecond=0)
     now_text = now.isoformat().replace("+00:00", "Z")
-
     try:
-        previous = json.load(open(OUT, encoding="utf-8"))
+        with open(OUT, encoding="utf-8") as f:
+            previous = json.load(f)
     except Exception:
         previous = {"active": [], "expired": []}
 
     previous_active = {(x.get("game"), x.get("code", "").upper()): x for x in previous.get("active", [])}
     previous_expired = {(x.get("game"), x.get("code", "").upper()): x for x in previous.get("expired", [])}
+    current_active, source_expired = collect()
 
-    try:
-        current_active, source_expired = collect()
-    except Exception as exc:
-        print("Code collection failed:", exc)
-        return
-
-    # Never destroy history merely because a source temporarily returns an empty response.
+    # If every source is unusable, keep the complete previous feed untouched.
     if not current_active and not source_expired and previous_active:
-        print("All sources returned no usable codes; keeping previous feed and expired history")
+        print("No usable source data; keeping previous feed")
         return
 
     active = []
@@ -176,7 +163,7 @@ def main():
             active.append(item)
             previous_expired.pop(key, None)
 
-    # Explicit expired/inactive records from sources are retained as history.
+    # Only explicit expired/inactive status or a real expiration date can make a code expired.
     for item in source_expired:
         key = (item["game"], item["code"].upper())
         previous_expired[key] = {
@@ -184,28 +171,35 @@ def main():
             "expired_at": previous_expired.get(key, {}).get("expired_at", now_text),
         }
 
+    # Do NOT treat a missing code as expired after one sync. Keep it as active with a
+    # missing_count marker; this protects against transient API/source omissions.
     current_keys = {(x["game"], x["code"].upper()) for x in active}
     for key, item in previous_active.items():
-        if key not in current_keys:
-            previous_expired[key] = {
-                "game": item.get("game"),
-                "code": item.get("code"),
-                "rewards": item.get("rewards", ""),
-                "source": item.get("source", ""),
-                "expires_at": item.get("expires_at", ""),
-                "expired_at": previous_expired.get(key, {}).get("expired_at", now_text),
-            }
+        if key not in current_keys and key not in previous_expired:
+            missing_count = int(item.get("missing_count", 0)) + 1
+            kept = dict(item)
+            kept["missing_count"] = missing_count
+            # Require three consecutive syncs to miss the code before archiving it.
+            if missing_count < 3:
+                active.append(kept)
+            else:
+                previous_expired[key] = {
+                    **kept,
+                    "expired_at": now_text,
+                }
 
-    # An item cannot be active and expired simultaneously.
+    # Reset missing_count for codes confirmed by a source.
+    for item in active:
+        item.pop("missing_count", None)
+
     active_keys = {(x["game"], x["code"].upper()) for x in active}
     previous_expired = {k: v for k, v in previous_expired.items() if k not in active_keys}
 
     payload = {
         "generated_at": now_text,
-        "active": sorted(active, key=lambda x: (x["game"], x["code"].upper())),
+        "active": sorted(merge_unique(active), key=lambda x: (x["game"], x["code"].upper())),
         "expired": sorted(previous_expired.values(), key=lambda x: x.get("expired_at", ""), reverse=True)[:500],
     }
-
     with open(OUT, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
         f.write("\n")
