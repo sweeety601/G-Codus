@@ -37,7 +37,7 @@ object CharacterDatabase {
         val pattern = Regex("href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"]+)[\\\"][^>]*>(.*?)</a>", RegexOption.IGNORE_CASE)
         val result = mutableListOf<OnlineCharacter>()
         for (m in pattern.findAll(html)) {
-NaN
+            val slug = m.groupValues[1].substringBefore("?").trim('/').lowercase()
             val rawName = m.groupValues[2].replace(Regex("<[^>]+>"), " ").replace("&amp;", "&").trim()
             val name = cleanName(rawName)
             if (slug.isBlank() || name.isBlank() || name.length > 80) continue
