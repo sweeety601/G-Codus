@@ -755,7 +755,7 @@ class MainActivity : AppCompatActivity() {
         loadTrackingPortrait(image, character.file, character.gameId)
 
         val heart = TextView(this).apply {
-            text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+            text = "♥"
             textSize = 17f
             gravity = Gravity.CENTER
             includeFontPadding = false
@@ -768,7 +768,7 @@ class MainActivity : AppCompatActivity() {
             }
             setOnClickListener {
                 toggleTracked(character.gameId, character.file)
-                text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+                text = "♥"
                 setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
             }
         }
@@ -787,7 +787,7 @@ class MainActivity : AppCompatActivity() {
 
         cell.setOnClickListener {
             toggleTracked(character.gameId, character.file)
-            heart.text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+            heart.text = "♥"
             heart.setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
         }
         return cell
