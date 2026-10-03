@@ -15,6 +15,7 @@ data class OnlineCharacter(
 object CharacterDatabase {
     private const val WUWA_CHARACTERS = "https://www.prydwen.gg/wuthering-waves/characters"
     private const val ZZZ_CHARACTERS = "https://www.prydwen.gg/zenless/characters"
+    private const val GENSHIN_CHARACTERS = "https://www.prydwen.gg/genshin-impact/characters"
 
     private val PROTAGONIST_SLUGS = mapOf(
         "genshin" to setOf("traveler", "aether", "lumine", "traveller"),
@@ -47,7 +48,7 @@ object CharacterDatabase {
             }
         }
 
-        return result.distinctBy { it.gameId + "|" + normalize(it.slug) }
+        return result.filterNot { isProtagonist(it.gameId, it.slug, it.name) }.distinctBy { canonicalKey(it.gameId, it.slug, it.name) }
     }
 
     private fun fetchGame(gameId: String, listUrl: String): List<OnlineCharacter> {
@@ -117,8 +118,14 @@ object CharacterDatabase {
         return PROTAGONIST_SLUGS[gameId].orEmpty().any { val p = normalize(it); normalizedSlug == p || normalizedName == p || normalizedSlug.startsWith(p) || normalizedName.startsWith(p) }
     }
 
-    private fun canonicalKey(gameId: String, slug: String, name: String): String =
-        "$gameId|" + normalize(slug).ifBlank { normalize(name) }
+    private fun canonicalKey(gameId: String, slug: String, name: String): String {
+        if (gameId == "zzz") {
+            val s = normalize(slug)
+            val n = normalize(name)
+            if (s == "billy" || s == "billykid" || n == "billy" || n == "billykid") return "zzz|billy"
+        }
+        return "$gameId|" + normalize(slug).ifBlank { normalize(name) }
+    }
 
     private fun portraitUrl(gameId: String, slug: String): String =
         when (gameId) {
