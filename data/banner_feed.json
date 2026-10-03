@@ -1,0 +1,105 @@
+{
+  "version": 1,
+  "generated_at": "2026-10-03T00:00:00Z",
+  "source": "Prydwen + official publisher notices",
+  "note": "Seed snapshot; GitHub Actions refreshes this file from the configured sources.",
+  "games": {
+    "Genshin Impact": {
+      "source_url": "https://www.prydwen.gg/genshin-impact/banners",
+      "current": [
+        {
+          "phase": "7.1 Phase 1",
+          "type": "character",
+          "characters": [
+            "Vesna",
+            "Vodyanitsa"
+          ],
+          "start_date": "2026-09-23",
+          "end_date": "2026-10-13",
+          "end_time_local": "17:59:59",
+          "timezone": "server",
+          "status": "live",
+          "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/"
+        }
+      ],
+      "next": [
+        {
+          "phase": "7.1 Phase 2",
+          "type": "character",
+          "characters": [
+            "Escoffier",
+            "Skirk"
+          ],
+          "start_date": "2026-10-13",
+          "end_date": "2026-11-03",
+          "status": "next",
+          "official_source": "https://www.hoyolab.com/circles/2/57/feed"
+        }
+      ]
+    },
+    "Wuthering Waves": {
+      "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
+      "current": [
+        {
+          "phase": "3.7 Phase 1",
+          "type": "character",
+          "characters": [
+            "Hsin",
+            "Chisa",
+            "Iuno"
+          ],
+          "start_date": "2026-09-30",
+          "end_date": "2026-10-22",
+          "end_time_local": "09:59:59",
+          "timezone": "UTC+8 server time",
+          "status": "live",
+          "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528"
+        }
+      ],
+      "next": [
+        {
+          "phase": "3.7 Phase 2",
+          "type": "character",
+          "characters": [
+            "Suoming",
+            "Lucilla",
+            "Lynae"
+          ],
+          "start_date": "2026-10-22",
+          "end_date": "2026-11-11",
+          "start_time_local": "10:00:00",
+          "status": "next",
+          "official_source": "https://mc.kurogames.com/main/news/detail/5569"
+        }
+      ]
+    },
+    "Zenless Zone Zero": {
+      "source_url": "https://www.prydwen.gg/zenless/banners",
+      "current": [
+        {
+          "phase": "3.2 Phase 2",
+          "type": "character",
+          "characters": [
+            "Roxy",
+            "Promeia"
+          ],
+          "start_date": "2026-09-30",
+          "end_date": "2026-10-20",
+          "end_time_local": "14:59:59",
+          "timezone": "server",
+          "status": "live",
+          "official_source": "https://zenless.hoyoverse.com/en-us/news/166475"
+        }
+      ],
+      "next": [
+        {
+          "phase": "3.3",
+          "type": "character",
+          "characters": [],
+          "status": "upcoming",
+          "official_source": "https://zenless.hoyoverse.com/en-us/news/"
+        }
+      ]
+    }
+  }
+}
