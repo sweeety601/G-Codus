@@ -30,9 +30,13 @@ data class Banner(
 )
 
 class MainActivity : AppCompatActivity() {
+    companion object {
+        const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
+    }
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
     private val prefs by lazy { getSharedPreferences("g_codus", Context.MODE_PRIVATE) }
+    private var codesFeed: CodesFeed = CodesFeed.empty()
 
     private val bg = Color.rgb(13, 14, 19)
     private val surface = Color.rgb(21, 23, 32)
@@ -49,6 +53,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        codesFeed = loadCachedCodes()
+        refreshCodesInBackground()
         showHome()
         startCountdownTicker()
     }
@@ -132,6 +138,10 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, dp(22), 0, dp(8))
         })
         column.addView(bannerPager(game.next, true, game.id))
+        column.addView(sectionLabel("ПРОМОКОДЫ").apply {
+            setPadding(0, dp(26), 0, dp(8))
+        })
+        column.addView(codeSection(game.id))
 
         scroll.addView(column)
         root.addView(scroll)
@@ -329,6 +339,103 @@ class MainActivity : AppCompatActivity() {
         return card
     }
 
+    private fun refreshCodesInBackground() {
+        executor.execute {
+            try {
+                val connection = java.net.URL(CODE_FEED_URL).openConnection()
+                connection.connectTimeout = 12000
+                connection.readTimeout = 20000
+                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                val json = connection.getInputStream().bufferedReader().use { it.readText() }
+                codesFeed = parseCodesFeed(json)
+                prefs.edit().putString("codes_feed", json).apply()
+                runOnUiThread { showHome() }
+            } catch (_: Exception) { }
+        }
+    }
+
+    private fun loadCachedCodes(): CodesFeed {
+        val json = prefs.getString("codes_feed", null) ?: return CodesFeed.empty()
+        return try { parseCodesFeed(json) } catch (_: Exception) { CodesFeed.empty() }
+    }
+
+    private fun parseCodesFeed(json: String): CodesFeed {
+        val root = JSONObject(json)
+        fun read(key: String, expired: Boolean): List<PromoCode> {
+            val arr = root.optJSONArray(key) ?: JSONArray()
+            return (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                PromoCode(
+                    o.optString("game"), o.optString("code"), o.optString("rewards"),
+                    o.optString("source"), o.optString("expires_at"),
+                    o.optString("expired_at"), if (expired) "expired" else "active"
+                )
+            }
+        }
+        return CodesFeed(read("active", false), read("expired", true))
+    }
+
+    private fun codeSection(gameId: String): View {
+        val box = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
+        val active = codesFeed.active.filter { it.game == gameId }
+        val expired = codesFeed.expired.filter { it.game == gameId }
+
+        if (active.isEmpty()) box.addView(emptyCard("Действительных промокодов сейчас нет"))
+        active.forEach { box.addView(codeCard(it)) }
+
+        if (expired.isNotEmpty()) {
+            box.addView(sectionLabel("ПРОСРОЧЕННЫЕ").apply {
+                setPadding(dp(4), dp(18), 0, dp(8))
+            })
+            expired.take(20).forEach { box.addView(codeCard(it)) }
+        }
+        return box
+    }
+
+    private fun codeCard(code: PromoCode): View {
+        val card = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(dp(14), dp(12), dp(10), dp(12))
+            background = roundedDrawable(surface, 18f)
+        }
+        val top = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL }
+        top.addView(label(code.code, 18f, text, true), LinearLayout.LayoutParams(0, -2, 1f))
+        top.addView(label(
+            if (code.status == "active") "ДЕЙСТВИТЕЛЕН" else "ПРОСРОЧЕН",
+            10f,
+            if (code.status == "active") Color.rgb(92, 214, 139) else muted,
+            true
+        ))
+        card.addView(top)
+        if (code.rewards.isNotBlank()) card.addView(label(code.rewards, 12f, muted, false).apply {
+            setPadding(0, dp(6), 0, 0)
+            maxLines = 3
+        })
+        val expiry = if (code.expiresAt.isNotBlank()) {
+            "Действует до " + formatDate(code.expiresAt)
+        } else if (code.expiredAt.isNotBlank()) {
+            "Истёк " + formatDate(code.expiredAt)
+        } else {
+            "Точный срок не указан; статус проверяется автоматически"
+        }
+        card.addView(label(expiry, 11f, muted, false).apply {
+            setPadding(0, dp(7), 0, 0)
+        })
+        card.addView(label("Источник: " + code.source, 10f, muted, false).apply {
+            setPadding(0, dp(4), 0, 0)
+        })
+        if (code.status == "active") {
+            card.setOnClickListener {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("G-Codus", code.code))
+                Toast.makeText(this, "Код скопирован", Toast.LENGTH_SHORT).show()
+            }
+        }
+        return card.apply {
+            layoutParams = LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = dp(8) }
+        }
+    }
+
     private inner class BannerPagerAdapter(
         private val items: List<Banner>,
         private val factory: (Banner) -> View
@@ -514,6 +621,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
     private fun dp(value: Float): Int = (value * resources.displayMetrics.density).toInt()
+
+    data class PromoCode(
+        val game: String,
+        val code: String,
+        val rewards: String,
+        val source: String,
+        val expiresAt: String,
+        val expiredAt: String,
+        val status: String
+    )
+
+    data class CodesFeed(
+        val active: List<PromoCode>,
+        val expired: List<PromoCode>
+    ) { companion object { fun empty() = CodesFeed(emptyList(), emptyList()) } }
 
     data class GameFeed(
         val id: String,
