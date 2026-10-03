@@ -16,38 +16,41 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch app to use existing bundled portraits only
+      - name: Bundle existing portraits and generate explicit mapping
         run: |
           python3 - <<'PY'
+          import json
           from pathlib import Path
+
+          # IMPORTANT: never download portraits here. Only use files already in the repo.
+          src = Path('assets/genshin/portraits')
+          dst = Path('app/src/main/assets/genshin/portraits')
+          dst.mkdir(parents=True, exist_ok=True)
+          for p in src.glob('*.png'):
+              target = dst / p.name
+              target.write_bytes(p.read_bytes())
+
+          manifest = json.loads(Path('data/genshin_portrait_manifest.json').read_text())
+          entries = {
+              str(x['name']).strip().lower(): str(x['local_path']).replace('assets/genshin/portraits/', '')
+              for x in manifest.get('characters', [])
+              if x.get('status') == 'downloaded' and Path(str(x.get('local_path',''))).exists()
+          }
+
           p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
           s = p.read_text()
           start = s.index('    private fun loadPortrait(')
           end = s.index('    private fun startCountdownTicker', start)
-          fn = '''    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
-        // Use only portrait files already bundled in the repository/APK. Never download images.
-        if (gameId.equals("genshin", ignoreCase = true)) {
-            val slug = character.trim().lowercase()
-                .replace("’", "")
-                .replace("'", "")
-                .replace("&", "and")
-                .replace(Regex("[^a-z0-9]+"), "-")
-                .trim('-')
-            try {
-                assets.open("genshin/portraits/$slug.png").use { input ->
-                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
-                    if (bitmap != null) {
-                        image.setImageBitmap(bitmap)
-                        return
-                    }
-                }
-            } catch (_: Exception) { }
-            image.setImageDrawable(null)
-            return
-        }
 
+          cases = '\n'.join(
+              f'            {json.dumps("genshin:" + name)} -> {json.dumps(file)}'
+              for name, file in sorted(entries.items())
+          )
+          fn = '''    private fun loadPortrait(image: ImageView, character: String, gameId: String) {
+        // Every portrait is bundled in the APK. There is no runtime image download.
         val key = gameId.trim().lowercase() + ":" + character.trim().lowercase()
-        val localName = when (key) {
+        val localPath = when (key) {
+%s
             "wuwa:hsin" -> "banner_wuthering_waves_hsin"
             "wuwa:chisa" -> "banner_wuthering_waves_chisa"
             "wuwa:iuno" -> "banner_wuthering_waves_iuno"
@@ -58,21 +61,45 @@ jobs:
             "zzz:promeia" -> "banner_zenless_zone_zero_promeia"
             else -> ""
         }
-        val localId = if (localName.isNotEmpty()) resources.getIdentifier(localName, "drawable", packageName) else 0
-        if (localId != 0) image.setImageResource(localId) else image.setImageDrawable(null)
+        if (localPath.isEmpty()) {
+            image.setImageDrawable(null)
+            return
+        }
+        val assetPath = if (key.startsWith("genshin:")) {
+            "genshin/portraits/$localPath"
+        } else {
+            ""
+        }
+        if (assetPath.isNotEmpty()) {
+            try {
+                assets.open(assetPath).use { input ->
+                    android.graphics.BitmapFactory.decodeStream(input)?.let {
+                        image.setImageBitmap(it)
+                        return
+                    }
+                }
+            } catch (_: Exception) { }
+        } else {
+            val id = resources.getIdentifier(localPath, "drawable", packageName)
+            if (id != 0) {
+                image.setImageResource(id)
+                return
+            }
+        }
+        image.setImageDrawable(null)
     }
 
-'''
+''' % cases
           p.write_text(s[:start] + fn + s[end:])
           PY
-      - name: Commit app mapping only
+      - name: Commit bundled portraits and explicit mapping
         run: |
           git config user.name 'G-Codus Bot'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add app/src/main/java/com/example/gcodus/MainActivity.kt
+          git add app/src/main/assets/genshin/portraits app/src/main/java/com/example/gcodus/MainActivity.kt
           if git diff --cached --quiet; then
-            echo 'No app changes.'
+            echo 'No changes.'
           else
-            git commit -m 'Use existing bundled portraits only'
+            git commit -m 'Use existing portraits with explicit character mapping'
             git push
           fi
