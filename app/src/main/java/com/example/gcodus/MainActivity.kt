@@ -746,10 +746,6 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             background = roundedDrawable(surface, 16f)
             clipToOutline = true
-            setOnClickListener {
-                toggleTracked(character.gameId, character.file)
-                updateTrackingHeart()
-            }
         }
         val imageFrame = FrameLayout(this)
         val image = ImageView(this).apply { scaleType = ImageView.ScaleType.CENTER_CROP }
@@ -769,7 +765,8 @@ class MainActivity : AppCompatActivity() {
             }
             setOnClickListener {
                 toggleTracked(character.gameId, character.file)
-                updateTrackingHeart()
+                text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+                setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
             }
         }
         imageFrame.addView(heart, FrameLayout.LayoutParams(dp(34), dp(34), Gravity.TOP or Gravity.END).apply {
@@ -785,18 +782,13 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(4), dp(5), dp(4), dp(5))
         }, LinearLayout.LayoutParams(-1, dp(58)))
 
-        fun updateTrackingHeart() {
-            val tracked = isTracked(character.gameId, character.file)
-            heart.text = if (tracked) "♥" else "♡"
-            heart.setTextColor(if (tracked) Color.rgb(255, 91, 123) else Color.WHITE)
-            if (currentScreen == Screen.WISHLIST) {
-                refreshCurrentScreen()
-            }
+        cell.setOnClickListener {
+            toggleTracked(character.gameId, character.file)
+            heart.text = if (isTracked(character.gameId, character.file)) "♥" else "♡"
+            heart.setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
         }
-
         return cell
     }
-
     private fun listCharacterFiles(gameId: String): List<String> {
         val folder = gameFolder(gameId) ?: return emptyList()
         return try { assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted() }
