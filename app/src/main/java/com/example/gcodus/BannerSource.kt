@@ -145,9 +145,9 @@ object BannerSource {
             current.put("five_star", JSONArray(current.optJSONArray("five_star")?.let { a ->
                 (0 until a.length()).map { a.optString(it) }.filterNot { it.equals("Corin", true) }
             } ?: emptyList<String>()))
-            current.put("four_star", JSONArray((current.optJSONArray("four_star")?.let { a ->
+            current.put("four_star", JSONArray(((current.optJSONArray("four_star")?.let { a ->
                 (0 until a.length()).map { a.optString(it) }
-            } ?: emptyList()) + "Corin").distinct())
+            } ?: emptyList()) + "Corin").distinct()))
         }
 
         return parsed
