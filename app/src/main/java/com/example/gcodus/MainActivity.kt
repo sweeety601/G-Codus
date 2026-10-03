@@ -3,6 +3,8 @@ package com.example.gcodus
 import android.Manifest
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Bitmap
+import android.util.LruCache
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -26,6 +28,7 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 import java.time.Duration
 import java.time.Instant
 import java.time.OffsetDateTime
@@ -52,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
     }
     private val executor = Executors.newSingleThreadScheduledExecutor()
+    private val imageExecutor = Executors.newFixedThreadPool(4)
+    private val portraitCache = LruCache<String, Bitmap>(48)
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
     private val prefs by lazy { getSharedPreferences("g_codus", Context.MODE_PRIVATE) }
     private var codesFeed: CodesFeed = CodesFeed.empty()
@@ -951,22 +956,23 @@ class MainActivity : AppCompatActivity() {
     private fun listCharacterFiles(gameId: String): List<String> {
         val folder = gameFolder(gameId) ?: return emptyList()
         return try {
-            val files = assets.list(folder).orEmpty().filter { it.endsWith(".webp", true) }.sorted()
-            when (gameId) {
-                // These three supplied portraits belong to Wuthering Waves,
-                // although their original filenames are in the ZZZ asset set.
-                // Expose them in WuWa through stable aliases and never show them in ZZZ.
+            val files = assets.list(folder).orEmpty()
+                .filter { it.endsWith(".webp", true) }
+                .filterNot { isMainProtagonist(gameId, it, characterDisplayName(it)) }
+                .sorted()
+            val prepared = when (gameId) {
                 "wuwa" -> (files.filterNot {
                     it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
-                } +
-                    "__wuwa-lucy.webp" +
-                    "__wuwa-aemeath.webp" +
-                    "__wuwa-hiyuki.webp").sorted()
+                } + "__wuwa-lucy.webp" + "__wuwa-aemeath.webp" + "__wuwa-hiyuki.webp").sorted()
                 "zzz" -> files.filterNot {
                     it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
                 }.plus("lucy_alt.webp").distinct().sorted()
                 else -> files
             }
+            if (gameId == "zzz") {
+                val hasBillyKid = prepared.any { normalizeCharacterForMatch(it) == "billykid" }
+                prepared.filterNot { hasBillyKid && normalizeCharacterForMatch(it) == "billy" }
+            } else prepared
         } catch (_: Exception) { emptyList() }
     }
 
@@ -1293,43 +1299,62 @@ class MainActivity : AppCompatActivity() {
         val b = normalizeCharacterForMatch(onlineName)
         val slug = normalizeCharacterForMatch(onlineSlug)
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
-        if (a == b || file == slug) return true
         if (gameId == "zzz") {
             val localStarlight = a.contains("starlight") || file.contains("starlight")
             val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
             if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
-
-            val localOrdinaryBilly = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
-            val onlineOrdinaryBilly = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
-            if (localOrdinaryBilly || onlineOrdinaryBilly) return localOrdinaryBilly && onlineOrdinaryBilly
+            val ordinary = setOf("billy", "billykid")
+            val localBilly = a in ordinary || file in ordinary
+            val onlineBilly = b in ordinary || slug in ordinary
+            if (localBilly || onlineBilly) return localBilly && onlineBilly
         }
-        return false
+        return a == b || file == slug
     }
 
     private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
         val slug = normalizedSlug.trim('-')
         if (slug.isBlank()) return
-        val url = when (gameId) {
-            "wuwa" -> "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
-            "zzz" -> "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
-            "genshin" -> "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
+        val urls = mutableListOf<String>()
+        when (gameId) {
+            "wuwa" -> {
+                urls += "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
+                urls += "https://api.resonance.rest/characters/" +
+                    URLEncoder.encode(slug.replace("-", " "), "UTF-8") + "/portrait"
+            }
+            "genshin" -> {
+                urls += "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
+                urls += "https://genshin.jmp.blue/characters/" + slug + "/portrait"
+            }
+            "zzz" -> urls += "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
             else -> return
         }
-        loadRemotePortrait(image, url)
+        loadRemotePortrait(image, urls)
     }
 
-    private fun loadRemotePortrait(image: ImageView, url: String) {
-        executor.execute {
-            try {
-                val connection = URL(url).openConnection() as HttpURLConnection
-                connection.connectTimeout = 12000
-                connection.readTimeout = 20000
-                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                val bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
-                if (bitmap != null) runOnUiThread {
+    private fun loadRemotePortrait(image: ImageView, urls: List<String>) {
+        if (urls.isEmpty()) return
+        val cacheKey = urls.first()
+        portraitCache.get(cacheKey)?.let { image.setImageBitmap(it); return }
+        imageExecutor.execute {
+            var bitmap: Bitmap? = null
+            for (url in urls) {
+                try {
+                    val connection = URL(url).openConnection() as HttpURLConnection
+                    connection.connectTimeout = 3500
+                    connection.readTimeout = 5000
+                    connection.instanceFollowRedirects = true
+                    connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                    connection.setRequestProperty("Accept", "image/avif,image/webp,image/png,image/*")
+                    bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
+                    if (bitmap != null) break
+                } catch (_: Exception) { }
+            }
+            if (bitmap != null) {
+                portraitCache.put(cacheKey, bitmap)
+                runOnUiThread {
                     if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
                 }
-            } catch (_: Exception) { }
+            }
         }
     }
 
