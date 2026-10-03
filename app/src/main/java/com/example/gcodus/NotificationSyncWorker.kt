@@ -43,10 +43,10 @@ class NotificationSyncWorker(
             val bannerJson = fetch(BANNER_URL)
             val codeJson = fetch(CODES_URL)
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
-            if (initialized) {
-                notifyTrackedCharacters(prefs, bannerJson)
-                notifyNewCodes(prefs, codeJson)
-            }
+            // Character tracking is user-selected, so it may notify even on the
+            // first sync if the tracked character is already in the relevant state.
+            notifyTrackedCharacters(prefs, bannerJson)
+            if (initialized) notifyNewCodes(prefs, codeJson)
             prefs.edit().putBoolean(KEY_INITIALIZED, true).apply()
             Result.success()
         } catch (_: Exception) { Result.retry() }
