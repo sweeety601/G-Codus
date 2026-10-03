@@ -164,6 +164,7 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, 0, dp(8), 0)
             setOnClickListener { showHome() }
         }
+        addPressEffect(back)
         header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
 
         val title = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
@@ -183,6 +184,7 @@ class MainActivity : AppCompatActivity() {
                 showGame(game.id)
             }
         }
+        addPressEffect(star)
         header.addView(star, LinearLayout.LayoutParams(dp(48), dp(50)))
         column.addView(header)
 
@@ -209,6 +211,9 @@ class MainActivity : AppCompatActivity() {
             setTextColor(Color.WHITE)
             setPadding(dp(8), dp(13), dp(8), dp(13))
         }
+        addPressEffect(bannerButton)
+        addPressEffect(codeButton)
+        addPressEffect(trackingButton)
         pageButtons.addView(bannerButton, LinearLayout.LayoutParams(0, -2, 1f))
         pageButtons.addView(codeButton, LinearLayout.LayoutParams(0, -2, 1f))
         pageButtons.addView(trackingButton, LinearLayout.LayoutParams(0, -2, 1f))
@@ -311,6 +316,7 @@ class MainActivity : AppCompatActivity() {
             val resId = resources.getIdentifier("game_" + meta.resourceName, "drawable", packageName)
             if (resId != 0) icon.setImageResource(resId) else icon.setImageDrawable(null)
             iconFrame.addView(icon, FrameLayout.LayoutParams(-1, -1))
+            addPressEffect(item)
             item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))
 
             item.addView(label(
@@ -333,6 +339,7 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(12), dp(15), dp(12), dp(15))
             setOnClickListener { showWishlist() }
         }
+        addPressEffect(wishlist)
         wrapper.addView(wishlist, LinearLayout.LayoutParams(-1, dp(52)).apply {
             topMargin = dp(8)
         })
@@ -731,7 +738,10 @@ class MainActivity : AppCompatActivity() {
         var row: LinearLayout? = null
         entries.forEachIndexed { index, character ->
             if (index % 3 == 0) {
-                row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; gravity = Gravity.TOP }
+                row = LinearLayout(this).apply {
+                    orientation = LinearLayout.HORIZONTAL
+                    gravity = Gravity.TOP
+                }
                 holder.addView(row, LinearLayout.LayoutParams(-1, -2))
             }
             row?.addView(trackingCharacterCell(character), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
@@ -739,6 +749,18 @@ class MainActivity : AppCompatActivity() {
                 marginEnd = dp(3)
                 bottomMargin = dp(8)
             })
+
+            // Keep the final row's cards exactly the same width as the other rows.
+            // Empty slots occupy the remaining weight instead of stretching the portraits.
+            if (index == entries.lastIndex && (index + 1) % 3 != 0) {
+                repeat(3 - ((index + 1) % 3)) {
+                    row?.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
+                        marginStart = dp(3)
+                        marginEnd = dp(3)
+                        bottomMargin = dp(8)
+                    })
+                }
+            }
         }
         return holder
     }
@@ -756,7 +778,7 @@ class MainActivity : AppCompatActivity() {
                 when (event.actionMasked) {
                     android.view.MotionEvent.ACTION_DOWN -> {
                         view.animate().cancel()
-                        view.animate().scaleX(0.94f).scaleY(0.94f).setDuration(90).start()
+                        view.animate().scaleX(0.88f).scaleY(0.88f).setDuration(90).start()
                     }
                     android.view.MotionEvent.ACTION_UP, android.view.MotionEvent.ACTION_CANCEL -> {
                         view.animate().cancel()
@@ -788,6 +810,8 @@ class MainActivity : AppCompatActivity() {
                 setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
             }
         }
+        // The portrait itself has the stronger press effect; keep the heart button tactile too.
+        addPressEffect(heart)
         imageFrame.addView(heart, FrameLayout.LayoutParams(dp(34), dp(34), Gravity.TOP or Gravity.END).apply {
             topMargin = dp(8)
             marginEnd = dp(8)
@@ -948,6 +972,7 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER
             setOnClickListener { showGame(gameId) }
         }
+        addPressEffect(back)
         header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
         header.addView(label(gameMeta.first { it.id == gameId }.name, 24f, text, true), LinearLayout.LayoutParams(0, -2, 1f))
         column.addView(header)
@@ -1131,6 +1156,24 @@ class MainActivity : AppCompatActivity() {
             typeface = if (bold) android.graphics.Typeface.DEFAULT_BOLD
             else android.graphics.Typeface.DEFAULT
         }
+
+    private fun addPressEffect(view: View) {
+        view.setOnTouchListener { v, event ->
+            when (event.actionMasked) {
+                android.view.MotionEvent.ACTION_DOWN -> {
+                    v.animate().cancel()
+                    v.animate().scaleX(0.94f).scaleY(0.94f).setDuration(80).start()
+                }
+                android.view.MotionEvent.ACTION_UP,
+                android.view.MotionEvent.ACTION_CANCEL -> {
+                    v.animate().cancel()
+                    v.animate().scaleX(1f).scaleY(1f).setDuration(120)
+                        .setInterpolator(android.view.animation.OvershootInterpolator(1.5f)).start()
+                }
+            }
+            false
+        }
+    }
 
     private fun roundedDrawable(color: Int, radius: Float) =
         android.graphics.drawable.GradientDrawable().apply {
