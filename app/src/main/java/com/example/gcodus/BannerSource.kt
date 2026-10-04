@@ -22,8 +22,11 @@ object BannerSource {
 
         // MainActivity consumes a normalized games array. The remote feed
         // uses a named games object, so always normalize it here.
-        val sourceGames = root.optJSONObject("games")
-            ?: throw IllegalStateException("Banner feed has no games object")
+        val sourceGamesObject = root.optJSONObject("games")
+        val sourceGamesArray = root.optJSONArray("games")
+        if (sourceGamesObject == null && sourceGamesArray == null) {
+            throw IllegalStateException("Banner feed has no games")
+        }
 
         val games = JSONArray()
         val definitions = listOf(
@@ -33,7 +36,22 @@ object BannerSource {
         )
 
         for ((id, name) in definitions) {
-            val sourceGame = sourceGames.optJSONObject(name) ?: continue
+            val sourceGame = when {
+                sourceGamesObject != null -> sourceGamesObject.optJSONObject(name)
+                else -> {
+                    var found: JSONObject? = null
+                    for (i in 0 until sourceGamesArray!!.length()) {
+                        val candidate = sourceGamesArray.optJSONObject(i) ?: continue
+                        val candidateName = candidate.optString("name")
+                        val candidateId = candidate.optString("id")
+                        if (candidateName.equals(name, true) || candidateId.equals(id, true)) {
+                            found = candidate
+                            break
+                        }
+                    }
+                    found
+                }
+            } ?: continue
             val current = normalizePhase(sourceGame.optJSONArray("current")?.optJSONObject(0))
             val next = normalizePhase(sourceGame.optJSONArray("next")?.optJSONObject(0))
             val upcoming = JSONArray()
