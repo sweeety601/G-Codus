@@ -1,11 +1,11 @@
 {
   "version": 3,
-  "generated_at": "2026-10-04T02:01:04.977779+00:00",
+  "generated_at": "2026-10-04T03:51:46.112632+00:00",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-04T02:02:35.783187+00:00",
+      "fetched_at": "2026-10-04T03:53:20.828785+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -49,7 +49,7 @@
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-04T02:04:06.356542+00:00",
+      "fetched_at": "2026-10-04T03:54:51.324825+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -100,7 +100,7 @@
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-04T02:05:37.770502+00:00",
+      "fetched_at": "2026-10-04T03:56:22.527225+00:00",
       "status": "source_unavailable",
       "current": [
         {
