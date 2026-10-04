@@ -401,19 +401,19 @@ class MainActivity : AppCompatActivity() {
         val icons = HorizontalScrollView(this).apply {
             isHorizontalScrollBarEnabled = false
             overScrollMode = View.OVER_SCROLL_NEVER
-            setPadding(0, dp(14), 0, dp(2))
+            setPadding(0, 0, 0, 0)
         }
         val iconRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))
+        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(118)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 gravity = Gravity.CENTER
-                setPadding(dp(4), 0, dp(4), 0)
+                setPadding(dp(2), 0, dp(2), 0)
                 setOnClickListener { showGame(meta.id) }
             }
 
@@ -429,7 +429,7 @@ class MainActivity : AppCompatActivity() {
             if (resId != 0) icon.setImageResource(resId) else loadGameLogo(icon, meta.id)
             iconFrame.addView(icon, FrameLayout.LayoutParams(-1, -1))
             addPressEffect(item)
-            item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))
+            item.addView(iconFrame, LinearLayout.LayoutParams(dp(72), dp(72)))
 
             item.addView(label(
                 meta.name, 11f, muted, true).apply {
@@ -437,10 +437,10 @@ class MainActivity : AppCompatActivity() {
                 setPadding(0, dp(5), 0, 0)
             })
 
-            iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))
+            iconRow.addView(item, LinearLayout.LayoutParams(dp(104), dp(116)))
         }
 
-        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))
+        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(122)))
 
         val wishlist = TextView(this).apply {
             text = "Мой вишлист"
