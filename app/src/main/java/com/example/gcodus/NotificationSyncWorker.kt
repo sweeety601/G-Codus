@@ -278,6 +278,8 @@ class NotificationSyncWorker(
             "genshin" -> "genshin"
             "wuwa" -> "wuthering_waves"
             "zzz" -> "zenless_zone_zero"
+            "starrail" -> "honkai_star_rail"
+            "endfield" -> "arknights_endfield"
             else -> null
         }
 
@@ -378,7 +380,14 @@ class NotificationSyncWorker(
     }
 
     private fun isFavorite(gameId: String): Boolean = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE).getBoolean("favorite_" + gameId, false)
-    private fun gameName(id: String) = when (id) { "genshin" -> "Genshin Impact"; "wuwa" -> "Wuthering Waves"; "zzz" -> "Zenless Zone Zero"; else -> id }
+    private fun gameName(id: String) = when (id) {
+        "genshin" -> "Genshin Impact"
+        "wuwa" -> "Wuthering Waves"
+        "zzz" -> "Zenless Zone Zero"
+        "starrail" -> "Honkai: Star Rail"
+        "endfield" -> "Arknights: Endfield"
+        else -> id
+    }
 
     private fun fetch(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
