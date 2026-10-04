@@ -1,0 +1,33 @@
+name: Integrate uploaded portraits
+
+on:
+  push:
+    paths:
+      - "*_card.webp"
+      - "scripts/integrate_uploaded_portraits.py"
+      - "data/gacha_character_manifest.json"
+      - ".github/workflows/integrate-uploaded-portraits.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Sort portraits into app assets
+        run: python3 scripts/integrate_uploaded_portraits.py
+      - name: Commit sorted portraits and manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No portrait changes."
+          else
+            git commit -m "Integrate uploaded HSR and Endfield portraits"
+            git push
+          fi
