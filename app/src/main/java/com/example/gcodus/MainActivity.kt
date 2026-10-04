@@ -398,10 +398,16 @@ class MainActivity : AppCompatActivity() {
         })
         wrapper.addView(titleRow)
 
-        val icons = LinearLayout(this).apply {
-            gravity = Gravity.CENTER
+        val icons = HorizontalScrollView(this).apply {
+            isHorizontalScrollBarEnabled = false
+            overScrollMode = View.OVER_SCROLL_NEVER
             setPadding(0, dp(14), 0, dp(2))
         }
+        val iconRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = Gravity.CENTER_VERTICAL
+        }
+        icons.addView(iconRow, HorizontalScrollView.LayoutParams(-2, dp(100)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
@@ -431,10 +437,10 @@ class MainActivity : AppCompatActivity() {
                 setPadding(0, dp(5), 0, 0)
             })
 
-            icons.addView(item, LinearLayout.LayoutParams(0, dp(94), 1f))
+            iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(94)))
         }
 
-        wrapper.addView(icons)
+        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(104)))
 
         val wishlist = TextView(this).apply {
             text = "Мой вишлист"
@@ -697,7 +703,9 @@ class MainActivity : AppCompatActivity() {
             return (0 until arr.length()).map { i ->
                 val o = arr.getJSONObject(i)
                 PromoCode(
-                    o.optString("game"), o.optString("code"), o.optString("rewards"),
+                    o.optString("game"), o.optString("code"),
+                    listOf(o.optString("rewards"), o.optString("reward"), o.optString("items"), o.optString("description"))
+                        .firstOrNull { it.isNotBlank() && !it.equals("unknown", true) } ?: "",
                     o.optString("source"), o.optString("expires_at"),
                     o.optString("expired_at"), if (expired) "expired" else "active"
                 )
@@ -976,13 +984,20 @@ class MainActivity : AppCompatActivity() {
             marginEnd = dp(8)
         })
         cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
+        val endfieldRarity = if (character.gameId == "endfield") endfieldRarityForDisplay(character.name) else 0
+        if (endfieldRarity > 0) {
+            cell.addView(label(endfieldRarity.toString() + "★", 11f, Color.rgb(255, 211, 76), true).apply {
+                gravity = Gravity.CENTER
+                setPadding(0, dp(4), 0, 0)
+            })
+        }
         cell.addView(label(character.name, 11.5f, text, true).apply {
             gravity = Gravity.CENTER
             maxLines = 3
             ellipsize = android.text.TextUtils.TruncateAt.END
             includeFontPadding = true
             setPadding(dp(4), dp(5), dp(4), dp(5))
-        }, LinearLayout.LayoutParams(-1, dp(58)))
+        }, LinearLayout.LayoutParams(-1, if (endfieldRarity > 0) dp(50) else dp(58)))
 
         cell.setOnClickListener {
             toggleTracked(character.gameId, character.file)
@@ -1074,6 +1089,17 @@ class MainActivity : AppCompatActivity() {
         overrides[base]?.let { return it }
         return base.split("-").joinToString(" ") { word ->
             word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+        }
+    }
+
+    private fun endfieldRarityForDisplay(name: String): Int {
+        val n = name.lowercase().replace("’", "").replace("'", "").replace("&", "and")
+            .replace(Regex("[^a-z0-9]+"), "")
+        return when {
+            n in setOf("arcane","ardelia","camille","ember","endministrator","gilberta","laevatain","lastrite","lifeng","liino","mifu","pogranichnik","rossi","tangtang","typhoeus","yvonne","zhuangfangyi") -> 6
+            n in setOf("alesh","arclight","avywenna","chenqianyu","dapan","perlica","purrchena","snowshine","wulfgard","xaihi") -> 5
+            n in setOf("akekuri","antal","catcher","estella","fluorite") -> 4
+            else -> 0
         }
     }
 

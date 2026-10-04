@@ -33,6 +33,17 @@ SECONDARY = {
     ],
 }
 
+LEAK_SOURCES = {
+    "Honkai: Star Rail": [
+        "https://hsr.hakush.in/",
+        "https://www.reddit.com/r/HonkaiStarRail_leaks/",
+    ],
+    "Arknights: Endfield": [
+        "https://www.reddit.com/r/ArknightsEndfieldLeak/",
+        "https://www.pocketgamer.com/arknights-endfield/upcoming-banners/",
+    ],
+}
+
 UA = "G-Codus/2.1 banner-sync"
 
 
@@ -316,7 +327,7 @@ def main():
         # The app displays only the current and immediate next phase.
         upcoming=[]
 
-        output["games"][game]={"source_url":url,"fetched_at":datetime.now(timezone.utc).isoformat(),"status":"source_reachable" if cards else "source_unavailable","current":current[:6],"next":next_phase[:6],"upcoming":[]}
+        output["games"][game]={"source_url":url,"fetched_at":datetime.now(timezone.utc).isoformat(),"status":"source_reachable" if cards else "source_unavailable","current":current[:6],"next":next_phase[:6],"upcoming":[],"leak_sources":LEAK_SOURCES.get(game, [])}
     OUT.write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Online banner sync completed:",OUT)
 

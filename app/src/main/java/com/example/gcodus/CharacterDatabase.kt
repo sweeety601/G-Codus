@@ -9,7 +9,8 @@ data class OnlineCharacter(
     val name: String,
     val slug: String,
     val announced: Boolean,
-    val portraitUrl: String
+    val portraitUrl: String,
+    val rarity: Int = 0
 )
 
 object CharacterDatabase {
@@ -160,8 +161,21 @@ object CharacterDatabase {
                 .replace("&", "and")
                 .replace(Regex("[^a-z0-9]+"), "-")
                 .trim('-')
-            OnlineCharacter(gameId, name, slug, false, portraitUrl(gameId, slug))
+            OnlineCharacter(
+                gameId, name, slug, false, portraitUrl(gameId, slug),
+                if (gameId == "endfield") endfieldRarity(name) else 0
+            )
         }
+
+    private fun endfieldRarity(name: String): Int {
+        val n = normalize(name)
+        return when {
+            n in ENDFIELD_6_STAR -> 6
+            n in ENDFIELD_5_STAR -> 5
+            n in ENDFIELD_4_STAR -> 4
+            else -> 0
+        }
+    }
 
     // HSR roster assembled from the live Prydwen character database.
     private val HSR_FALLBACK = listOf(
@@ -182,6 +196,21 @@ object CharacterDatabase {
         "Trailblazer • Harmony","Trailblazer • Preservation","Trailblazer • Remembrance",
         "Tribbie","Welt","Xueyi","Yanqing","Yao Guang","Yukong","Yunli"
     )
+
+    private val ENDFIELD_6_STAR = setOf(
+        "arcane","ardelia","camille","ember","endministrator","gilberta","laevatain",
+        "last rite","lifeng","liino","mi fu","pogranichnik","rossi","tangtang",
+        "typhoeus","yvonne","zhuang fangyi"
+    ).map(::normalize).toSet()
+
+    private val ENDFIELD_5_STAR = setOf(
+        "alesh","arclight","avywenna","chen qianyu","da pan","perlica","purrchena",
+        "snowshine","wulfgard","xaihi"
+    ).map(::normalize).toSet()
+
+    private val ENDFIELD_4_STAR = setOf(
+        "akekuri","antal","catcher","estella","fluorite"
+    ).map(::normalize).toSet()
 
     // Endfield roster from the current Prydwen operator database.
     // Purrchena is included from the public free-operator roster.

@@ -29,6 +29,7 @@ object PromoCodeSource {
             "game-codes" to "https://game-codes.wisp.uno/codes?game=wuwa"
         ),
         "starrail" to listOf(
+            "hoyo-codes" to "https://hoyo-codes.seria.moe/codes?game=hkrpg",
             "OpenGachaCodes" to "https://api.ennead.cc/codes/starrail"
         ),
         "endfield" to listOf(
@@ -55,7 +56,12 @@ object PromoCodeSource {
                     val key = game + "|" + code.uppercase(Locale.US)
                     if (!seen.add(key)) continue
 
-                    val rewards = formatRewards(item.opt("rewards"))
+                    val rewards = formatRewards(
+                        item.opt("rewards").takeUnless { it == null || it == JSONObject.NULL || it.toString().equals("unknown", true) }
+                            ?: item.opt("reward").takeUnless { it == null || it == JSONObject.NULL || it.toString().equals("unknown", true) }
+                            ?: item.opt("items").takeUnless { it == null || it == JSONObject.NULL }
+                            ?: item.opt("description")
+                    )
                     active += JSONObject()
                         .put("game", game)
                         .put("code", code)
