@@ -38,7 +38,9 @@ object BannerSource {
         val definitions = listOf(
             "genshin" to "Genshin Impact",
             "wuwa" to "Wuthering Waves",
-            "zzz" to "Zenless Zone Zero"
+            "zzz" to "Zenless Zone Zero",
+            "starrail" to "Honkai: Star Rail",
+            "endfield" to "Arknights: Endfield"
         )
 
         for ((id, name) in definitions) {
