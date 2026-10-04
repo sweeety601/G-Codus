@@ -1,0 +1,28 @@
+name: Finalize current G-Codus fixes
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply current fixes
+        run: python3 scripts/apply_current_portrait_fixes.py
+      - name: Commit generated fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt scripts/sync_game_icons.py data/gacha_character_manifest.json
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No generated changes."
+          else
+            git commit -m "Finalize portrait, logo, and HSR matching fixes"
+            git push
+          fi
