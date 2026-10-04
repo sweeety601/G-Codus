@@ -94,7 +94,18 @@ def normalize_cards(cards, primary_url):
             name = clean(link.get("name", "")) or clean(link.get("alt", ""))
             if not name: name = href.rstrip("/").split("/")[-1].replace("-", " ")
             if not name: continue
-            rarity = classify_character(href, link, rarity_cache)
+            # Do not open every character page just to determine rarity.
+            # That turns a single banner-page scrape into dozens of slow requests.
+            # The banner card context is sufficient when the source exposes rarity;
+            # otherwise the character is kept in the main list and known schedules
+            # provide exact 4-star lineups for supported confirmed phases.
+            context_lower = clean(link.get("context", "")).lower()
+            if re.search(r"4\s*[★⭐]|4[- ]star|a[- ]rank", context_lower):
+                rarity = 4
+            elif re.search(r"5\s*[★⭐]|5[- ]star|s[- ]rank", context_lower):
+                rarity = 5
+            else:
+                rarity = 0
             target = four_stars if rarity == 4 else names
             if name.lower() not in {x.lower() for x in target}: target.append(name)
         if not names and not four_stars: continue
