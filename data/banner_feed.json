@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "generated_at": "2026-10-04T01:46:29.270Z",
+  "version": 3,
+  "generated_at": "2026-10-04T01:52:38.175Z",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
@@ -138,7 +138,22 @@
           "status": "upcoming",
           "unconfirmed": true,
           "source_status": "unconfirmed",
-          "secondary_source": "https://timesaver.gg/blog/zzz-3-3"
+          "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
+        }
+      ],
+      "upcoming": [
+        {
+          "phase": "3.3 Phase 2",
+          "type": "character",
+          "characters": [
+            "Severian"
+          ],
+          "start_date": "2026-11-11",
+          "end_date": "2026-12-02",
+          "status": "upcoming",
+          "unconfirmed": true,
+          "source_status": "unconfirmed",
+          "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
         }
       ]
     }
