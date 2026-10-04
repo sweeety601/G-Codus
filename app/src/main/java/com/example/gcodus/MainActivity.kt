@@ -1322,12 +1322,13 @@ class MainActivity : AppCompatActivity() {
         // bundled Endfield portrait and never allow a same-named portrait
         // from another game/fallback to be selected.
         if (gameId == "endfield" && normalized == "perlica") {
-            try {
-                assets.open("arknights_endfield/perlica_card.webp").use { input ->
-                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
-                    if (bitmap != null) image.setImageBitmap(bitmap)
-                }
-            } catch (_: Exception) { }
+            // Perlica must use the exact portrait from Prydwen's Endfield
+            // character page. Do not let the generic local-name matcher pick
+            // another Perlica image.
+            loadRemotePortrait(
+                image,
+                listOf("https://cdn.prydwen.gg/images/arknights-endfield/characters/perlica_card.webp")
+            )
             return
         }
 
