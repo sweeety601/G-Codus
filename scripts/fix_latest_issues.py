@@ -69,6 +69,46 @@ s = s.replace('''            val fiveStars = (0 until arr.length())
                 .map { arr.optString(it).replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim() }
                 .filter { it.isNotBlank() }
                 .distinct()''',1)
+
+# Remove Storyteller and Sunbringer from the Tracking/Wishlist UI and from
+# any already-saved tracking preferences. Keep every other character intact.
+replace_once('''        val normalizedQuery = query?.trim()?.lowercase().orEmpty()
+        val rawEntries = mutableListOf<TrackedCharacter>()''','''        val normalizedQuery = query?.trim()?.lowercase().orEmpty()
+        val rawEntries = mutableListOf<TrackedCharacter>()
+        val blockedTrackingNames = setOf("storyteller", "sunbringer")
+        fun isBlockedTrackingCharacter(gameId: String, name: String): Boolean =
+            gameId == "endfield" && normalizeCharacterForMatch(stripZzzVersion(name)) in blockedTrackingNames''','tracking blacklist declaration')
+replace_once('''                val name = canonicalCharacterDisplayName(meta.id, characterDisplayName(file))
+                if (isMainProtagonist(meta.id, file, name)) return@forEach''','''                val name = canonicalCharacterDisplayName(meta.id, characterDisplayName(file))
+                if (isBlockedTrackingCharacter(meta.id, name)) return@forEach
+                if (isMainProtagonist(meta.id, file, name)) return@forEach''','local tracking blacklist')
+replace_once('''                .forEach { online ->
+                    val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
+                    val duplicateLocal = localFiles.any { localFile ->''','''                .forEach { online ->
+                    val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
+                    if (isBlockedTrackingCharacter(meta.id, displayOnlineName)) return@forEach
+                    val duplicateLocal = localFiles.any { localFile ->''','online tracking blacklist')
+replace_once('''    private fun migrateTrackingKeys() {
+        val editor = prefs.edit()
+        var changed = false
+
+        prefs.all.forEach { (key, value) ->''','''    private fun migrateTrackingKeys() {
+        val editor = prefs.edit()
+        var changed = false
+
+        prefs.all.keys
+            .filter { it.startsWith("tracked_") }
+            .filter { key ->
+                val normalized = key.lowercase()
+                normalized.contains("storyteller") || normalized.contains("sunbringer")
+            }
+            .forEach { key ->
+                editor.remove(key)
+                changed = true
+            }
+
+        prefs.all.forEach { (key, value) ->''','tracking preference cleanup')
+
 main.write_text(s)
 
 icons = ROOT / "scripts/sync_game_icons.py"
@@ -115,4 +155,4 @@ chars = ROOT / "app/src/main/java/com/example/gcodus/CharacterDatabase.kt"
 c=chars.read_text()
 c=c.replace('s = s.replace(Regex("\\\\s+"), " ").trim()','s = s.replace("•", " ").replace("·", " ").replace(Regex("\\\\s+"), " ").trim()')
 chars.write_text(c)
-print("Applied latest UI, portrait, rarity and HSR naming fixes")
+print("Applied latest UI, portrait, rarity, HSR naming and tracking blacklist fixes")
