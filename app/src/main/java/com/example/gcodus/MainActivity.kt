@@ -1368,17 +1368,39 @@ class MainActivity : AppCompatActivity() {
                 val now = Instant.now()
                 countdownViews.forEach { pair ->
                     try {
-                        val target = try {
-                            OffsetDateTime.parse(pair.second).toInstant()
-                        } catch (_: Exception) {
-                            try { Instant.parse(pair.second) } catch (_: Exception) { null }
-                        } ?: return@forEach
+                        val target = parseBannerInstant(pair.second, endOfDay = true) ?: return@forEach
                         val seconds = Duration.between(now, target).seconds.coerceAtLeast(0)
                         pair.first.text = "До окончания\n" + formatCountdown(seconds)
                     } catch (_: Exception) { }
                 }
             }
         }, 0, 1, TimeUnit.SECONDS)
+    }
+
+    private fun parseBannerInstant(value: String, endOfDay: Boolean = false): Instant? {
+        val v = value.trim()
+        if (v.isBlank() || v == "null") return null
+        return try {
+            OffsetDateTime.parse(v).toInstant()
+        } catch (_: Exception) {
+            try {
+                Instant.parse(v)
+            } catch (_: Exception) {
+                try {
+                    java.time.LocalDateTime.parse(v)
+                        .atZone(ZoneId.systemDefault()).toInstant()
+                } catch (_: Exception) {
+                    try {
+                        val date = java.time.LocalDate.parse(v)
+                        val time = if (endOfDay) java.time.LocalTime.of(23, 59, 59)
+                        else java.time.LocalTime.MIDNIGHT
+                        date.atTime(time).atZone(ZoneId.systemDefault()).toInstant()
+                    } catch (_: Exception) {
+                        null
+                    }
+                }
+            }
+        }
     }
 
     private fun loadFeed(): List<GameFeed> {
@@ -1490,9 +1512,22 @@ class MainActivity : AppCompatActivity() {
         else "%02dh %02dm %02ds".format(hours, minutes, secs)
     }
 
-    private fun formatDate(value: String): String = try {
-        OffsetDateTime.parse(value).atZoneSameInstant(ZoneId.systemDefault())
-            .format(DateTimeFormatter.ofPattern("dd.MM.yyyy • HH:mm"))
+    private fun formatDate(value: String): String {
+        val zone = ZoneId.systemDefault()
+        try {
+            return OffsetDateTime.parse(value)
+                .atZoneSameInstant(zone)
+                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy • HH:mm"))
+        } catch (_: Exception) { }
+        try {
+            return java.time.LocalDateTime.parse(value)
+                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy • HH:mm"))
+        } catch (_: Exception) { }
+        try {
+            return java.time.LocalDate.parse(value)
+                .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+        } catch (_: Exception) { }
+        return value
     } catch (_: Exception) {
         value
     }
