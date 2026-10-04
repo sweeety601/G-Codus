@@ -137,6 +137,8 @@ object CharacterDatabase {
             if (s == "blademortenax" || s == "mortenaxblade" || n == "blademortenax" || n == "mortenaxblade") return "starrail|mortenaxblade"
             if (s == "imbibitorlunae" || s == "danhengimbibitorlunae" ||
                 n == "imbibitorlunae" || n == "danhengimbibitorlunae") return "starrail|imbibitorlunae"
+            if (s == "topaz" || s == "topazandnumby" ||
+                n == "topaz" || n == "topazandnumby") return "starrail|topaz"
         }
         if (gameId == "zzz") {
             val s = normalize(slug)
