@@ -1067,7 +1067,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun characterDisplayName(file: String): String {
+        // CARD_FILENAME_IDENTITY_FIX_V1
+        // Ignore technical asset suffixes when resolving the character name.
         val base = file.substringBeforeLast(".")
+            .removeSuffix("_card")
+            .removeSuffix("_full")
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
             "__wuwa-aemeath" to "Aemeath",
