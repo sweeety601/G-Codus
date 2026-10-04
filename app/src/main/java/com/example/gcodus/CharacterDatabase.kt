@@ -131,6 +131,11 @@ object CharacterDatabase {
     }
 
     private fun canonicalKey(gameId: String, slug: String, name: String): String {
+        if (gameId == "starrail") {
+            val s = normalize(slug)
+            val n = normalize(name)
+            if (s == "blademortenax" || s == "mortenaxblade" || n == "blademortenax" || n == "mortenaxblade") return "starrail|mortenaxblade"
+        }
         if (gameId == "zzz") {
             val s = normalize(slug)
             val n = normalize(name)
