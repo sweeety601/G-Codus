@@ -1551,19 +1551,10 @@ class MainActivity : AppCompatActivity() {
 
         return when (gameId) {
             "zzz" -> {
-                val localCanonical = normalizeCharacterForMatch(
-                    canonicalCharacterDisplayName("zzz", localName)
-                )
-                val onlineCanonical = normalizeCharacterForMatch(
-                    canonicalCharacterDisplayName("zzz", onlineName)
-                )
-                val localFileCanonical = normalizeCharacterForMatch(
-                    canonicalCharacterDisplayName("zzz", localFile.substringBeforeLast("."))
-                )
-                val onlineSlugCanonical = normalizeCharacterForMatch(
-                    canonicalCharacterDisplayName("zzz", onlineSlug)
-                )
-                localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical
+                val local = normalizeCharacterForMatch(localName)
+                val online = normalizeCharacterForMatch(onlineName)
+                val localSlug = normalizeCharacterForMatch(localFile)
+                local == online || localSlug == normalizeCharacterForMatch(onlineSlug)
             }
             else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
