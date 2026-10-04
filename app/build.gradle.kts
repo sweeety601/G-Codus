@@ -1,3 +1,7 @@
+plugins {
+    id("com.android.application")
+}
+
 android {
     namespace = "com.example.gcodus"
     compileSdk = 36
