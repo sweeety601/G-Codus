@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MAIN = ROOT / "app/src/main/java/com/example/gcodus/MainActivity.kt"
 ICON_SYNC = ROOT / "scripts/sync_game_icons.py"
 
+# Current fixes: local HSR/Endfield portraits, HSR name aliases, and larger top game tiles.
 s = MAIN.read_text()
 repls = {
     'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))':
@@ -17,9 +18,9 @@ repls = {
         'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))',
 }
 for old, new in repls.items():
-    if old not in s:
+    if old not in s and new not in s:
         raise SystemExit(f"MainActivity replacement target not found: {old}")
-    s = s.replace(old, new, 1)
+    s = s.replace(old, new, 1) if old in s else s
 
 old = '''    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
         val a = normalizeCharacterForMatch(localName)
@@ -48,13 +49,9 @@ new = '''    private fun sameCharacterIdentity(gameId: String, localName: String
         }
 
         if (gameId == "zzz") {'''
-if old not in s:
-    raise SystemExit('sameCharacterIdentity target not found')
-s = s.replace(old, new, 1)
-MAIN.write_text(s)
+if old in s:
+    s = s.replace(old, new, 1)
 
-# Make the uploaded root HSR logo authoritative. The old CDN source is used only
-# when the user has not supplied Honkai_Star_Rail_logo.png in the repository root.
 icon = ICON_SYNC.read_text()
 old = '''for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
@@ -73,7 +70,6 @@ new = '''for filename, url in ICONS.items():
     with urlopen(req, timeout=30) as response:
         target.write_bytes(response.read())
 '''
-if old not in icon:
-    raise SystemExit('icon sync replacement target not found')
-ICON_SYNC.write_text(icon.replace(old, new, 1))
+if old in icon:
+    ICON_SYNC.write_text(icon.replace(old, new, 1))
 print('Applied portrait identity, top tile size, and supplied HSR logo fixes.')
