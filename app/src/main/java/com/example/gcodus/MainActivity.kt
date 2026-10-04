@@ -1094,7 +1094,7 @@ class MainActivity : AppCompatActivity() {
             "orhpie-magus" to "Orphie & Magus",
             "luuk-herssen" to "Luuk Herssen",
             "billy-kid" to "Billy Kid",
-            "billy" to "Billy Kid"
+            "billy" to "Billy Kid",
             "blade-mortenax" to "Mortenax Blade"
         )
         overrides[base]?.let { return it }
