@@ -25,8 +25,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Sync bundled game icons
-        run: python3 scripts/sync_game_icons.py
       - name: Apply requested game fixes
         run: python3 scripts/run_requested_game_updates.py
       - name: Fix horizontal LayoutParams
