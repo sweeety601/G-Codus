@@ -412,8 +412,8 @@ class MainActivity : AppCompatActivity() {
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                gravity = Gravity.TOP
-                setPadding(dp(2), 0, dp(2), 0)
+                gravity = Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                setPadding(0, 0, 0, 0)
                 setOnClickListener { showGame(meta.id) }
             }
 
@@ -435,9 +435,9 @@ class MainActivity : AppCompatActivity() {
                 meta.name, 11f, muted, true).apply {
                 gravity = Gravity.CENTER
                 setPadding(0, dp(5), 0, 0)
-            })
+            }, LinearLayout.LayoutParams(dp(72), dp(38)))
 
-            iconRow.addView(item, LinearLayout.LayoutParams(dp(104), dp(116)))
+            iconRow.addView(item, LinearLayout.LayoutParams(dp(80), dp(116)))
         }
 
         wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(122)))
@@ -1695,10 +1695,21 @@ class MainActivity : AppCompatActivity() {
                 ?: b.optJSONArray("fourStars")
                 ?: JSONArray()
 
+            fun canonicalBannerCharacterName(value: String): String {
+                val cleaned = value.replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim()
+                val key = normalizeCharacterForMatch(cleaned)
+                return if (game.optString("id").equals("starrail", true) &&
+                    key in setOf("danhengimbibitorlunae", "imbibitorlunae")) {
+                    "Imbibitor Lunae"
+                } else {
+                    cleaned
+                }
+            }
+
             val fiveStars = (0 until arr.length())
-                .map { arr.optString(it).replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim() }
+                .map { canonicalBannerCharacterName(arr.optString(it)) }
                 .filter { it.isNotBlank() }
-                .distinct()
+                .distinctBy { normalizeCharacterForMatch(it) }
 
             val fourStars = (0 until fourStarArr.length())
                 .map { fourStarArr.optString(it) }
