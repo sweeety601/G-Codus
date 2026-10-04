@@ -1,4 +1,5 @@
 name: Verify Android build
+# Verification includes bundled game icons.
 
 on:
   push:
