@@ -20,11 +20,8 @@ object BannerSource {
         val source = fetch(FEED_URL)
         val root = JSONObject(source)
 
-        // New normalized feed can be consumed directly.
-        if (root.optJSONArray("games") != null) {
-            return root.toString()
-        }
-
+        // MainActivity consumes a normalized games array. The remote feed
+        // uses a named games object, so always normalize it here.
         val sourceGames = root.optJSONObject("games")
             ?: throw IllegalStateException("Banner feed has no games object")
 
