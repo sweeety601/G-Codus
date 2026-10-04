@@ -1728,7 +1728,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun emergencyBannerFeed/(): String =
+    private fun emergencyBannerFeed(): String =
         JSONObject().put("version", 1).put("games", JSONArray().apply {
             put(JSONObject()
                 .put("id", "genshin")
