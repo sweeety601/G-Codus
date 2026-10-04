@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity() {
     private var previousGameId: String? = null
     private var currentGameId: String? = null
     private var onlineCharacters: List<OnlineCharacter> = emptyList()
+    private var bannerFeedJson: String? = null
 
     private val bg = Color.rgb(13, 14, 19)
     private val surface = Color.rgb(21, 23, 32)
@@ -1381,7 +1382,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFeed(): List<GameFeed> {
-        fun parseSource(source: String): List<GameFeed> {
+        val source = bannerFeedJson ?: return emptyList()
+        return try {
             val games = JSONObject(source).optJSONArray("games") ?: JSONArray()
             val result = mutableListOf<GameFeed>()
             for (i in 0 until games.length()) {
@@ -1396,30 +1398,11 @@ class MainActivity : AppCompatActivity() {
                         parseBanners(g, "current"),
                         parseBanners(g, "next")
                     )
-                } catch (_: Exception) {
-                    // One broken game's online payload must never prevent the
-                    // other games (or the game selector) from opening.
-                }
+                } catch (_: Exception) { }
             }
             return result
-        }
-
-        val bundled = try {
-            assets.open("banner_feed.json").bufferedReader().use(BufferedReader::readText)
         } catch (_: Exception) {
-            "{\"games\":[]}"
-        }
-
-        val cached = prefs.getString("banner_feed", null)
-        val onlineGames = if (!cached.isNullOrBlank()) parseSource(cached) else emptyList()
-        val bundledGames = parseSource(bundled)
-
-        // Prefer online banner data, but fall back per game to the bundled
-        // snapshot. This is especially important for WuWa if the Kuro API
-        // changes its response format temporarily.
-        return gameMeta.mapNotNull { meta ->
-            onlineGames.firstOrNull { it.id == meta.id }
-                ?: bundledGames.firstOrNull { it.id == meta.id }
+            emptyList()
         }
     }
 
@@ -1428,9 +1411,8 @@ class MainActivity : AppCompatActivity() {
             try {
                 val fresh = BannerSource.fetchNormalized(this@MainActivity)
                 JSONObject(fresh).getJSONArray("games")
-                val old = prefs.getString("banner_feed", null)
-                if (old != fresh) {
-                    prefs.edit().putString("banner_feed", fresh).apply()
+                if (bannerFeedJson != fresh) {
+                    bannerFeedJson = fresh
                     runOnUiThread {
                         if (!isFinishing) refreshCurrentScreen()
                     }
