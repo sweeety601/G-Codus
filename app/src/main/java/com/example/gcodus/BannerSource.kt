@@ -52,6 +52,7 @@ object BannerSource {
         }
         val schedule = fetch(GENSHIN_SCHEDULE)
         if (schedule != null) {
+            updateGenshinLineupFromSchedule(game.optJSONObject("current"), game.optJSONObject("next"), schedule)
             updateGenshinNextFromSchedule(game.optJSONObject("next"), schedule)
         }
         // Version 7.1 Phase 2 was shown in the Special Program but has not
@@ -71,6 +72,15 @@ object BannerSource {
         putDateRange(phase, dates.groupValues[1], dates.groupValues[2])
     }
 
+    private fun updateGenshinLineupFromSchedule(current: JSONObject?, next: JSONObject?, text: String) {
+        if (current != null && text.contains("Vesna", true) && text.contains("Vodyanitsa", true)) {
+            current.put("five_star", JSONArray(listOf("Vesna", "Vodyanitsa")))
+        }
+        if (next != null && text.contains("Escoffier", true) && text.contains("Skirk", true)) {
+            next.put("five_star", JSONArray(listOf("Escoffier", "Skirk")))
+        }
+    }
+
     private fun updateGenshinNextFromSchedule(phase: JSONObject?, text: String) {
         if (phase == null) return
         val m = Regex("(?is)Version\\s+7\\.1\\s+Phase\\s+2.{0,1500}?Opens\\s+([A-Z][a-z]+\\s+\\d{1,2},\\s+\\d{4}).{0,120}?Ends\\s+([A-Z][a-z]+\\s+\\d{1,2},\\s+\\d{4})")
@@ -88,6 +98,12 @@ object BannerSource {
             .find(text)
         val nextRange = Regex("(?is)What's the next Wuthering Waves banner\\?.{0,1800}?(September|October|November|December)\\s+\\d{1,2}\\s*-\\s*(September|October|November|December)\\s+\\d{1,2}")
             .find(text)
+        if (current != null && text.contains("Hsin", true) && text.contains("Chisa", true) && text.contains("Iuno", true)) {
+            current.put("five_star", JSONArray(listOf("Hsin", "Chisa", "Iuno")))
+        }
+        if (next != null && text.contains("Suoming", true) && text.contains("Lynae", true) && text.contains("Lucilla", true)) {
+            next.put("five_star", JSONArray(listOf("Suoming", "Lynae", "Lucilla")))
+        }
         currentRange?.let { putMonthRange(current, it.value) }
         nextRange?.let { putMonthRange(next, it.value) }
     }
@@ -106,7 +122,7 @@ object BannerSource {
         history?.let { updateZzzCurrent(game.optJSONObject("current"), it) }
 
         val next = game.optJSONObject("next") ?: return
-        if ((next.optJSONArray("five_star")?.length() ?: 0) > 0) return
+        if (next.optJSONArray("five_star")?.length() ?: 0 > 0) return
 
         val forecast = fetch(ZZZ_FORECAST)
         if (forecast != null && forecast.contains("Phoenix", true)) {
@@ -123,8 +139,7 @@ object BannerSource {
         if (phase == null) return
         val version = phase.optString("version").substringBefore(" Phase").trim()
         val phaseNo = Regex("(?i)Phase\\s+(\\d+)").find(phase.optString("version"))?.groupValues?.getOrNull(1) ?: return
-        val phaseTag = if (phaseNo == "1") "I" else if (phaseNo == "2") "II" else phaseNo
-        val block = Regex("(?ms)^##\\s+Version\\s+" + Regex.escape(version) + ".*?\\[Phase\\s+(?:" + Regex.escape(phaseNo) + "|" + Regex.escape(phaseTag) + ")\\].*?(?=^##\\s+Version\\s+|\\z)")
+        val block = Regex("(?ms)^##\\s+Version\\s+" + Regex.escape(version) + ".*?\\[Phase\\s+" + phaseNo + "\\].*?(?=^##\\s+Version\\s+|\\z)")
             .find(text)?.value ?: return
         val dates = Regex("(?ms)^Start\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))\\s*\\n.*?^End\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))")
             .find(block) ?: return
