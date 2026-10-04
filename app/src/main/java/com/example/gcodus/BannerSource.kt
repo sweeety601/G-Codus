@@ -106,7 +106,7 @@ object BannerSource {
         history?.let { updateZzzCurrent(game.optJSONObject("current"), it) }
 
         val next = game.optJSONObject("next") ?: return
-        if (next.optJSONArray("five_star")?.length() ?: 0 > 0) return
+        if ((next.optJSONArray("five_star")?.length() ?: 0) > 0) return
 
         val forecast = fetch(ZZZ_FORECAST)
         if (forecast != null && forecast.contains("Phoenix", true)) {
@@ -123,7 +123,8 @@ object BannerSource {
         if (phase == null) return
         val version = phase.optString("version").substringBefore(" Phase").trim()
         val phaseNo = Regex("(?i)Phase\\s+(\\d+)").find(phase.optString("version"))?.groupValues?.getOrNull(1) ?: return
-        val block = Regex("(?ms)^##\\s+Version\\s+" + Regex.escape(version) + ".*?\\[Phase\\s+" + phaseNo + "\\].*?(?=^##\\s+Version\\s+|\\z)")
+        val phaseTag = if (phaseNo == "1") "I" else if (phaseNo == "2") "II" else phaseNo
+        val block = Regex("(?ms)^##\\s+Version\\s+" + Regex.escape(version) + ".*?\\[Phase\\s+(?:" + Regex.escape(phaseNo) + "|" + Regex.escape(phaseTag) + ")\\].*?(?=^##\\s+Version\\s+|\\z)")
             .find(text)?.value ?: return
         val dates = Regex("(?ms)^Start\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))\\s*\\n.*?^End\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))")
             .find(block) ?: return
