@@ -42,7 +42,11 @@ tasks.named("preBuild").configure {
     dependsOn(prepareAppIcon)
 }
 
-android.sourceSets.getByName("main").res.srcDir(layout.buildDirectory.dir("generated/res/appIcon"))
+// Use a concrete directory here. Newer Android Gradle Plugin versions reject
+// Provider instances passed directly to Android SourceSet APIs.
+android.sourceSets.getByName("main").res.srcDir(
+    layout.buildDirectory.dir("generated/res/appIcon").get().asFile
+)
 
 dependencies {
     implementation("androidx.core:core-ktx:1.17.0")
