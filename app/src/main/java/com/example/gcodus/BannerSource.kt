@@ -102,7 +102,11 @@ object BannerSource {
         // A next phase is treated as unconfirmed only when the canonical source
         // does not provide an official announcement link.
         game.optJSONObject("next")?.let { next ->
-            next.put("unconfirmed", next.optString("official_source").isBlank())
+            val official = next.optString("official_source")
+            // A specific official announcement is confirmation. A generic
+            // HoYoLAB news feed is not enough to mark a banner as confirmed.
+            val confirmed = official.contains("/news/", true) || official.contains("/news/detail/", true)
+            next.put("unconfirmed", !confirmed)
         }
     }
 
