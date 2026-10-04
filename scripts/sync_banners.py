@@ -131,8 +131,8 @@ def scrape_with_playwright(url):
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1440, "height": 1400})
-        page.goto(url, wait_until="networkidle", timeout=90000)
-        page.wait_for_timeout(3000)
+        page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(1500)
         cards = page.evaluate("""() => {
             const headings=[...document.querySelectorAll('h1,h2,h3,h4')];
             const nodes=[...document.querySelectorAll('.custom-banner-header')];
