@@ -877,6 +877,7 @@ class MainActivity : AppCompatActivity() {
             val localFiles = listCharacterFiles(meta.id)
             localFiles.forEach { file ->
                 val name = canonicalCharacterDisplayName(meta.id, characterDisplayName(file))
+                if (isForbiddenTrackingCharacter(meta.id, name, file)) return@forEach
                 if (isMainProtagonist(meta.id, file, name)) return@forEach
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
@@ -886,6 +887,7 @@ class MainActivity : AppCompatActivity() {
 
             onlineCharacters
                 .filter { it.gameId == meta.id }
+                .filterNot { online -> isForbiddenTrackingCharacter(meta.id, online.name, online.slug) }
                 .filterNot { online -> isMainProtagonist(meta.id, online.slug, online.name) }
                 .forEach { online ->
                     val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
@@ -912,10 +914,7 @@ class MainActivity : AppCompatActivity() {
         // duplicate aliases that can come from either local assets or the
         // online character list. One game + one canonical character = one card.
         val entries = rawEntries
-            .filterNot {
-                it.gameId == "endfield" && normalizeCharacterForMatch(it.name) in
-                    setOf("storyteller", "thestoryteller", "sunbringer")
-            }
+            .filterNot { isForbiddenTrackingCharacter(it.gameId, it.name, it.file) }
             .groupBy { trackedIdentityKey(it.gameId, it.file) }
             .values
             .map { group ->
@@ -1204,6 +1203,15 @@ class MainActivity : AppCompatActivity() {
             n in setOf("akekuri","antal","catcher","estella","fluorite") -> 4
             else -> 0
         }
+    }
+
+    private fun isForbiddenTrackingCharacter(gameId: String, name: String, file: String = ""): Boolean {
+        if (!gameId.equals("endfield", true) && !gameId.contains("endfield", true)) return false
+        val nameKey = normalizeCharacterForMatch(name)
+        val fileKey = normalizeCharacterForMatch(file.substringBeforeLast("."))
+        return nameKey in setOf("storyteller", "thestoryteller", "sunbringer") ||
+            fileKey in setOf("storyteller", "thestoryteller", "sunbringer") ||
+            fileKey.contains("storyteller") || fileKey.contains("sunbringer")
     }
 
     private fun trackedCharacterName(gameId: String, file: String): String {
