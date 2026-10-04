@@ -58,7 +58,11 @@ object BannerSource {
         for (i in 0 until fallbackGames.length()) {
             val base = JSONObject(fallbackGames.getJSONObject(i).toString())
             val gameName = base.optString("name")
-            val srcGame = sourceGames.optJSONObject(gameName) ?: continue
+            val srcGame = sourceGames.optJSONObject(gameName)
+            if (srcGame == null) {
+                normalizedGames.put(base)
+                continue
+            }
 
             applySourcePhase(base.optJSONObject("current"), srcGame.optJSONArray("current")?.optJSONObject(0))
             applySourcePhase(base.optJSONObject("next"), srcGame.optJSONArray("next")?.optJSONObject(0))
