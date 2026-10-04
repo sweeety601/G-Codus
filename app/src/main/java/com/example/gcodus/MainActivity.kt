@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))
+        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
@@ -429,7 +429,7 @@ class MainActivity : AppCompatActivity() {
             if (resId != 0) icon.setImageResource(resId) else loadGameLogo(icon, meta.id)
             iconFrame.addView(icon, FrameLayout.LayoutParams(-1, -1))
             addPressEffect(item)
-            item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))
+            item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))
 
             item.addView(label(
                 meta.name, 11f, muted, true).apply {
@@ -437,10 +437,10 @@ class MainActivity : AppCompatActivity() {
                 setPadding(0, dp(5), 0, 0)
             })
 
-            iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))
+            iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))
         }
 
-        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))
+        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))
 
         val wishlist = TextView(this).apply {
             text = "Мой вишлист"
@@ -1335,6 +1335,8 @@ class MainActivity : AppCompatActivity() {
                 listOf("billy-kid", "billy")
             "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
                 listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
+            "mortenax-blade", "blade-mortenax" ->
+                listOf("mortenax-blade", "blade-mortenax")
             "corin", "corin-wickes" ->
                 listOf("corin", "corin-wickes")
             "buling" -> listOf("buling", "bulin")
@@ -1440,6 +1442,19 @@ class MainActivity : AppCompatActivity() {
         val b = normalizeCharacterForMatch(onlineName)
         val slug = normalizeCharacterForMatch(onlineSlug)
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
+
+        if (gameId == "starrail") {
+            fun hsrCanonical(value: String): String = when (value) {
+                "mortenaxblade", "blademortenax" -> "mortenaxblade"
+                else -> value
+            }
+            val localCanonical = hsrCanonical(a)
+            val onlineCanonical = hsrCanonical(b)
+            val localFileCanonical = hsrCanonical(file)
+            val onlineSlugCanonical = hsrCanonical(slug)
+            if (localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical) return true
+        }
+
         if (gameId == "zzz") {
             val localStarlight = a.contains("starlight") || file.contains("starlight")
             val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
