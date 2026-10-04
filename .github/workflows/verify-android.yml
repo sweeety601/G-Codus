@@ -10,6 +10,7 @@ on:
       - "settings.gradle.kts"
       - "gradle.properties"
       - "scripts/run_requested_game_updates.py"
+      - "scripts/sync_game_icons.py"
       - ".github/workflows/verify-android.yml"
   workflow_dispatch:
 
@@ -24,6 +25,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Sync bundled game icons
+        run: python3 scripts/sync_game_icons.py
       - name: Apply requested game fixes
         run: python3 scripts/run_requested_game_updates.py
       - name: Fix horizontal LayoutParams
@@ -39,7 +42,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/PromoCodeSource.kt scripts/sync_banners.py scripts/sync_game_icons.py
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/PromoCodeSource.kt scripts/sync_banners.py scripts/sync_game_icons.py app/src/main/res/drawable-nodpi/game_starrail.png
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "No requested fixes to commit."
