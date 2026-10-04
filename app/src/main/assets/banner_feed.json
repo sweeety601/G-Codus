@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-04T00:00:00Z",
   "rerun_source": "https://bannerhistory.app/en",
-  "rerun_source_note": "Rerun counts are based on BannerHistory pickup records, checked against official publisher announcements. Upcoming pickups are not counted as completed runs.",
+  "rerun_source_note": "Rerun counts use only pickup appearances that have actually started. Debut = first pickup; rerun number = completed/started prior pickups minus one. Scheduled future pickups are never counted as completed history.",
   "games": [
     {
       "id": "genshin",
@@ -27,7 +27,7 @@
         "status": "next",
         "rerun_labels": {
           "Escoffier": "1-й реран",
-          "Skirk": "1-й реран"
+          "Skirk": "2-й реран"
         }
       }
     },
@@ -43,8 +43,8 @@
         "status": "live",
         "rerun_labels": {
           "Hsin": "Дебют",
-          "Chisa": "3-й реран",
-          "Iuno": "3-й реран"
+          "Chisa": "2-й реран",
+          "Iuno": "1-й реран"
         }
       },
       "next": {
@@ -56,7 +56,7 @@
         "status": "next",
         "rerun_labels": {
           "Suoming": "Дебют",
-          "Lucilla": "Дебют",
+          "Lucilla": "1-й реран",
           "Lynae": "2-й реран"
         }
       }
