@@ -13,7 +13,7 @@ ICONS = {
     "game_genshin.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Genshin_Impact_wordmark.svg",
     "game_wuwa.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Wuthering_Waves_logo.svg",
     "game_zzz.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Zenless_Zone_Zero_wordmark.svg",
-    "game_starrail.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Honkai_Star_Rail_logo.svg",
+    "game_starrail.svg": "https://www.svgrepo.com/download/516904/honkai-star-rail.svg",
     "game_endfield.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Arknights_Endfield_logo.svg",
 }
 
