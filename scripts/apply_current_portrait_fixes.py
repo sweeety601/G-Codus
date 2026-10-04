@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
 
 ROOT = Path(__file__).resolve().parents[1]
 MAIN = ROOT / "app/src/main/java/com/example/gcodus/MainActivity.kt"
 ICON_SYNC = ROOT / "scripts/sync_game_icons.py"
+MANIFEST = ROOT / "data/gacha_character_manifest.json"
 
 # Current fixes: local HSR/Endfield portraits, HSR name aliases, and larger top game tiles.
 s = MAIN.read_text()
@@ -23,8 +25,6 @@ for old, new in repls.items():
     elif new not in s:
         raise SystemExit(f"MainActivity replacement target not found: {old}")
 
-# The online banner source and local database use reversed HSR names:
-# "Blade Mortenax" vs "Mortenax Blade". Treat them as one identity.
 old = '''    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
         val a = normalizeCharacterForMatch(localName)
         val b = normalizeCharacterForMatch(onlineName)
@@ -54,7 +54,6 @@ if old not in s:
     raise SystemExit('HSR identity target not found')
 s = s.replace(old, new, 1)
 
-# Make local portrait lookup accept both HSR name orders.
 old = '''            "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
                 listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
             "corin", "corin-wickes" ->'''
@@ -68,7 +67,6 @@ if old not in s:
 s = s.replace(old, new, 1)
 MAIN.write_text(s)
 
-# The newly uploaded root HSR logo is authoritative.
 icon = ICON_SYNC.read_text()
 old = '''for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
@@ -89,4 +87,20 @@ new = '''for filename, url in ICONS.items():
 '''
 if old in icon:
     ICON_SYNC.write_text(icon.replace(old, new, 1))
-print('Applied current HSR portrait matching, top tile sizing, and supplied logo fixes.')
+
+# Repair the manifest after the old integration pass placed Perlica in HSR.
+if MANIFEST.exists():
+    data = json.loads(MANIFEST.read_text())
+    images = data.get("images", [])
+    images = [x for x in images if not (x.get("game") == "Honkai: Star Rail" and x.get("file") == "perlica_card.webp")]
+    if not any(x.get("game") == "Arknights: Endfield" and x.get("file") == "perlica_card.webp" for x in images):
+        images.append({"game": "Arknights: Endfield", "character": "Perlica", "file": "perlica_card.webp"})
+    counts = {}
+    for x in images:
+        counts[x["game"]] = counts.get(x["game"], 0) + 1
+    data["images"] = images
+    data["total_images"] = len(images)
+    data["games"] = counts
+    MANIFEST.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n")
+
+print('Applied current HSR portrait matching, top tile sizing, supplied logo, and Perlica manifest fixes.')
