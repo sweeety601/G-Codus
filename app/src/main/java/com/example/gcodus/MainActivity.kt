@@ -1206,12 +1206,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isForbiddenTrackingCharacter(gameId: String, name: String, file: String = ""): Boolean {
-        if (!gameId.equals("endfield", true) && !gameId.contains("endfield", true)) return false
         val nameKey = normalizeCharacterForMatch(name)
         val fileKey = normalizeCharacterForMatch(file.substringBeforeLast("."))
-        return nameKey in setOf("storyteller", "thestoryteller", "sunbringer") ||
-            fileKey in setOf("storyteller", "thestoryteller", "sunbringer") ||
-            fileKey.contains("storyteller") || fileKey.contains("sunbringer")
+        val forbidden = listOf("storyteller", "thestoryteller", "sunbringer")
+        return forbidden.any { key ->
+            nameKey == key || nameKey.startsWith(key) ||
+                fileKey == key || fileKey.startsWith(key)
+        }
     }
 
     private fun trackedCharacterName(gameId: String, file: String): String {
@@ -1251,18 +1252,14 @@ class MainActivity : AppCompatActivity() {
         val editor = prefs.edit()
         var changed = false
 
-        // These Endfield characters must never appear in Tracking/Wishlist.
+        // Storyteller and Sunbringer are permanently excluded from Tracking/Wishlist.
+        // Remove all legacy/new saved keys for either name, regardless of game/prefix/version.
         prefs.all.keys.filter { key ->
             val normalized = key.lowercase()
                 .replace("’", "")
                 .replace("'", "")
                 .replace(Regex("[^a-z0-9]+"), "")
-            normalized.contains("trackedv2endfieldthestoryteller") ||
-                normalized.contains("trackedv2endfieldstoryteller") ||
-                normalized.contains("trackedv2endfieldsunbringer") ||
-                normalized.contains("trackedendfieldthestoryteller") ||
-                normalized.contains("trackedendfieldstoryteller") ||
-                normalized.contains("trackedendfieldsunbringer")
+            normalized.contains("storyteller") || normalized.contains("sunbringer")
         }.forEach {
             editor.remove(it)
             changed = true
