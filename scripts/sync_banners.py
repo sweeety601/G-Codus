@@ -85,14 +85,38 @@ def phase_from_text(text):
     return m.group(1) if m else ""
 
 
+def classify_character(href, link, cache):
+    context = clean(link.get("context", "")).lower()
+    if re.search(r"5\\s*[★⭐]|5[- ]star|s[- ]rank", context):
+        return 5
+    if re.search(r"4\\s*[★⭐]|4[- ]star|a[- ]rank", context):
+        return 4
+    if href in cache:
+        return cache[href]
+    try:
+        body = clean(http_get(href, timeout=20)).lower()
+        if re.search(r"5\\s*[★⭐]|5[- ]star", body):
+            cache[href] = 5
+            return 5
+        if re.search(r"4\\s*[★⭐]|4[- ]star", body):
+            cache[href] = 4
+            return 4
+    except Exception:
+        pass
+    cache[href] = 0
+    return 0
+
+
 def normalize_cards(cards, primary_url):
     result = []
+    rarity_cache = {}
     for card in cards:
         text = clean(card.get("text", ""))
         section = clean(card.get("section", ""))
         links = card.get("character_links") or []
 
         names = []
+        four_stars = []
         for link in links:
             href = str(link.get("href", ""))
             if not re.search(r"/characters/[^/?#]+", href, re.I):
@@ -100,10 +124,14 @@ def normalize_cards(cards, primary_url):
             name = clean(link.get("name", "")) or clean(link.get("alt", ""))
             if not name:
                 name = href.rstrip("/").split("/")[-1].replace("-", " ")
-            if name and name.lower() not in {x.lower() for x in names}:
-                names.append(name)
+            if not name:
+                continue
+            rarity = classify_character(href, link, rarity_cache)
+            target = four_stars if rarity == 4 else names
+            if name.lower() not in {x.lower() for x in target}:
+                target.append(name)
 
-        if not names:
+        if not names and not four_stars:
             continue
 
         section_lower = section.lower()
@@ -120,6 +148,7 @@ def normalize_cards(cards, primary_url):
             "phase": phase_from_text(text) or phase_from_text(section),
             "type": "character",
             "characters": names,
+            "four_star": four_stars,
             "status": "live" if bucket == "current" else ("next" if bucket == "next" else "upcoming"),
             "source_status": "confirmed",
             "official_source": primary_url,
@@ -129,7 +158,6 @@ def normalize_cards(cards, primary_url):
             item.update(date_range)
         result.append((bucket, item))
     return result
-
 
 def scrape_with_playwright(url):
     from playwright.sync_api import sync_playwright
@@ -155,11 +183,18 @@ def scrape_with_playwright(url):
                         section: heading ? (heading.innerText || '').trim() : '',
                         character_links: [...card.querySelectorAll('a[href*="/characters/"]')].map(a => {
                             const img = a.querySelector('img');
+                            let node = a;
+                            const context = [];
+                            for (let i = 0; i < 5 && node; i++, node = node.parentElement) {
+                                context.push((node.innerText || '').trim());
+                                context.push((node.className || '').toString());
+                            }
                             return {
                                 href: a.href || '',
                                 name: (a.innerText || a.getAttribute('aria-label') ||
                                        a.getAttribute('title') || '').trim(),
-                                alt: img ? (img.alt || '').trim() : ''
+                                alt: img ? (img.alt || '').trim() : '',
+                                context: context.join(' ')
                             };
                         })
                     };
