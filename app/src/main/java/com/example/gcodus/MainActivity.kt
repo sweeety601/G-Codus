@@ -1076,7 +1076,7 @@ class MainActivity : AppCompatActivity() {
             .removeSuffix("_full")
             .replace("•", " ")
             .replace("·", " ")
-            .replace(Regex("\s+"), " ")
+            .replace(Regex("\\s+"), " ")
             .trim()
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
@@ -1676,7 +1676,7 @@ class MainActivity : AppCompatActivity() {
                 ?: JSONArray()
 
             val fiveStars = (0 until arr.length())
-                .map { arr.optString(it).replace("•", " ").replace("·", " ").replace(Regex("\s+"), " ").trim() }
+                .map { arr.optString(it).replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim() }
                 .filter { it.isNotBlank() }
                 .distinct()
 
