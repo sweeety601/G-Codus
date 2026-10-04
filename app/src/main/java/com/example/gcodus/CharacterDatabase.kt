@@ -83,6 +83,7 @@ object CharacterDatabase {
                 .replace(Regex("\\s+"), " ")
                 .trim()
             val name = cleanName(rawName)
+            val displayName = if (gameId == "zzz") canonicalZzzName(name) else name
 
             // Prydwen's character page contains navigation/metadata links too.
             // Accept only short, human-readable character names; this removes
@@ -94,7 +95,7 @@ object CharacterDatabase {
                 normalize(name) in ANNOUNCED_ONLY[gameId].orEmpty()
             result += OnlineCharacter(
                 gameId,
-                if (gameId == "zzz" && normalize(slug) == "billy") "Billy Kid" else name,
+                displayName,
                 slug,
                 announced,
                 portraitUrl(gameId, slug)
@@ -141,9 +142,7 @@ object CharacterDatabase {
                 n == "topaz" || n == "topazandnumby") return "starrail|topaz"
         }
         if (gameId == "zzz") {
-            val s = normalize(slug)
-            val n = normalize(name)
-            if (s == "billy" || s == "billykid" || n == "billy" || n == "billykid") return "zzz|billy"
+            return "zzz|" + normalize(canonicalZzzName(name.ifBlank { slug }))
         }
         return "$gameId|" + normalize(slug).ifBlank { normalize(name) }
     }
@@ -235,6 +234,22 @@ object CharacterDatabase {
         var s = value.replace(Regex("\\s+"), " ").trim()
         s = s.replace(Regex("\\b(New|[0-9]+\\.[0-9]+)\\b"), "").trim()
         return s
+    }
+
+    private fun canonicalZzzName(value: String): String {
+        val cleaned = cleanName(value)
+            .replace(Regex("(?<![A-Za-z0-9])3\\.\\d+(?![A-Za-z0-9])"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+        return when (normalize(cleaned)) {
+            "yuzuha", "ukinamiyuzuha" -> "Yuzuha"
+            "anby", "anbydemara" -> "Anby"
+            "billy", "billykid" -> "Billy Kid"
+            "grace", "gracehoward" -> "Grace"
+            "lucy", "lucyalt", "lucialt" -> "Lucy"
+            "nicole", "nicoledemara" -> "Nicole Demara"
+            else -> cleaned
+        }
     }
 
     private fun normalize(value: String): String =

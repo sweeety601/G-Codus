@@ -563,7 +563,12 @@ class MainActivity : AppCompatActivity() {
             setBackgroundColor(Color.argb(95, 0, 0, 0))
         }
         overlay.addView(label(bannerRarity, 28f, Color.WHITE, true))
-        overlay.addView(label(banner.characters.joinToString(" • ").ifBlank { "—" }, 18f, Color.WHITE, true).apply {
+        val displayBannerCharacters = banner.characters
+            .map { canonicalCharacterDisplayName(gameId, it) }
+            .filter { it.isNotBlank() }
+            .distinct()
+        val bannerCharacterText = displayBannerCharacters.joinToString(" • ").ifBlank { "—" }
+        overlay.addView(label(bannerCharacterText, 18f, Color.WHITE, true).apply {
             maxLines = 2
         })
         art.addView(overlay, FrameLayout.LayoutParams(-1, -2, Gravity.BOTTOM))
@@ -576,7 +581,7 @@ class MainActivity : AppCompatActivity() {
             setPadding(dp(14), dp(8), dp(8), dp(4))
         }
         info.addView(label(bannerRarity, 17f, Color.rgb(255, 211, 76), true))
-        val fiveName = banner.characters.joinToString(" • ").ifBlank { "Баннер" }
+        val fiveName = displayBannerCharacters.joinToString(" • ").ifBlank { "Баннер" }
         info.addView(label(fiveName, 22f, text, true).apply {
             setPadding(0, dp(4), 0, dp(2))
             maxLines = 2
@@ -1042,13 +1047,20 @@ class MainActivity : AppCompatActivity() {
                     it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
                 } + "__wuwa-lucy.webp" + "__wuwa-aemeath.webp" + "__wuwa-hiyuki.webp").sorted()
                 "zzz" -> files.filterNot {
-                    it == "lucy.webp" || it == "math.webp" || it == "hiyuki.webp"
+                    it == "lucy.webp" || it == "nicole.webp" || it == "math.webp" || it == "hiyuki.webp"
                 }.plus("lucy_alt.webp").distinct().sorted()
                 else -> files
             }
             if (gameId == "zzz") {
-                val hasBillyKid = prepared.any { normalizeCharacterForMatch(it) == "billykid" }
-                prepared.filterNot { hasBillyKid && normalizeCharacterForMatch(it) == "billy" }
+                // ZZZ aliases are one character each:
+                // Yuzuha/Ukinami Yuzuha, Anby/Anby Demara, Billy/Billy Kid,
+                // Grace/Grace Howard, Lucy/Lucy_alt, Nicole/Nicole Demara.
+                // Keep the requested canonical portrait for each merged identity.
+                prepared.distinctBy {
+                    normalizeCharacterForMatch(
+                        canonicalCharacterDisplayName("zzz", characterDisplayName(it))
+                    )
+                }
             } else {
                 // Dan Heng Imbibitor Lunae and Imbibitor Lunae are the same HSR character.
                 // Keep one card, but always use the full display name.
@@ -1081,8 +1093,25 @@ class MainActivity : AppCompatActivity() {
     private fun cleanCharacterName(value: String): String =
         value.replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim()
 
+    private fun stripZzzVersion(value: String): String =
+        value.replace(Regex("(?<![A-Za-z0-9])3\\.\\d+(?![A-Za-z0-9])"), " ")
+            .replace(Regex("\\s+"), " ")
+            .trim()
+
     private fun canonicalCharacterDisplayName(gameId: String, value: String): String {
         val cleaned = cleanCharacterName(value)
+        if (gameId == "zzz") {
+            val zzzCleaned = stripZzzVersion(cleaned)
+            return when (normalizeCharacterForMatch(zzzCleaned)) {
+                "yuzuha", "ukinamiyuzuha" -> "Yuzuha"
+                "anby", "anbydemara" -> "Anby"
+                "billy", "billykid" -> "Billy Kid"
+                "grace", "gracehoward" -> "Grace"
+                "lucy", "lucyalt", "lucialt" -> "Lucy"
+                "nicole", "nicoledemara" -> "Nicole Demara"
+                else -> zzzCleaned
+            }
+        }
         if (gameId == "starrail") {
             val key = normalizeCharacterForMatch(cleaned)
             if (key == "danhengimbibitorlunae" || key == "imbibitorlunae") {
@@ -1136,6 +1165,9 @@ class MainActivity : AppCompatActivity() {
             "luuk-herssen" to "Luuk Herssen",
             "billy-kid" to "Billy Kid",
             "billy" to "Billy Kid",
+            "ukinami-yuzuha" to "Yuzuha",
+            "anby-demara" to "Anby",
+            "grace-howard" to "Grace",
             "blade-mortenax" to "Mortenax Blade"
         )
         overrides[base]?.let { return it }
@@ -1380,6 +1412,11 @@ class MainActivity : AppCompatActivity() {
             gameId == "wuwa" && normalized == "danjin" -> "danjin.webp"
             gameId == "wuwa" && normalized == "chixia" -> "chixia.webp"
             gameId == "zzz" && normalized == "corin" -> "corin.webp"
+            gameId == "zzz" && normalized == "yuzuha" -> "ukinami-yuzuha.webp"
+            gameId == "zzz" && normalized == "anby" -> "anby-demara.webp"
+            gameId == "zzz" && normalized == "grace" -> "grace-howard.webp"
+            gameId == "zzz" && normalized == "lucy" -> "lucy_alt.webp"
+            gameId == "zzz" && normalized == "nicole" -> "nicole-demara.webp"
             gameId == "zzz" && normalized == "billy-starlight" -> "billy-starlight.webp"
             gameId == "starrail" && normalized in setOf("mortenax-blade", "blade-mortenax") -> "blade-mortenax_card.webp"
             gameId == "endfield" && normalized == "perlica" -> "perlica_card.webp"
@@ -1514,10 +1551,19 @@ class MainActivity : AppCompatActivity() {
 
         return when (gameId) {
             "zzz" -> {
-                val local = normalizeCharacterForMatch(localName)
-                val online = normalizeCharacterForMatch(onlineName)
-                val localSlug = normalizeCharacterForMatch(localFile)
-                local == online || localSlug == normalizeCharacterForMatch(onlineSlug)
+                val localCanonical = normalizeCharacterForMatch(
+                    canonicalCharacterDisplayName("zzz", localName)
+                )
+                val onlineCanonical = normalizeCharacterForMatch(
+                    canonicalCharacterDisplayName("zzz", onlineName)
+                )
+                val localFileCanonical = normalizeCharacterForMatch(
+                    canonicalCharacterDisplayName("zzz", localFile.substringBeforeLast("."))
+                )
+                val onlineSlugCanonical = normalizeCharacterForMatch(
+                    canonicalCharacterDisplayName("zzz", onlineSlug)
+                )
+                localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical
             }
             else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
