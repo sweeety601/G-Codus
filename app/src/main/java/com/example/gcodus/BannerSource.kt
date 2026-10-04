@@ -5,7 +5,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 
 /**
  * Runtime banner-history source.
@@ -34,14 +33,12 @@ object BannerSource {
         val local = context.assets.open("banner_feed.json").bufferedReader().use { it.readText() }
         val root = JSONObject(local)
         val games = root.optJSONArray("games") ?: return local
-
         clearRerunLabels(games)
         addLeakFallbacks(games)
         updateRerunLabels(games)
-
         val result = JSONObject(root.toString()).put("games", games)
-        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit().putString(CACHE_KEY, result.toString()).apply()
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit()
+            .putString(CACHE_KEY, result.toString()).apply()
         return result.toString()
     }
 
@@ -66,29 +63,19 @@ object BannerSource {
         val chars = phase.optJSONArray("five_star") ?: return
         val labels = JSONObject()
         val version = phase.optString("version").substringBefore(" Phase").trim()
-
         for (i in 0 until chars.length()) {
             val name = chars.optString(i).trim()
             if (name.isEmpty()) continue
-
             val history = when (gameId) {
                 "genshin" -> fetchGenshinHistory(name, version)
                 "wuwa" -> fetchWuwaHistory(name, version)
                 "zzz" -> fetchZzzHistory(name, version)
                 else -> null
             } ?: continue
-
-            // History sources contain only started/past pickups. Therefore a future phase
-            // is never added to the historical count. For a current phase, subtract the
-            // current run only when the source already contains that version.
-            val previous = if (isFuture) {
-                history.count
-            } else {
-                (history.count - if (history.containsCurrentVersion) 1 else 0).coerceAtLeast(0)
-            }
+            val previous = if (isFuture) history.count
+            else (history.count - if (history.containsCurrentVersion) 1 else 0).coerceAtLeast(0)
             labels.put(name, rerunLabel(previous))
         }
-
         if (labels.length() > 0) phase.put("rerun_labels", labels)
     }
 
@@ -97,43 +84,39 @@ object BannerSource {
 
     private data class HistoryCount(val count: Int, val containsCurrentVersion: Boolean)
 
-    /** Jaeger publishes a version/phase archive where every featured character appears once per pickup. */
+    /** Jaeger lines use R for reruns and ×N for previous featured appearances. */
     private fun fetchGenshinHistory(character: String, currentVersion: String): HistoryCount? {
         val text = try { get(GENSHIN_HISTORY) } catch (_: Exception) { return null }
-        val aliases = characterAliases("genshin", character)
-        val count = countNameOccurrences(text, aliases)
-        if (count !in 1..20) return null
-        val current = aliases.any { alias ->
-            Regex("(?im)^(?:.*\\b${Regex.escape(alias)}\\b.*)$").findAll(text).any { match ->
-                val line = match.value
-                currentVersion.isNotBlank() && line.contains(currentVersion, ignoreCase = true)
+        for (alias in characterAliases("genshin", character)) {
+            val matches = text.lines().filter { line ->
+                line.contains(alias, ignoreCase = true) &&
+                    Regex("(^|\\s)(R|×\\d+)\\s+.*", RegexOption.IGNORE_CASE).containsMatchIn(line)
             }
+            if (matches.isEmpty() || matches.size > 20) continue
+            val current = currentVersion.isNotBlank() && matches.any { it.contains(currentVersion, true) }
+            return HistoryCount(matches.size, current)
         }
-        return HistoryCount(count, current)
+        return null
     }
 
     /**
      * WuWa Tracker is the primary WuWa source. The page is client-rendered, so r.jina.ai
-     * is used only as an HTML/text reader. If it fails, the WuWa-specific BannerHistory
-     * archive is used rather than returning a false "Дебют".
+     * is used only as a text reader. If it fails, a WuWa-specific BannerHistory archive
+     * is used instead of silently returning a false "Дебют".
      */
     private fun fetchWuwaHistory(character: String, currentVersion: String): HistoryCount? {
         val aliases = characterAliases("wuwa", character)
         val primary = try { get(WUWA_HISTORY) } catch (_: Exception) { "" }
-        val result = parseLineBasedHistory(primary, aliases, currentVersion)
-        if (result != null) return result
-
+        parseLineBasedHistory(primary, aliases, currentVersion)?.let { return it }
         val fallback = try { get(WUWA_HISTORY_FALLBACK) } catch (_: Exception) { return null }
         return parseLineBasedHistory(fallback, aliases, currentVersion)
     }
 
-    /** zzz.163.moe lists each S-rank with its debut version and every later pickup version. */
+    /** zzz.163.moe lists each S-rank with its debut version and later pickup versions. */
     private fun fetchZzzHistory(character: String, currentVersion: String): HistoryCount? {
         val aliases = characterAliases("zzz", character)
         val text = try { get(ZZZ_HISTORY) } catch (_: Exception) { "" }
-        val primary = parseZzz163History(text, aliases, currentVersion)
-        if (primary != null) return primary
-
+        parseZzz163History(text, aliases, currentVersion)?.let { return it }
         val fallback = try { get(ZZZ_HISTORY_FALLBACK) } catch (_: Exception) { return null }
         return parseLineBasedHistory(fallback, aliases, currentVersion)
     }
@@ -143,17 +126,10 @@ object BannerSource {
         for (alias in aliases) {
             val nameIndex = text.indexOf(alias, ignoreCase = true)
             if (nameIndex < 0) continue
-
-            // 163.moe renders one compact record per agent: debut version, zero or more
-            // rerun versions, then the full agent name. Limit the window to this record.
             val start = (nameIndex - 350).coerceAtLeast(0)
             val end = (nameIndex + 120).coerceAtMost(text.length)
             val block = text.substring(start, end)
-            val versions = Regex("\\b(?:[123]\\.\\d+)\\b").findAll(block)
-                .map { it.value }
-                .toList()
-                .distinct()
-
+            val versions = Regex("\\b[123]\\.\\d+\\b").findAll(block).map { it.value }.distinct().toList()
             if (versions.isEmpty()) continue
             val current = currentVersion.isNotBlank() && versions.any { it.equals(currentVersion, true) }
             return HistoryCount(versions.size, current)
@@ -161,35 +137,17 @@ object BannerSource {
         return null
     }
 
-    private fun parseLineBasedHistory(
-        text: String,
-        aliases: List<String>,
-        currentVersion: String
-    ): HistoryCount? {
+    private fun parseLineBasedHistory(text: String, aliases: List<String>, currentVersion: String): HistoryCount? {
         if (text.isBlank()) return null
         val lines = text.lines()
         for (alias in aliases) {
             val matches = lines.filter { it.contains(alias, ignoreCase = true) }
                 .filterNot { it.contains("Download", true) || it.contains("Privacy", true) }
-            if (matches.isEmpty()) continue
-
-            val count = matches.size
-            if (count !in 1..20) continue
-            val current = currentVersion.isNotBlank() && matches.any {
-                it.contains(currentVersion, ignoreCase = true)
-            }
-            return HistoryCount(count, current)
+            if (matches.isEmpty() || matches.size > 20) continue
+            val current = currentVersion.isNotBlank() && matches.any { it.contains(currentVersion, true) }
+            return HistoryCount(matches.size, current)
         }
         return null
-    }
-
-    private fun countNameOccurrences(text: String, aliases: List<String>): Int {
-        for (alias in aliases) {
-            val regex = Regex("(?i)(?<![\\p{L}\\p{N}_])${Regex.escape(alias)}(?![\\p{L}\\p{N}_])")
-            val count = regex.findAll(text).count()
-            if (count in 1..20) return count
-        }
-        return 0
     }
 
     private fun characterAliases(gameId: String, name: String): List<String> {
@@ -217,29 +175,22 @@ object BannerSource {
             val game = games.optJSONObject(i) ?: continue
             val next = game.optJSONObject("next") ?: JSONObject()
             if ((next.optJSONArray("five_star")?.length() ?: 0) > 0) continue
-
             val source = when (game.optString("id")) {
                 "genshin" -> GENSHIN_LEAK
                 "wuwa" -> WUWA_LEAK
                 "zzz" -> ZZZ_LEAK
                 else -> null
             } ?: continue
-
             val html = try { get(source) } catch (_: Exception) { continue }
-            val plain = html
-                .replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
+            val plain = html.replace(Regex("<script[\\s\\S]*?</script>", RegexOption.IGNORE_CASE), " ")
                 .replace(Regex("<style[\\s\\S]*?</style>", RegexOption.IGNORE_CASE), " ")
-                .replace(Regex("<[^>]+>"), " ")
-                .replace(Regex("\\s+"), " ")
-                .trim()
-
+                .replace(Regex("<[^>]+>"), " ").replace(Regex("\\s+"), " ").trim()
             val leaked = when (game.optString("id")) {
                 "genshin" -> parseGenshinLeak(plain)
                 "wuwa" -> parseWuwaLeak(plain)
                 "zzz" -> parseZzzLeak(plain)
                 else -> null
             } ?: continue
-
             leaked.put("unconfirmed", true)
             game.put("next", leaked)
         }
