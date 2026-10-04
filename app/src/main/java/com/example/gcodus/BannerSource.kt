@@ -61,13 +61,10 @@ object BannerSource {
 
             val current = normalizePhase(sourceGame.optJSONArray("current")?.optJSONObject(0))
             val next = normalizePhase(sourceGame.optJSONArray("next")?.optJSONObject(0))
+
+            // The app deliberately shows only the current and immediately next phase.
+            // Do not pass later leak phases into the UI.
             val upcoming = JSONArray()
-            sourceGame.optJSONArray("upcoming")?.let { arr ->
-                for (j in 0 until arr.length()) {
-                    val phase = arr.optJSONObject(j) ?: continue
-                    upcoming.put(normalizePhase(phase))
-                }
-            }
 
             games.put(
                 JSONObject()
@@ -120,9 +117,11 @@ object BannerSource {
         val explicitUnconfirmed = source.optBoolean("unconfirmed", false)
         val explicitStatus = source.optString("source_status")
         val status = when {
-            explicitUnconfirmed -> "unconfirmed"
+            // An explicit source_status is authoritative. This prevents a stale
+            // unconfirmed flag from overriding a phase that the feed marks confirmed.
             explicitStatus.equals("confirmed", true) -> "confirmed"
             explicitStatus.equals("unconfirmed", true) -> "unconfirmed"
+            explicitUnconfirmed -> "unconfirmed"
             source.optString("status").equals("live", true) -> "confirmed"
             else -> explicitStatus.ifBlank { "confirmed" }
         }
