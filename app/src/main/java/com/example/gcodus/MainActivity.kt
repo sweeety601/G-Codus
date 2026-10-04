@@ -405,14 +405,14 @@ class MainActivity : AppCompatActivity() {
         }
         val iconRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
-            gravity = Gravity.CENTER_VERTICAL
+            gravity = Gravity.TOP
         }
         icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(118)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
-                gravity = Gravity.CENTER
+                gravity = Gravity.TOP
                 setPadding(dp(2), 0, dp(2), 0)
                 setOnClickListener { showGame(meta.id) }
             }
@@ -1330,6 +1330,10 @@ class MainActivity : AppCompatActivity() {
             gameId == "wuwa" && normalized == "chixia" -> "chixia.webp"
             gameId == "zzz" && normalized == "corin" -> "corin.webp"
             gameId == "zzz" && normalized == "billy-starlight" -> "billy-starlight.webp"
+            gameId == "starrail" && normalized in setOf("mortenax-blade", "blade-mortenax") -> "blade-mortenax_card.webp"
+            gameId == "endfield" && normalized == "perlica" -> "perlica_card.webp"
+            gameId == "endfield" && normalized == "camille" -> "camille_card.webp"
+            gameId == "endfield" && normalized == "si" -> "si_card.webp"
             else -> null
         }
 
@@ -1416,10 +1420,7 @@ class MainActivity : AppCompatActivity() {
                         (a.length >= 4 && compact.length >= 4 &&
                             (compact.startsWith(a) || a.startsWith(compact)))
                 }
-            } ?: run {
-                loadPrydwenPortrait(image, gameId, normalized)
-                return
-            }
+            } ?: return
 
             assets.open("$gameFolder/$target").use { input ->
                 val bitmap = android.graphics.BitmapFactory.decodeStream(input)
@@ -1722,10 +1723,12 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-        return result
+        return result.distinctBy {
+            it.gameId + "|" + it.version + "|" + it.characters.joinToString("|")
+        }
     }
 
-    private fun emergencyBannerFeed(): String =
+    private fun emergencyBannerFeed/(): String =
         JSONObject().put("version", 1).put("games", JSONArray().apply {
             put(JSONObject()
                 .put("id", "genshin")
