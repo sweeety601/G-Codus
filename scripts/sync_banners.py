@@ -87,18 +87,18 @@ def phase_from_text(text):
 
 def classify_character(href, link, cache):
     context = clean(link.get("context", "")).lower()
-    if re.search(r"5\\s*[★⭐]|5[- ]star|s[- ]rank", context):
+    if re.search(r"5\s*[★⭐]|5[- ]star|s[- ]rank", context):
         return 5
-    if re.search(r"4\\s*[★⭐]|4[- ]star|a[- ]rank", context):
+    if re.search(r"4\s*[★⭐]|4[- ]star|a[- ]rank", context):
         return 4
     if href in cache:
         return cache[href]
     try:
         body = clean(http_get(href, timeout=20)).lower()
-        if re.search(r"5\\s*[★⭐]|5[- ]star", body):
+        if re.search(r"5\s*[★⭐]|5[- ]star", body):
             cache[href] = 5
             return 5
-        if re.search(r"4\\s*[★⭐]|4[- ]star", body):
+        if re.search(r"4\s*[★⭐]|4[- ]star", body):
             cache[href] = 4
             return 4
     except Exception:
