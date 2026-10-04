@@ -117,6 +117,7 @@ class MainActivity : AppCompatActivity() {
         refreshCodesInBackground()
         refreshBannerFeedInBackground()
         refreshCharacterDatabaseInBackground()
+        migrateTrackingKeys()
         showHome()
         startCountdownTicker()
     }
@@ -870,7 +871,8 @@ class MainActivity : AppCompatActivity() {
         val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val games = if (gameId == null) gameMeta else gameMeta.filter { it.id == gameId }
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
-        val entries = mutableListOf<TrackedCharacter>()
+        val rawEntries = mutableListOf<TrackedCharacter>()
+
         games.forEach { meta ->
             val localFiles = listCharacterFiles(meta.id)
             localFiles.forEach { file ->
@@ -878,7 +880,7 @@ class MainActivity : AppCompatActivity() {
                 if (isMainProtagonist(meta.id, file, name)) return@forEach
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
-                    entries += TrackedCharacter(meta.id, meta.name, name, file)
+                    rawEntries += TrackedCharacter(meta.id, meta.name, name, canonicalPreferredTrackingFile(meta.id, file))
                 }
             }
 
@@ -886,35 +888,46 @@ class MainActivity : AppCompatActivity() {
                 .filter { it.gameId == meta.id }
                 .filterNot { online -> isMainProtagonist(meta.id, online.slug, online.name) }
                 .forEach { online ->
+                    val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
                     val duplicateLocal = localFiles.any { localFile ->
                         sameCharacterIdentity(
                             meta.id,
                             characterDisplayName(localFile),
-                            online.name,
+                            displayOnlineName,
                             online.slug,
                             localFile
                         )
                     }
                     if (!duplicateLocal) {
                         val file = "__online_" + meta.id + "_" + online.slug + ".webp"
-                        val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
-                        val duplicateEntry = entries.any { existing ->
-                            existing.gameId == meta.id &&
-                                normalizeCharacterForMatch(existing.name) == normalizeCharacterForMatch(displayOnlineName)
-                        }
-                        if (!duplicateEntry &&
-                            (gameId != null || isTracked(meta.id, file)) &&
+                        if ((gameId != null || isTracked(meta.id, file)) &&
                             (normalizedQuery.isBlank() || displayOnlineName.lowercase().contains(normalizedQuery))) {
-                            entries += TrackedCharacter(meta.id, meta.name, displayOnlineName, file)
+                            rawEntries += TrackedCharacter(meta.id, meta.name, displayOnlineName, file)
                         }
                     }
                 }
         }
-        entries.sortWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.name.lowercase() })
+
+        // Final canonical merge protects the Tracking/Wishlist screen from
+        // duplicate aliases that can come from either local assets or the
+        // online character list. One game + one canonical character = one card.
+        val entries = rawEntries
+            .groupBy { trackedIdentityKey(it.gameId, it.file) }
+            .values
+            .map { group ->
+                group.firstOrNull { it.file == canonicalPreferredTrackingFile(it.gameId, it.file) }
+                    ?: group.first()
+            }
+            .sortedWith(
+                compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }
+                    .thenBy { it.name.lowercase() }
+            )
+
         if (entries.isEmpty()) {
             holder.addView(emptyCard(if (normalizedQuery.isBlank()) "Персонажей пока нет" else "Ничего не найдено"))
             return holder
         }
+
         var row: LinearLayout? = null
         entries.forEachIndexed { index, character ->
             if (index % 3 == 0) {
@@ -930,8 +943,6 @@ class MainActivity : AppCompatActivity() {
                 bottomMargin = dp(8)
             })
 
-            // Keep the final row's cards exactly the same width as the other rows.
-            // Empty slots occupy the remaining weight instead of stretching the portraits.
             if (index == entries.lastIndex && (index + 1) % 3 != 0) {
                 repeat(3 - ((index + 1) % 3)) {
                     row?.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
@@ -1187,8 +1198,66 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun trackingKey(gameId: String, file: String) = "tracked_" + gameId + "_" + file
-    private fun isTracked(gameId: String, file: String): Boolean = prefs.getBoolean(trackingKey(gameId, file), false)
+    private fun trackedCharacterName(gameId: String, file: String): String {
+        if (file.startsWith("__online_")) {
+            val prefix = "__online_" + gameId + "_"
+            if (file.startsWith(prefix)) {
+                val slug = file.removePrefix(prefix).removeSuffix(".webp")
+                return canonicalCharacterDisplayName(
+                    gameId,
+                    slug.replace("-", " ")
+                )
+            }
+        }
+        return canonicalCharacterDisplayName(gameId, characterDisplayName(file))
+    }
+
+    private fun trackedIdentityKey(gameId: String, file: String): String =
+        "tracked_v2_" + gameId + "_" + normalizeCharacterForMatch(trackedCharacterName(gameId, file))
+
+    private fun canonicalPreferredTrackingFile(gameId: String, file: String): String {
+        if (gameId != "zzz" || file.startsWith("__online_")) return file
+
+        return when (normalizeCharacterForMatch(trackedCharacterName(gameId, file))) {
+            "yuzuha" -> "ukinami-yuzuha.webp"
+            "anby" -> "anby-demara.webp"
+            "billykid" -> "billy-kid.webp"
+            "grace" -> "grace-howard.webp"
+            "lucy" -> "lucy_alt.webp"
+            "nicoledemara" -> "nicole-demara.webp"
+            else -> file
+        }
+    }
+
+    private fun trackingKey(gameId: String, file: String) = trackedIdentityKey(gameId, file)
+
+    private fun migrateTrackingKeys() {
+        val editor = prefs.edit()
+        var changed = false
+
+        prefs.all.forEach { (key, value) ->
+            if (!key.startsWith("tracked_") || key.startsWith("tracked_v2_")) return@forEach
+            val enabled = value as? Boolean ?: return@forEach
+
+            val remainder = key.removePrefix("tracked_")
+            val separator = remainder.indexOf('_')
+            if (separator <= 0 || separator >= remainder.lastIndex) return@forEach
+
+            val gameId = remainder.substring(0, separator)
+            val file = remainder.substring(separator + 1)
+            if (enabled) {
+                editor.putBoolean(trackingKey(gameId, file), true)
+            }
+            editor.remove(key)
+            changed = true
+        }
+
+        if (changed) editor.apply()
+    }
+
+    private fun isTracked(gameId: String, file: String): Boolean =
+        prefs.getBoolean(trackingKey(gameId, file), false)
+
     private fun toggleTracked(gameId: String, file: String) {
         val enabled = !isTracked(gameId, file)
         prefs.edit().putBoolean(trackingKey(gameId, file), enabled).apply()
