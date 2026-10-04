@@ -7,6 +7,7 @@ on:
       - "scripts/apply_current_portrait_fixes.py"
       - "app/src/main/java/com/example/gcodus/MainActivity.kt"
       - "scripts/sync_game_icons.py"
+      - "data/gacha_character_manifest.json"
       - "Honkai_Star_Rail_logo.png"
 
 permissions:
@@ -25,11 +26,11 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java/com/example/gcodus/MainActivity.kt scripts/sync_game_icons.py
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt scripts/sync_game_icons.py data/gacha_character_manifest.json
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "No code changes."
           else
-            git commit -m "Fix HSR portrait matching and enlarge top game tiles"
+            git commit -m "Fix HSR portraits and Perlica mapping"
             git push
           fi
