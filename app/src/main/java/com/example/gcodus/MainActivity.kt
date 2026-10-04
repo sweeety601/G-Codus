@@ -295,6 +295,12 @@ class MainActivity : AppCompatActivity() {
                     setPadding(0, dp(22), 0, dp(8))
                 })
                 content.addView(bannerPager(game.next, true, game.id))
+                if (game.upcoming.isNotEmpty()) {
+                    content.addView(sectionLabel("СЛИВЫ • НЕ ПОДТВЕРЖДЕНО").apply {
+                        setPadding(0, dp(22), 0, dp(8))
+                    })
+                    content.addView(bannerPager(game.upcoming, true, game.id))
+                }
             }
         }
 
@@ -405,6 +411,12 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, dp(22), 0, dp(8))
         })
         block.addView(bannerPager(game.next, true, game.id))
+        if (game.upcoming.isNotEmpty()) {
+            block.addView(sectionLabel("СЛИВЫ • НЕ ПОДТВЕРЖДЕНО").apply {
+                setPadding(0, dp(22), 0, dp(8))
+            })
+            block.addView(bannerPager(game.upcoming, true, game.id))
+        }
         return block
     }
 
@@ -1418,7 +1430,8 @@ class MainActivity : AppCompatActivity() {
                         id,
                         name,
                         parseBanners(g, "current"),
-                        parseBanners(g, "next")
+                        parseBanners(g, "next"),
+                        parseBanners(g, "upcoming")
                     )
                 } catch (_: Exception) { }
             }
@@ -1615,7 +1628,8 @@ class MainActivity : AppCompatActivity() {
         val id: String,
         val name: String,
         val current: List<Banner>,
-        val next: List<Banner>
+        val next: List<Banner>,
+        val upcoming: List<Banner> = emptyList()
     )
 
     data class GameMeta(
