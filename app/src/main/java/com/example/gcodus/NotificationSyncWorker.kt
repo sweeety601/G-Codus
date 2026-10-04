@@ -40,8 +40,6 @@ class NotificationSyncWorker(
         return try {
             val bannerJson = BannerSource.fetchNormalized(applicationContext)
             val codeJson = try { PromoCodeSource.fetchJson() } catch (_: Exception) { null }
-            applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
-                .edit().putString("banner_feed", bannerJson).apply()
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
             // Character tracking is user-selected, so it may notify even on the
             // first sync if the tracked character is already in the relevant state.
