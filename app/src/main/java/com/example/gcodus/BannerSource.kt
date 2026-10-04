@@ -43,7 +43,10 @@ object BannerSource {
 
         for ((id, name) in definitions) {
             val sourceGame = when {
-                sourceGamesObject != null -> sourceGamesObject.optJSONObject(name)
+                sourceGamesObject != null -> {
+                    sourceGamesObject.optJSONObject(name)
+                        ?: sourceGamesObject.optJSONObject(id)
+                }
                 else -> {
                     var found: JSONObject? = null
                     for (i in 0 until sourceGamesArray!!.length()) {
@@ -63,7 +66,6 @@ object BannerSource {
             val next = normalizePhase(sourceGame.optJSONArray("next")?.optJSONObject(0))
 
             // The app deliberately shows only the current and immediately next phase.
-            // Do not pass later leak phases into the UI.
             val upcoming = JSONArray()
 
             games.put(
@@ -114,16 +116,22 @@ object BannerSource {
                 ?: source.optJSONArray("fourStars")
         )
 
+        val explicitStatus = source.optString("source_status").trim()
+        val officialSource = source.optString("official_source").trim()
+        val phaseStatus = source.optString("status").trim()
         val explicitUnconfirmed = source.optBoolean("unconfirmed", false)
-        val explicitStatus = source.optString("source_status")
+
+        // Confirmation is decided by the phase itself, not by the availability
+        // of Prydwen or by the game's top-level status. An official source or a
+        // live phase is sufficient to mark a phase as confirmed. An explicit
+        // source_status="confirmed" always wins over a stale unconfirmed flag.
         val status = when {
-            // An explicit source_status is authoritative. This prevents a stale
-            // unconfirmed flag from overriding a phase that the feed marks confirmed.
             explicitStatus.equals("confirmed", true) -> "confirmed"
+            officialSource.isNotBlank() -> "confirmed"
+            phaseStatus.equals("live", true) -> "confirmed"
             explicitStatus.equals("unconfirmed", true) -> "unconfirmed"
             explicitUnconfirmed -> "unconfirmed"
-            source.optString("status").equals("live", true) -> "confirmed"
-            else -> explicitStatus.ifBlank { "confirmed" }
+            else -> "unconfirmed"
         }
 
         return JSONObject()
@@ -136,7 +144,7 @@ object BannerSource {
             })
             .put("five_star", characters)
             .put("four_star", fourStars)
-            .put("official_source", source.optString("official_source"))
+            .put("official_source", officialSource)
             .put("secondary_source", source.optString("secondary_source"))
             .put("source_status", status)
             .put("unconfirmed", status.equals("unconfirmed", true))
