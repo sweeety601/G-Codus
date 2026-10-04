@@ -1,0 +1,199 @@
+name: Fix banner dates and wishlist notifications
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: github.event.head_commit.message != 'fix banner dates and wishlist notifications'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Patch app
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          # 1) Replace BannerSource: no rerun system; dates come from live sources,
+          #    with bundled feed as a safe fallback when a source is unavailable.
+          banner = r'''package com.example.gcodus
+
+import android.content.Context
+import org.json.JSONArray
+import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
+import java.time.OffsetDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+/** Live banner-date synchronizer. Rerun information is intentionally not used. */
+object BannerSource {
+    private const val PREFS = "g_codus"
+    private const val CACHE_KEY = "banner_feed"
+
+    private const val GENSHIN_SCHEDULE = "https://r.jina.ai/https://jaeger.moe/ru/banners/"
+    private const val WUWA_SCHEDULE = "https://r.jina.ai/https://www.wuwabuild.com/banners"
+    private const val ZZZ_SCHEDULE = "https://r.jina.ai/https://bannerhistory.app/en/zzz-pickup-history"
+
+    fun fetchNormalized(context: Context): String {
+        val bundled = context.assets.open("banner_feed.json").bufferedReader().use { it.readText() }
+        val root = JSONObject(bundled)
+        val games = root.optJSONArray("games") ?: JSONArray()
+
+        for (i in 0 until games.length()) {
+            val game = games.optJSONObject(i) ?: continue
+            game.optJSONObject("current")?.remove("rerun_labels")
+            game.optJSONObject("next")?.remove("rerun_labels")
+            when (game.optString("id")) {
+                "genshin" -> updateGenshin(game)
+                "wuwa" -> updateWuwa(game)
+                "zzz" -> updateZzz(game)
+            }
+        }
+
+        val result = root.put("games", games).toString()
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit().putString(CACHE_KEY, result).apply()
+        return result
+    }
+
+    private fun updateGenshin(game: JSONObject) {
+        val text = fetch(GENSHIN_SCHEDULE) ?: return
+        applyGenshinPhase(game.optJSONObject("current"), text)
+        applyGenshinPhase(game.optJSONObject("next"), text)
+    }
+
+    private fun applyGenshinPhase(phase: JSONObject?, text: String) {
+        if (phase == null) return
+        val version = phase.optString("version").substringBefore(" Phase").trim()
+        val phaseNo = Regex("Phase\\s+(\\d+)").find(phase.optString("version"))?.groupValues?.getOrNull(1) ?: return
+        val block = Regex("(?ms)^##\\s+v" + Regex.escape(version) + ":.*?(?=^##\\s+v|\\z)")
+            .find(text)?.value ?: return
+        val dates = Regex("(?ms)^###\\s+Фаза\\s+" + phaseNo + "\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2})\\s+—\\s+(\\d{4}-\\d{2}-\\d{2})")
+            .find(block) ?: return
+        phase.put("start", mergeDate(phase.optString("start"), dates.groupValues[1], false))
+        phase.put("end", mergeDate(phase.optString("end"), dates.groupValues[2], true))
+    }
+
+    private fun updateWuwa(game: JSONObject) {
+        val text = fetch(WUWA_SCHEDULE) ?: return
+        val current = game.optJSONObject("current")
+        val next = game.optJSONObject("next")
+        val currentRange = Regex("(?is)Current Banners.*?([A-Z]{3}\\s+\\d{1,2}).{0,80}?([A-Z]{3}\\s+\\d{1,2})\\s*[·•]?\\s*END").find(text)
+        val nextRange = Regex("(?is)Upcoming Banners.*?([A-Z]{3}\\s+\\d{1,2}).{0,100}?([A-Z]{3}\\s+\\d{1,2})\\s*[·•]?\\s*START").find(text)
+        applyMonthRange(current, currentRange)
+        applyMonthRange(next, nextRange)
+    }
+
+    private fun applyMonthRange(phase: JSONObject?, match: MatchResult?) {
+        if (phase == null || match == null) return
+        val start = parseMonthDay(match.groupValues[1]) ?: return
+        val end = parseMonthDay(match.groupValues[2]) ?: return
+        phase.put("start", mergeDate(phase.optString("start"), start, false))
+        phase.put("end", mergeDate(phase.optString("end"), end, true))
+    }
+
+    private fun parseMonthDay(value: String): String? {
+        val parts = value.trim().split(Regex("\\s+"))
+        if (parts.size != 2) return null
+        val month = mapOf("JAN" to 1, "FEB" to 2, "MAR" to 3, "APR" to 4, "MAY" to 5, "JUN" to 6, "JUL" to 7, "AUG" to 8, "SEP" to 9, "OCT" to 10, "NOV" to 11, "DEC" to 12)[parts[0].uppercase(Locale.US)] ?: return null
+        return "%04d-%02d-%02d".format(Locale.US, 2026, month, parts[1].toIntOrNull() ?: return null)
+    }
+
+    private fun updateZzz(game: JSONObject) {
+        val text = fetch(ZZZ_SCHEDULE) ?: return
+        updateZzzPhase(game.optJSONObject("current"), text)
+        updateZzzPhase(game.optJSONObject("next"), text)
+    }
+
+    private fun updateZzzPhase(phase: JSONObject?, text: String) {
+        if (phase == null) return
+        val version = phase.optString("version").substringBefore(" Phase").trim()
+        val phaseNo = Regex("Phase\\s+(\\d+)").find(phase.optString("version"))?.groupValues?.getOrNull(1) ?: return
+        val block = Regex("(?ms)^##\\s+Version\\s+" + Regex.escape(version) + " Limited-Time Channels \\[Phase " + phaseNo + "\\].*?(?=^##\\s+Version\\s+|\\z)")
+            .find(text)?.value ?: return
+        val dates = Regex("(?ms)^Start\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))\\s*\\n.*?^End\\s*\\n\\s*(\\d{4}-\\d{2}-\\d{2}\\([^\\n]+\\))")
+            .find(block) ?: return
+        phase.put("start", toLocalIso(dates.groupValues[1]))
+        phase.put("end", toLocalIso(dates.groupValues[2]))
+    }
+
+    private fun toLocalIso(value: String): String {
+        val m = Regex("(\\d{4}-\\d{2}-\\d{2})\\([^)]*\\)(\\d{2}:\\d{2})\\s+GMT([+-]\\d+)").find(value)
+        if (m == null) return value
+        return try {
+            val offsetHours = m.groupValues[3].toInt()
+            val source = OffsetDateTime.parse(m.groupValues[1] + "T" + m.groupValues[2] + ":00" + "%+03d:00".format(offsetHours))
+            source.atZoneSameInstant(ZoneId.systemDefault()).toOffsetDateTime().toString()
+        } catch (_: Exception) { value }
+    }
+
+    private fun mergeDate(old: String, date: String, end: Boolean): String {
+        if (old.isBlank() || old == "null") return date + if (end) "T23:59:59" else "T00:00:00"
+        return try {
+            val oldDt = OffsetDateTime.parse(old)
+            date + "T" + oldDt.toLocalTime().toString() + oldDt.offset.toString()
+        } catch (_: Exception) {
+            date + if (end) "T23:59:59" else "T00:00:00"
+        }
+    }
+
+    private fun fetch(url: String): String? = try {
+        val c = URL(url).openConnection() as HttpURLConnection
+        c.connectTimeout = 10000
+        c.readTimeout = 15000
+        c.instanceFollowRedirects = true
+        c.setRequestProperty("User-Agent", "G-Codus/1.0")
+        if (c.responseCode !in 200..299) return null
+        c.inputStream.use { it.bufferedReader().readText() }
+    } catch (_: Exception) { null }
+}
+'''
+          Path('app/src/main/java/com/example/gcodus/BannerSource.kt').write_text(banner)
+
+          # 2) Remove rerun text from banner cards completely.
+          p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
+          s = p.read_text()
+          s = re.sub(r'\n\s*val rerun = banner\.characters\.mapNotNull \{ banner\.rerunLabels\[it\] \}.*?\n\s*}\n\s*\n\s*if \(banner\.unconfirmed\)', '\n\n        if (banner.unconfirmed)', s, count=1, flags=re.S)
+          p.write_text(s)
+
+          # 3) Wishlist notifications must NOT depend on the game being a favorite.
+          p = Path('app/src/main/java/com/example/gcodus/NotificationSyncWorker.kt')
+          s = p.read_text()
+          s = s.replace('            if (!appPrefs.getBoolean("favorite_" + gameId, false)) continue\n\n            val current = game.optJSONObject("current") ?: JSONObject()',
+                        '            val current = game.optJSONObject("current") ?: JSONObject()', 1)
+          # Remove now-unused local appPrefs declaration in notifyTrackedCharacters only.
+          marker = '    private fun notifyTrackedCharacters(prefs: android.content.SharedPreferences, json: String) {'
+          pos = s.find(marker)
+          if pos >= 0:
+              end = s.find('\n    private fun notifyCurrentBannerAppearance', pos)
+              chunk = s[pos:end]
+              chunk = chunk.replace('        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)\n\n', '')
+              s = s[:pos] + chunk + s[end:]
+          p.write_text(s)
+
+          # 4) Ensure a newly tracked character triggers the notification worker immediately.
+          p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
+          s = p.read_text()
+          old = '''        if (enabled) {
+            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()'''
+          new = '''        if (enabled) {
+            // Run immediately after adding a character so an already-live banner
+            // cannot be missed while waiting for the 15-minute periodic worker.
+            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()'''
+          s = s.replace(old, new, 1)
+          p.write_text(s)
+          PY
+      - name: Commit patched files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app/src/main/java/com/example/gcodus/BannerSource.kt app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/NotificationSyncWorker.kt .github/workflows/fix-banners-notifications.yml
+          git commit -m 'fix banner dates and wishlist notifications'
+          git rm .github/workflows/fix-banners-notifications.yml
+          git commit -m 'remove temporary banner patch workflow'
+          git push
