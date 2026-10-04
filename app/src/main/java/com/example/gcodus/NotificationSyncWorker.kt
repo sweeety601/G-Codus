@@ -118,9 +118,9 @@ class NotificationSyncWorker(
             }
         }
 
-        // Wishlist/tracking alerts are emitted only for games the user marked
-        // as favourite. A character in a leaked next phase gets the softer
-        // wording; once that phase becomes official, the wording changes.
+        // Wish List alerts are driven by the characters the user actually tracks.
+        // They are independent of the game favorite flag and include 5★/4★
+        // characters and returning characters alike.
         for (file in trackedFiles(gameId)) {
             val name = displayName(file)
             val present = nextChars.any { sameCharacter(it, file) }
