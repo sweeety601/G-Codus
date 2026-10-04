@@ -21,6 +21,14 @@ SECONDARY = {
         "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks",
         "https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/",
     ],
+    "Honkai: Star Rail": [
+        "https://www.prydwen.gg/star-rail/banners",
+        "https://hsr.hoyoverse.com/",
+    ],
+    "Arknights: Endfield": [
+        "https://endfield.gryphline.com/en-us/news/3839",
+        "https://www.prydwen.gg/arknights-endfield/banners",
+    ],
 }
 
 UA = "G-Codus/2.1 banner-sync"
@@ -276,7 +284,7 @@ def main():
         # Use confirmed schedule knowledge as a safety net for games whose
         # primary tracker can lag behind an official phase change.
         forced_current = known_current(game)
-        if forced_current and game in {"Honkai: Star Rail", "Arknights: Endfield"}:
+        if forced_current:
             current=[forced_current]
 
         if not next_phase:
