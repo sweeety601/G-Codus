@@ -1,7 +1,10 @@
 package com.example.gcodus
 
 import android.content.Context
+import org.json.JSONArray
 import org.json.JSONObject
+import java.net.HttpURLConnection
+import java.net.URL
 
 /**
  * Local banner database.
