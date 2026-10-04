@@ -1470,42 +1470,85 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadCachedBannerFeed(): String? {
-        val cached = prefs.getString("banner_feed", null)
-        if (!cached.isNullOrBlank()) {
-            try {
-                val games = JSONObject(cached).optJSONArray("games")
-                if (games != null && games.length() > 0) return cached
-            } catch (_: Exception) { }
-        }
-
+    private fun isUsableBannerFeed(source: String?): Boolean {
+        if (source.isNullOrBlank()) return false
         return try {
-            assets.open("banner_feed.json").use { it.bufferedReader().readText() }
+            val games = JSONObject(source).opt("games")
+            when (games) {
+                is JSONArray -> games.length() > 0
+                is JSONObject -> games.length() > 0
+                else -> false
+            }
         } catch (_: Exception) {
-            null
+            false
         }
     }
 
+    private fun loadCachedBannerFeed(): String? {
+        val candidates = listOf(
+            prefs.getString("banner_feed", null),
+            try {
+                assets.open("banner_feed.json").use { it.bufferedReader().readText() }
+            } catch (_: Exception) {
+                null
+            },
+            emergencyBannerFeed()
+        )
+        return candidates.firstOrNull { isUsableBannerFeed(it) }
+    }
+
     private fun loadFeed(): List<GameFeed> {
-        val source = bannerFeedJson ?: return emptyList()
+        val source = bannerFeedJson ?: loadCachedBannerFeed()?.also { bannerFeedJson = it }
+            ?: return emptyList()
+
         return try {
-            val games = JSONObject(source).optJSONArray("games") ?: return emptyList()
+            val root = JSONObject(source)
+            val gamesValue = root.opt("games")
             val result = mutableListOf<GameFeed>()
-            for (i in 0 until games.length()) {
-                val g = games.optJSONObject(i) ?: continue
-                val id = g.optString("id")
-                val name = g.optString("name")
-                if (id.isBlank() || name.isBlank()) continue
-                try {
-                    result += GameFeed(
+            val definitions = listOf(
+                "genshin" to "Genshin Impact",
+                "wuwa" to "Wuthering Waves",
+                "zzz" to "Zenless Zone Zero"
+            )
+
+            for ((wantedId, wantedName) in definitions) {
+                val g = when (gamesValue) {
+                    is JSONObject -> {
+                        gamesValue.optJSONObject(wantedName)
+                            ?: gamesValue.optJSONObject(wantedId)
+                    }
+                    is JSONArray -> {
+                        var found: JSONObject? = null
+                        for (i in 0 until gamesValue.length()) {
+                            val candidate = gamesValue.optJSONObject(i) ?: continue
+                            val id = candidate.optString("id")
+                            val name = candidate.optString("name")
+                            if (id.equals(wantedId, true) || name.equals(wantedName, true)) {
+                                found = candidate
+                                break
+                            }
+                        }
+                        found
+                    }
+                    else -> null
+                } ?: continue
+
+                val id = g.optString("id").ifBlank { wantedId }
+                val name = g.optString("name").ifBlank { wantedName }
+
+                result += try {
+                    GameFeed(
                         id,
                         name,
                         parseBanners(g, "current"),
                         parseBanners(g, "next"),
                         parseBanners(g, "upcoming")
                     )
-                } catch (_: Exception) { }
+                } catch (_: Exception) {
+                    GameFeed(id, name, emptyList(), emptyList(), emptyList())
+                }
             }
+
             result
         } catch (_: Exception) {
             emptyList()
@@ -1534,32 +1577,108 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
-        val b = game.getJSONObject(key)
-        val arr = b.optJSONArray("five_star") ?: JSONArray()
-        val fourStarArr = b.optJSONArray("four_star") ?: JSONArray()
-        val fiveStars = (0 until arr.length()).map { arr.optString(it) }.filter { it.isNotBlank() }.distinct()
-        val fourStars = (0 until fourStarArr.length()).map { arrName ->
-            fourStarArr.optString(arrName)
-        }.filter { it.isNotBlank() }.distinct().take(3)
-        if (fiveStars.isEmpty()) return emptyList()
-
-        // Each featured 5★ is its own swipeable banner card again.
-        // The 4★ lineup belongs to the phase, so it is repeated on each
-        // 5★ card exactly as it appears on the in-game phase.
-        return fiveStars.map { five ->
-            Banner(
-                game.getString("id"),
-                game.getString("name"),
-                b.optString("version"),
-                b.optString("start").takeIf { it.isNotBlank() && it != "null" },
-                b.optString("end").takeIf { it.isNotBlank() && it != "null" },
-                listOf(five),
-                fourStars,
-                key == "next",
-                b.optBoolean("unconfirmed", false)
-            )
+        val raw = game.opt(key)
+        val phases = when (raw) {
+            is JSONObject -> listOf(raw)
+            is JSONArray -> (0 until raw.length()).mapNotNull { raw.optJSONObject(it) }
+            else -> emptyList()
         }
+        if (phases.isEmpty()) return emptyList()
+
+        val result = mutableListOf<Banner>()
+        for (b in phases) {
+            val arr = b.optJSONArray("five_star")
+                ?: b.optJSONArray("characters")
+                ?: JSONArray()
+            val fourStarArr = b.optJSONArray("four_star")
+                ?: b.optJSONArray("fourStars")
+                ?: JSONArray()
+
+            val fiveStars = (0 until arr.length())
+                .map { arr.optString(it) }
+                .filter { it.isNotBlank() }
+                .distinct()
+
+            val fourStars = (0 until fourStarArr.length())
+                .map { fourStarArr.optString(it) }
+                .filter { it.isNotBlank() }
+                .distinct()
+                .take(3)
+
+            if (fiveStars.isEmpty()) continue
+
+            // Each featured 5★ is its own swipeable banner card.
+            for (five in fiveStars) {
+                result += Banner(
+                    game.optString("id"),
+                    game.optString("name"),
+                    b.optString("version", b.optString("phase")),
+                    b.optString("start").takeIf { it.isNotBlank() && it != "null" },
+                    b.optString("end").takeIf { it.isNotBlank() && it != "null" },
+                    listOf(five),
+                    fourStars,
+                    key == "next",
+                    b.optBoolean("unconfirmed", false)
+                )
+            }
+        }
+        return result
     }
+
+    private fun emergencyBannerFeed(): String =
+        JSONObject().put("version", 1).put("games", JSONArray().apply {
+            put(JSONObject()
+                .put("id", "genshin")
+                .put("name", "Genshin Impact")
+                .put("current", JSONObject()
+                    .put("version", "7.1 Phase 1")
+                    .put("start", "2026-09-23")
+                    .put("end", "2026-10-13")
+                    .put("five_star", JSONArray().put("Vesna").put("Vodyanitsa"))
+                    .put("four_star", JSONArray().put("Diona").put("Faruzan").put("Chongyun"))
+                    .put("unconfirmed", false))
+                .put("next", JSONObject()
+                    .put("version", "7.1 Phase 2")
+                    .put("start", "2026-10-13")
+                    .put("end", "2026-11-03")
+                    .put("five_star", JSONArray().put("Escoffier").put("Skirk"))
+                    .put("four_star", JSONArray())
+                    .put("unconfirmed", true)))
+            put(JSONObject()
+                .put("id", "wuwa")
+                .put("name", "Wuthering Waves")
+                .put("current", JSONObject()
+                    .put("version", "3.7 Phase 1")
+                    .put("start", "2026-09-30")
+                    .put("end", "2026-10-22")
+                    .put("five_star", JSONArray().put("Hsin").put("Chisa").put("Iuno"))
+                    .put("four_star", JSONArray().put("Buling").put("Taoqi").put("Youhu"))
+                    .put("unconfirmed", false))
+                .put("next", JSONObject()
+                    .put("version", "3.7 Phase 2")
+                    .put("start", "2026-10-22")
+                    .put("end", "2026-11-11")
+                    .put("five_star", JSONArray().put("Suoming").put("Lucilla").put("Lynae"))
+                    .put("four_star", JSONArray().put("Lumi").put("Danjin").put("Chixia"))
+                    .put("unconfirmed", true)))
+            put(JSONObject()
+                .put("id", "zzz")
+                .put("name", "Zenless Zone Zero")
+                .put("current", JSONObject()
+                    .put("version", "3.2 Phase 2")
+                    .put("start", "2026-09-30")
+                    .put("end", "2026-10-20")
+                    .put("five_star", JSONArray().put("Roxy").put("Promeia"))
+                    .put("four_star", JSONArray().put("Corin").put("Billy"))
+                    .put("unconfirmed", false))
+                .put("next", JSONObject()
+                    .put("version", "3.3 Phase 1")
+                    .put("start", "2026-10-21")
+                    .put("end", "2026-11-11")
+                    .put("five_star", JSONArray().put("Phoenix"))
+                    .put("four_star", JSONArray())
+                    .put("unconfirmed", true)))
+        }).toString()
 
     private fun isFavorite(gameId: String): Boolean =
         prefs.getBoolean("favorite_$gameId", false)
