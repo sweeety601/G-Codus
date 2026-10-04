@@ -1,11 +1,11 @@
 {
   "version": 3,
-  "generated_at": "2026-10-04T09:21:12.829191+00:00",
+  "generated_at": "2026-10-04T09:22:19.936323+00:00",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-04T09:21:15.661373+00:00",
+      "fetched_at": "2026-10-04T09:22:22.729772+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -54,7 +54,7 @@
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-04T09:21:18.048966+00:00",
+      "fetched_at": "2026-10-04T09:22:25.019428+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -105,7 +105,7 @@
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-04T09:21:20.863079+00:00",
+      "fetched_at": "2026-10-04T09:22:27.770272+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -141,6 +141,80 @@
           "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
         }
       ],
+      "upcoming": []
+    },
+    "Honkai: Star Rail": {
+      "source_url": "https://www.prydwen.gg/star-rail/banners",
+      "fetched_at": "2026-10-04T09:22:29.893502+00:00",
+      "status": "source_unavailable",
+      "current": [
+        {
+          "phase": "4.6 Phase 1",
+          "type": "character",
+          "characters": [
+            "Pearl",
+            "Evanescia"
+          ],
+          "start_date": "2026-09-28",
+          "end_date": "2026-10-21",
+          "status": "live",
+          "source_status": "confirmed",
+          "confirmation_basis": "Version 4.6 official announcement",
+          "official_source": "https://hsr.hoyoverse.com/",
+          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
+          "four_star": [
+            "Qingque",
+            "Xueyi",
+            "Misha"
+          ]
+        }
+      ],
+      "next": [
+        {
+          "phase": "4.6 Phase 2",
+          "type": "character",
+          "characters": [
+            "Pearl",
+            "Mortenax Blade"
+          ],
+          "start_date": "2026-10-21",
+          "end_date": "2026-11-10",
+          "status": "upcoming",
+          "source_status": "confirmed",
+          "confirmation_basis": "Version 4.6 official announcement",
+          "official_source": "https://hsr.hoyoverse.com/",
+          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
+          "four_star": [
+            "Qingque",
+            "Xueyi",
+            "Misha"
+          ]
+        }
+      ],
+      "upcoming": []
+    },
+    "Arknights: Endfield": {
+      "source_url": "https://www.prydwen.gg/arknights-endfield/banners",
+      "fetched_at": "2026-10-04T09:22:32.044270+00:00",
+      "status": "source_unavailable",
+      "current": [
+        {
+          "phase": "1.5 Phase 2",
+          "type": "character",
+          "characters": [
+            "Yvonne"
+          ],
+          "start_date": "2026-09-24",
+          "end_date": "2026-10-21",
+          "status": "live",
+          "source_status": "confirmed",
+          "confirmation_basis": "Official RE-Factor Headhunting #1 announcement",
+          "official_source": "https://endfield.gryphline.com/en-us/news/3839",
+          "secondary_source": "https://endfield.gryphline.com/en-us/news/3839",
+          "four_star": []
+        }
+      ],
+      "next": [],
       "upcoming": []
     }
   }
