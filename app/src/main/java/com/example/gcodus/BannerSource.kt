@@ -39,6 +39,13 @@ object BannerSource {
             val sourceGame = sourceGames.optJSONObject(name) ?: continue
             val current = normalizePhase(sourceGame.optJSONArray("current")?.optJSONObject(0))
             val next = normalizePhase(sourceGame.optJSONArray("next")?.optJSONObject(0))
+            val upcoming = JSONArray()
+            sourceGame.optJSONArray("upcoming")?.let { arr ->
+                for (j in 0 until arr.length()) {
+                    val phase = arr.optJSONObject(j) ?: continue
+                    upcoming.put(normalizePhase(phase))
+                }
+            }
 
             games.put(
                 JSONObject()
@@ -46,6 +53,7 @@ object BannerSource {
                     .put("name", name)
                     .put("current", current)
                     .put("next", next)
+                    .put("upcoming", upcoming)
             )
         }
 
