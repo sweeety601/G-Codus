@@ -74,7 +74,9 @@ class MainActivity : AppCompatActivity() {
     private val gameMeta = listOf(
         GameMeta("genshin", "Genshin Impact", "genshin"),
         GameMeta("wuwa", "Wuthering Waves", "wuwa"),
-        GameMeta("zzz", "Zenless Zone Zero", "zzz")
+        GameMeta("zzz", "Zenless Zone Zero", "zzz"),
+        GameMeta("starrail", "Honkai: Star Rail", "starrail"),
+        GameMeta("endfield", "Arknights: Endfield", "endfield")
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -418,7 +420,7 @@ class MainActivity : AppCompatActivity() {
                 setPadding(dp(7), dp(7), dp(7), dp(7))
             }
             val resId = resources.getIdentifier("game_" + meta.resourceName, "drawable", packageName)
-            if (resId != 0) icon.setImageResource(resId) else icon.setImageDrawable(null)
+            if (resId != 0) icon.setImageResource(resId) else loadGameLogo(icon, meta.id)
             iconFrame.addView(icon, FrameLayout.LayoutParams(-1, -1))
             addPressEffect(item)
             item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))
@@ -862,6 +864,28 @@ class MainActivity : AppCompatActivity() {
                     entries += TrackedCharacter(meta.id, meta.name, name, file)
                 }
             }
+
+            onlineCharacters
+                .filter { it.gameId == meta.id }
+                .filterNot { online -> isMainProtagonist(meta.id, online.slug, online.name) }
+                .forEach { online ->
+                    val duplicateLocal = localFiles.any { localFile ->
+                        sameCharacterIdentity(
+                            meta.id,
+                            characterDisplayName(localFile),
+                            online.name,
+                            online.slug,
+                            localFile
+                        )
+                    }
+                    if (!duplicateLocal) {
+                        val file = "__online_" + meta.id + "_" + online.slug + ".webp"
+                        if ((gameId != null || isTracked(meta.id, file)) &&
+                            (normalizedQuery.isBlank() || online.name.lowercase().contains(normalizedQuery))) {
+                            entries += TrackedCharacter(meta.id, meta.name, online.name, file)
+                        }
+                    }
+                }
         }
         entries.sortWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.name.lowercase() })
         if (entries.isEmpty()) {
@@ -1008,6 +1032,8 @@ class MainActivity : AppCompatActivity() {
         "genshin" -> "genshin"
         "wuwa" -> "wuthering_waves"
         "zzz" -> "zenless_zone_zero"
+        "starrail" -> "honkai_star_rail"
+        "endfield" -> "arknights_endfield"
         else -> null
     }
 
@@ -1397,6 +1423,14 @@ class MainActivity : AppCompatActivity() {
                 urls += "https://genshin.jmp.blue/characters/" + slug + "/portrait"
             }
             "zzz" -> urls += "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
+            "starrail" -> {
+                urls += "https://cdn.prydwen.gg/images/star-rail/characters/card_" + slug + ".webp"
+                urls += "https://cdn.prydwen.gg/images/star-rail/characters/" + slug + ".webp"
+            }
+            "endfield" -> {
+                urls += "https://cdn.prydwen.gg/images/arknights-endfield/characters/card_" + slug + ".webp"
+                urls += "https://cdn.prydwen.gg/images/arknights-endfield/characters/" + slug + ".webp"
+            }
             else -> return
         }
         loadRemotePortrait(image, urls)
@@ -1737,10 +1771,52 @@ class MainActivity : AppCompatActivity() {
         return value
     }
 
+    private fun loadGameLogo(image: ImageView, gameId: String) {
+        val urls = when (gameId) {
+            "starrail" -> listOf(
+                "https://www.pngall.com/wp-content/uploads/17/Honkai-Star-Rail-Visual-Identity-Symbol-PNG-thumb.png"
+            )
+            "endfield" -> listOf(
+                "https://arknights.win/images/logo/endfield-logo.png"
+            )
+            else -> emptyList()
+        }
+        loadRemoteImage(image, urls)
+    }
+
+    private fun loadRemoteImage(image: ImageView, urls: List<String>) {
+        if (urls.isEmpty()) return
+        val cacheKey = urls.first()
+        portraitCache.get(cacheKey)?.let { image.setImageBitmap(it); return }
+        imageExecutor.execute {
+            var bitmap: Bitmap? = null
+            for (url in urls) {
+                try {
+                    val connection = URL(url).openConnection() as HttpURLConnection
+                    connection.connectTimeout = 3500
+                    connection.readTimeout = 5000
+                    connection.instanceFollowRedirects = true
+                    connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                    connection.setRequestProperty("Accept", "image/avif,image/webp,image/png,image/*")
+                    bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
+                    if (bitmap != null) break
+                } catch (_: Exception) { }
+            }
+            if (bitmap != null) {
+                portraitCache.put(cacheKey, bitmap)
+                runOnUiThread {
+                    if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
+                }
+            }
+        }
+    }
+
     private fun gameAccent(id: String): Int = when (id) {
         "genshin" -> Color.rgb(155, 114, 255)
         "wuwa" -> Color.rgb(79, 168, 255)
         "zzz" -> Color.rgb(240, 182, 77)
+        "starrail" -> Color.rgb(91, 173, 255)
+        "endfield" -> Color.rgb(174, 182, 197)
         else -> purple
     }
 
