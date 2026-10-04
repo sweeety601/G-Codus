@@ -8,17 +8,35 @@ on:
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle.properties"
+      - "scripts/apply_requested_game_updates.py"
       - ".github/workflows/verify-android.yml"
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Apply requested game fixes
+        run: python3 scripts/apply_requested_game_updates.py
+      - name: Commit requested game fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/PromoCodeSource.kt scripts/sync_banners.py scripts/sync_game_icons.py
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "No requested fixes to commit."
+          else
+            git commit -m "Fix Endfield rarities, HSR codes, scrolling games and leak sources"
+            git push
+          fi
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
