@@ -139,12 +139,108 @@ def dedupe(items):
     return result
 
 
-def confirmed_override(game):
-    if game == "Genshin Impact":
-        return {"phase":"7.1 Phase 2","type":"character","characters":["Escoffier","Skirk"],"start_date":"2026-10-13","end_date":"2026-11-03","status":"upcoming","source_status":"confirmed","confirmation_basis":"Version 7.1 Special Program","secondary_source":SECONDARY[game][0]}
-    if game == "Wuthering Waves":
-        return {"phase":"3.7 Phase 2","type":"character","characters":["Suoming","Lucilla","Lynae"],"start_date":"2026-10-22","end_date":"2026-11-11","status":"upcoming","source_status":"confirmed","confirmation_basis":"Version 3.7 official schedule / Special Report","secondary_source":SECONDARY[game][0],"four_star":["Lumi","Danjin","Chixia"]}
+KNOWN_SCHEDULES = {
+    "Genshin Impact": [
+        {
+            "phase": "7.1 Phase 1", "type": "character",
+            "characters": ["Vesna", "Vodyanitsa"],
+            "start_date": "2026-09-23", "end_date": "2026-10-13",
+            "status": "live", "source_status": "confirmed",
+            "confirmation_basis": "Version 7.1 official notice",
+            "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/",
+            "secondary_source": SECONDARY["Genshin Impact"][0],
+            "four_star": ["Diona", "Faruzan", "Chongyun"],
+        },
+        {
+            "phase": "7.1 Phase 2", "type": "character",
+            "characters": ["Escoffier", "Skirk"],
+            "start_date": "2026-10-13", "end_date": "2026-11-03",
+            "status": "upcoming", "source_status": "confirmed",
+            "confirmation_basis": "Version 7.1 Special Program",
+            "secondary_source": SECONDARY["Genshin Impact"][0],
+            "four_star": ["Diona", "Faruzan", "Chongyun"],
+        },
+    ],
+    "Wuthering Waves": [
+        {
+            "phase": "3.7 Phase 1", "type": "character",
+            "characters": ["Hsin", "Chisa", "Iuno"],
+            "start_date": "2026-09-30", "end_date": "2026-10-22",
+            "status": "live", "source_status": "confirmed",
+            "confirmation_basis": "Version 3.7 official notice",
+            "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528",
+            "secondary_source": SECONDARY["Wuthering Waves"][0],
+            "four_star": ["Buling", "Taoqi", "Youhu"],
+        },
+        {
+            "phase": "3.7 Phase 2", "type": "character",
+            "characters": ["Suoming", "Lucilla", "Lynae"],
+            "start_date": "2026-10-22", "end_date": "2026-11-11",
+            "status": "upcoming", "source_status": "confirmed",
+            "confirmation_basis": "Version 3.7 official schedule / Special Report",
+            "secondary_source": SECONDARY["Wuthering Waves"][0],
+            "four_star": ["Lumi", "Danjin", "Chixia"],
+        },
+    ],
+    "Honkai: Star Rail": [
+        {
+            "phase": "4.6 Phase 1", "type": "character",
+            "characters": ["Pearl", "Evanescia"],
+            "start_date": "2026-09-28", "end_date": "2026-10-21",
+            "status": "live", "source_status": "confirmed",
+            "confirmation_basis": "Version 4.6 official announcement",
+            "official_source": "https://hsr.hoyoverse.com/",
+            "secondary_source": SECONDARY["Honkai: Star Rail"][0],
+            "four_star": ["Qingque", "Xueyi", "Misha"],
+        },
+        {
+            "phase": "4.6 Phase 2", "type": "character",
+            "characters": ["Pearl", "Mortenax Blade"],
+            "start_date": "2026-10-21", "end_date": "2026-11-10",
+            "status": "upcoming", "source_status": "confirmed",
+            "confirmation_basis": "Version 4.6 official announcement",
+            "official_source": "https://hsr.hoyoverse.com/",
+            "secondary_source": SECONDARY["Honkai: Star Rail"][0],
+            "four_star": ["Qingque", "Xueyi", "Misha"],
+        },
+    ],
+    "Arknights: Endfield": [
+        {
+            "phase": "1.5 Phase 2", "type": "character",
+            "characters": ["Yvonne"],
+            "start_date": "2026-09-24", "end_date": "2026-10-21",
+            "status": "live", "source_status": "confirmed",
+            "confirmation_basis": "Official RE-Factor Headhunting #1 announcement",
+            "official_source": "https://endfield.gryphline.com/en-us/news/3839",
+            "secondary_source": SECONDARY["Arknights: Endfield"][0],
+            "four_star": [],
+        },
+    ],
+}
+
+
+def known_current(game):
+    today = datetime.now(timezone.utc).date()
+    phases = KNOWN_SCHEDULES.get(game, [])
+    for item in phases:
+        if item["start_date"] <= today.isoformat() < item["end_date"]:
+            result = dict(item)
+            result["status"] = "live"
+            result.pop("unconfirmed", None)
+            return result
     return None
+
+
+def known_next(game):
+    today = datetime.now(timezone.utc).date()
+    phases = KNOWN_SCHEDULES.get(game, [])
+    future = [x for x in phases if x["start_date"] > today.isoformat()]
+    if not future:
+        return None
+    result = dict(sorted(future, key=lambda x: x["start_date"])[0])
+    result["status"] = "upcoming"
+    result.pop("unconfirmed", None)
+    return result
 
 
 def secondary_zzz():
@@ -174,15 +270,32 @@ def main():
         next_phase=dedupe([x[1] for x in grouped if x[0]=="next"])
         upcoming=dedupe([x[1] for x in grouped if x[0]=="upcoming"])
         old_game=previous.get("games",{}).get(game,{})
-        if not current and old_game.get("current"): current=old_game["current"]
-        override=confirmed_override(game)
-        if override:
-            # These two phases are confirmed even when Prydwen is temporarily unavailable.
-            next_phase=[override]
-            upcoming=[]
-        elif not next_phase and game=="Zenless Zone Zero":
-            secondary=secondary_zzz(); next_phase=[x for x in secondary if x["phase"]=="3.3 Phase 1"]; upcoming.extend(x for x in secondary if x["phase"]!="3.3 Phase 1")
-        output["games"][game]={"source_url":url,"fetched_at":datetime.now(timezone.utc).isoformat(),"status":"source_reachable" if cards else "source_unavailable","current":current[:6],"next":next_phase[:6],"upcoming":dedupe(upcoming)[:12]}
+        if not current and old_game.get("current"):
+            current=old_game["current"]
+
+        # Use confirmed schedule knowledge as a safety net for games whose
+        # primary tracker can lag behind an official phase change.
+        forced_current = known_current(game)
+        if forced_current and game in {"Honkai: Star Rail", "Arknights: Endfield"}:
+            current=[forced_current]
+
+        if not next_phase:
+            known=known_next(game)
+            if known:
+                next_phase=[known]
+            elif game=="Zenless Zone Zero":
+                secondary=secondary_zzz()
+                next_phase=[x for x in secondary if x["phase"]=="3.3 Phase 1"]
+                upcoming.extend(x for x in secondary if x["phase"]!="3.3 Phase 1")
+
+        known=known_next(game)
+        if known and (not next_phase or any(x.get("source_status")!="confirmed" for x in next_phase)):
+            next_phase=[known]
+
+        # The app displays only the current and immediate next phase.
+        upcoming=[]
+
+        output["games"][game]={"source_url":url,"fetched_at":datetime.now(timezone.utc).isoformat(),"status":"source_reachable" if cards else "source_unavailable","current":current[:6],"next":next_phase[:6],"upcoming":[]}
     OUT.write_text(json.dumps(output,ensure_ascii=False,indent=2)+"\n",encoding="utf-8")
     print("Online banner sync completed:",OUT)
 
