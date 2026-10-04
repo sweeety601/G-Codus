@@ -23,8 +23,8 @@ jobs:
         id: build
         run: |
           set +e
-          ./gradlew clean assembleDebug --stacktrace
-          rc=$?
+          ./gradlew clean assembleDebug --stacktrace 2>&1 | tee /tmp/build.log
+          rc=${PIPESTATUS[0]}
           echo "$rc" > /tmp/build_rc
           exit $rc
       - name: Record build result
@@ -33,12 +33,13 @@ jobs:
           rc=$(cat /tmp/build_rc 2>/dev/null || echo 1)
           mkdir -p .ci
           if [ "$rc" -eq 0 ]; then
-            printf 'PASS\ncommit=%s\n' "$GITHUB_SHA" > .ci/build-status.txt
+            printf 'PASS\ncommit=%s\nrun=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > .ci/build-status.txt
           else
-            printf 'FAIL\ncommit=%s\n' "$GITHUB_SHA" > .ci/build-status.txt
+            printf 'FAIL\ncommit=%s\nrun=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > .ci/build-status.txt
           fi
+          tail -n 160 /tmp/build.log 2>/dev/null > .ci/build-log.txt || true
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add .ci/build-status.txt
+          git add .ci/build-status.txt .ci/build-log.txt
           git commit -m 'CI verify result' || true
           git push || true
