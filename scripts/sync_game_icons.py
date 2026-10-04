@@ -13,7 +13,7 @@ ICONS = {
     "game_genshin.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Genshin_Impact_wordmark.svg",
     "game_wuwa.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Wuthering_Waves_logo.svg",
     "game_zzz.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Zenless_Zone_Zero_wordmark.svg",
-    "game_starrail.svg": "https://brandlogos.sgp1.digitaloceanspaces.com/svg/arcticons/honkai-star-rail.svg",
+    "game_starrail.png": "https://images.seeklogo.com/logo-png/50/1/honkai-star-rail-logo-png_seeklogo-503999.png",
     "game_endfield.svg": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Arknights_Endfield_logo.svg",
 }
 
@@ -25,24 +25,19 @@ for filename, url in ICONS.items():
 
 subprocess.run(["python3", "-m", "pip", "install", "--quiet", "cairosvg", "pillow"], check=True)
 
+from PIL import Image
 for filename in ICONS:
     src = SOURCE_DIR / filename
-    rendered = DRAWABLE_DIR / (filename.replace(".svg", "_rendered.png"))
-    out = DRAWABLE_DIR / filename.replace(".svg", ".png")
-
-    subprocess.run(
-        ["python3", "-c",
-         "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1],write_to=sys.argv[2],output_width=220)",
-         str(src), str(rendered)],
-        check=True,
-    )
-
-    from PIL import Image
-    logo = Image.open(rendered).convert("RGBA")
+    if filename.endswith(".png"):
+        logo = Image.open(src).convert("RGBA")
+    else:
+        rendered = DRAWABLE_DIR / (filename.replace(".svg", "_rendered.png"))
+        subprocess.run(["python3", "-c", "import cairosvg,sys; cairosvg.svg2png(url=sys.argv[1],write_to=sys.argv[2],output_width=220)", str(src), str(rendered)], check=True)
+        logo = Image.open(rendered).convert("RGBA")
+        rendered.unlink(missing_ok=True)
     canvas = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
-    logo.thumbnail((220, 180), Image.Resampling.LANCZOS)
+    logo.thumbnail((232, 190), Image.Resampling.LANCZOS)
     canvas.alpha_composite(logo, ((256 - logo.width) // 2, (256 - logo.height) // 2))
-    canvas.save(out, "PNG", optimize=True)
-    rendered.unlink(missing_ok=True)
+    canvas.save(DRAWABLE_DIR / (filename.rsplit('.', 1)[0] + ".png"), "PNG", optimize=True)
 
 print("Downloaded and integrated all five game icons with transparent backgrounds.")

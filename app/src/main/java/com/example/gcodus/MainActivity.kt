@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(100)))
+        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
@@ -437,10 +437,10 @@ class MainActivity : AppCompatActivity() {
                 setPadding(0, dp(5), 0, 0)
             })
 
-            iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(94)))
+            iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))
         }
 
-        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(104)))
+        wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))
 
         val wishlist = TextView(this).apply {
             text = "Мой вишлист"
@@ -554,13 +554,15 @@ class MainActivity : AppCompatActivity() {
         }
         art.addView(image, FrameLayout.LayoutParams(-1, -1))
 
+        val bannerRarity = if (gameId == "endfield") "6★" else "5★"
+
         val overlay = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.BOTTOM
             setPadding(dp(12), dp(12), dp(12), dp(12))
             setBackgroundColor(Color.argb(95, 0, 0, 0))
         }
-        overlay.addView(label("5★", 28f, Color.WHITE, true))
+        overlay.addView(label(bannerRarity, 28f, Color.WHITE, true))
         overlay.addView(label(banner.characters.joinToString(" • ").ifBlank { "—" }, 18f, Color.WHITE, true).apply {
             maxLines = 2
         })
@@ -573,7 +575,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.VERTICAL
             setPadding(dp(14), dp(8), dp(8), dp(4))
         }
-        info.addView(label("5★", 17f, Color.rgb(255, 211, 76), true))
+        info.addView(label(bannerRarity, 17f, Color.rgb(255, 211, 76), true))
         val fiveName = banner.characters.joinToString(" • ").ifBlank { "Баннер" }
         info.addView(label(fiveName, 22f, text, true).apply {
             setPadding(0, dp(4), 0, dp(2))
@@ -1072,6 +1074,10 @@ class MainActivity : AppCompatActivity() {
         val base = file.substringBeforeLast(".")
             .removeSuffix("_card")
             .removeSuffix("_full")
+            .replace("•", " ")
+            .replace("·", " ")
+            .replace(Regex("\s+"), " ")
+            .trim()
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
             "__wuwa-aemeath" to "Aemeath",
@@ -1100,7 +1106,7 @@ class MainActivity : AppCompatActivity() {
         val n = name.lowercase().replace("’", "").replace("'", "").replace("&", "and")
             .replace(Regex("[^a-z0-9]+"), "")
         return when {
-            n in setOf("arcane","ardelia","camille","ember","endministrator","gilberta","laevatain","lastrite","lifeng","liino","mifu","pogranichnik","rossi","tangtang","typhoeus","yvonne","zhuangfangyi") -> 6
+            n in setOf("arcane","ardelia","camille","ember","endministrator","gilberta","laevatain","lastrite","lifeng","liino","mifu","pogranichnik","rossi","si","tangtang","typhoeus","yvonne","zhuangfangyi") -> 6
             n in setOf("alesh","arclight","avywenna","chenqianyu","dapan","perlica","purrchena","snowshine","wulfgard","xaihi") -> 5
             n in setOf("akekuri","antal","catcher","estella","fluorite") -> 4
             else -> 0
@@ -1302,6 +1308,8 @@ class MainActivity : AppCompatActivity() {
             "genshin" -> "genshin"
             "wuwa" -> "wuthering_waves"
             "zzz" -> "zenless_zone_zero"
+            "starrail" -> "honkai_star_rail"
+            "endfield" -> "arknights_endfield"
             else -> return
         }
 
@@ -1382,11 +1390,16 @@ class MainActivity : AppCompatActivity() {
             val exact = exactAssetByCharacter?.takeIf { files.contains(it) }
                 ?: specialFile?.takeIf { files.contains(it) }
             val target = exact ?: files.firstOrNull { file ->
-                val stem = file.substringBeforeLast('.').lowercase()
+                val stem = file.substringBeforeLast('.')
+                    .removeSuffix("_card")
+                    .removeSuffix("_full")
+                    .lowercase()
                     .replace("’", "")
                     .replace("'", "")
                     .replace(":", "")
                     .replace("&", "and")
+                    .replace("•", "-")
+                    .replace("·", "-")
                     .replace(Regex("[^a-z0-9]+"), "-")
                     .trim('-')
                 val compact = stem.replace("-", "")
@@ -1663,7 +1676,7 @@ class MainActivity : AppCompatActivity() {
                 ?: JSONArray()
 
             val fiveStars = (0 until arr.length())
-                .map { arr.optString(it) }
+                .map { arr.optString(it).replace("•", " ").replace("·", " ").replace(Regex("\s+"), " ").trim() }
                 .filter { it.isNotBlank() }
                 .distinct()
 
