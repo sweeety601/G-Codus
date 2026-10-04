@@ -63,6 +63,48 @@ needle = '            "billy" to "Billy Kid"\n'
 if needle in s and '"blade-mortenax" to "Mortenax Blade"' not in s:
     s = s.replace(needle, needle + '            "blade-mortenax" to "Mortenax Blade"\n', 1)
 
+
+# Exclude unwanted Endfield characters from Tracking/Wishlist and purge saved keys.
+tracking_old = '''        val entries = rawEntries
+            .groupBy { trackedIdentityKey(it.gameId, it.file) }'''
+tracking_new = '''        val entries = rawEntries
+            .filterNot {
+                it.gameId == "endfield" && normalizeCharacterForMatch(it.name) in
+                    setOf("storyteller", "thestoryteller", "sunbringer")
+            }
+            .groupBy { trackedIdentityKey(it.gameId, it.file) }'''
+if tracking_old not in s:
+    raise SystemExit("trackingGrid entries anchor not found")
+s = s.replace(tracking_old, tracking_new, 1)
+
+migrate_old = '''        val editor = prefs.edit()
+        var changed = false
+'''
+migrate_new = '''        val editor = prefs.edit()
+        var changed = false
+
+        // These Endfield characters must never appear in Tracking/Wishlist.
+        prefs.all.keys.filter { key ->
+            val normalized = key.lowercase()
+                .replace("’", "")
+                .replace("'", "")
+                .replace(Regex("[^a-z0-9]+"), "")
+            normalized.contains("trackedv2endfieldthestoryteller") ||
+                normalized.contains("trackedv2endfieldstoryteller") ||
+                normalized.contains("trackedv2endfieldsunbringer") ||
+                normalized.contains("trackedendfieldthestoryteller") ||
+                normalized.contains("trackedendfieldstoryteller") ||
+                normalized.contains("trackedendfieldsunbringer")
+        }.forEach {
+            editor.remove(it)
+            changed = true
+        }
+'''
+if migrate_old not in s:
+    raise SystemExit("migrateTrackingKeys anchor not found")
+s = s.replace(migrate_old, migrate_new, 1)
+
+MAIN.write_text(s)
 MAIN.write_text(s)
 
 # Keep online HSR canonical keys stable too.
