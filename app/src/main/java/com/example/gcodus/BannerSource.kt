@@ -101,12 +101,15 @@ object BannerSource {
         if (phase.optBoolean("unconfirmed", false)) return false
         val status = phase.optString("source_status")
         if (status.equals("confirmed", true)) return true
+
+        // A generic news landing page is NOT confirmation. Require a concrete
+        // announcement/detail URL for the corresponding game.
         val source = phase.optString("official_source").lowercase()
-        return source.contains("kurogames.com/main/news/detail") ||
-            source.contains("wutheringwaves.kurogames.com") ||
-            source.contains("zenless.hoyoverse.com/en-us/news/") ||
-            source.contains("genshin.hoyoverse.com") ||
-            source.contains("hoyolab.com/article/")
+        return source.contains("kurogames.com/main/news/detail/") ||
+            source.contains("wutheringwaves.kurogames.com/main/news/detail/") ||
+            Regex("zenless\\.hoyoverse\\.com/.*/news/\\d+").containsMatchIn(source) ||
+            Regex("hoyolab\\.com/article/\\d+").containsMatchIn(source) ||
+            Regex("genshin\\.hoyoverse\\.com/.*/news/\\d+").containsMatchIn(source)
     }
 
     private fun applySecondaryNextSource(game: JSONObject) {
