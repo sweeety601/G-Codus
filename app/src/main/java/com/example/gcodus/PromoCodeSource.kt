@@ -27,6 +27,13 @@ object PromoCodeSource {
         "wuwa" to listOf(
             "OpenGachaCodes" to "https://api.ennead.cc/codes/wuwa",
             "game-codes" to "https://game-codes.wisp.uno/codes?game=wuwa"
+        ),
+        "starrail" to listOf(
+            "OpenGachaCodes" to "https://api.ennead.cc/codes/starrail"
+        ),
+        "endfield" to listOf(
+            "OpenGachaCodes" to "https://api.ennead.cc/codes/endfield",
+            "game-codes" to "https://game-codes.wisp.uno/codes?game=endfield"
         )
     )
 
