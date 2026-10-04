@@ -54,9 +54,23 @@ jobs:
           java-version: "21"
       - uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: "8.13"
+          gradle-version: "9.8"
+      - name: Generate Gradle Wrapper
+        run: gradle wrapper --gradle-version 9.8 --distribution-type bin
+      - name: Commit Gradle Wrapper
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gradlew gradlew.bat gradle/wrapper/gradle-wrapper.jar gradle/wrapper/gradle-wrapper.properties
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Gradle Wrapper already up to date."
+          else
+            git commit -m "Add Gradle 9.8 wrapper"
+            git push
+          fi
       - name: Assemble debug APK
-        run: gradle :app:assembleDebug --stacktrace
+        run: ./gradlew :app:assembleDebug --stacktrace
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
