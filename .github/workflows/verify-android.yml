@@ -25,7 +25,16 @@ jobs:
           python-version: "3.12"
       - name: Apply requested game fixes
         run: python3 scripts/run_requested_game_updates.py
-      - name: Commit requested game fixes
+      - name: Fix horizontal LayoutParams
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
+          s=p.read_text()
+          s=s.replace('icons.addView(iconRow, HorizontalScrollView.LayoutParams(-2, dp(100)))','icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(100)))')
+          p.write_text(s)
+          PY
+      - name: Commit requested fixes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -34,7 +43,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No requested fixes to commit."
           else
-            git commit -m "Fix Endfield rarities, HSR codes, scrolling games and leak sources"
+            git commit -m "Fix requested game UI compilation"
             git push
           fi
       - uses: actions/setup-java@v5
