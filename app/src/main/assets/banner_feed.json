@@ -1,0 +1,136 @@
+{
+  "version": 3,
+  "generated_at": "2026-10-04T02:01:04.977779+00:00",
+  "source": "Prydwen + secondary fallback",
+  "games": [
+    {
+      "id": "genshin",
+      "name": "Genshin Impact",
+      "current": {
+        "version": "7.1 Phase 1",
+        "start": "2026-09-23",
+        "end": "2026-10-13",
+        "five_star": [
+          "Vesna",
+          "Vodyanitsa"
+        ],
+        "four_star": [
+          "Diona",
+          "Faruzan",
+          "Chongyun"
+        ],
+        "unconfirmed": false,
+        "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/",
+        "secondary_source": "",
+        "source_status": "confirmed"
+      },
+      "next": {
+        "version": "7.1 Phase 2",
+        "start": "2026-10-13",
+        "end": "2026-11-03",
+        "five_star": [
+          "Escoffier",
+          "Skirk"
+        ],
+        "four_star": [],
+        "unconfirmed": true,
+        "official_source": "",
+        "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026",
+        "source_status": "unconfirmed"
+      },
+      "upcoming": []
+    },
+    {
+      "id": "wuwa",
+      "name": "Wuthering Waves",
+      "current": {
+        "version": "3.7 Phase 1",
+        "start": "2026-09-30",
+        "end": "2026-10-22",
+        "five_star": [
+          "Hsin",
+          "Chisa",
+          "Iuno"
+        ],
+        "four_star": [
+          "Buling",
+          "Taoqi",
+          "Youhu"
+        ],
+        "unconfirmed": false,
+        "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528",
+        "secondary_source": "",
+        "source_status": "confirmed"
+      },
+      "next": {
+        "version": "3.7 Phase 2",
+        "start": "2026-10-22",
+        "end": "2026-11-11",
+        "five_star": [
+          "Suoming",
+          "Lucilla",
+          "Lynae"
+        ],
+        "four_star": [
+          "Lumi",
+          "Danjin",
+          "Chixia"
+        ],
+        "unconfirmed": true,
+        "official_source": "",
+        "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
+        "source_status": "unconfirmed"
+      },
+      "upcoming": []
+    },
+    {
+      "id": "zzz",
+      "name": "Zenless Zone Zero",
+      "current": {
+        "version": "3.2 Phase 2",
+        "start": "2026-09-30",
+        "end": "2026-10-20",
+        "five_star": [
+          "Roxy",
+          "Promeia"
+        ],
+        "four_star": [
+          "Corin",
+          "Billy"
+        ],
+        "unconfirmed": false,
+        "official_source": "https://zenless.hoyoverse.com/en-us/news/166475",
+        "secondary_source": "",
+        "source_status": "confirmed"
+      },
+      "next": {
+        "version": "3.3 Phase 1",
+        "start": "2026-10-21",
+        "end": "2026-11-11",
+        "five_star": [
+          "Phoenix"
+        ],
+        "four_star": [],
+        "unconfirmed": true,
+        "official_source": "",
+        "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks",
+        "source_status": "unconfirmed"
+      },
+      "upcoming": [
+        {
+          "version": "3.3 Phase 2",
+          "start": "2026-11-11",
+          "end": "2026-12-02",
+          "five_star": [
+            "Severian"
+          ],
+          "four_star": [],
+          "unconfirmed": true,
+          "official_source": "",
+          "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks",
+          "source_status": "unconfirmed"
+        }
+      ]
+    }
+  ]
+}
