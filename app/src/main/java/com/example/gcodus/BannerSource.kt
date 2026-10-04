@@ -10,7 +10,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/** Live banner-date/forecast synchronizer. Rerun data is intentionally not used. */
+/** Live banner-date/forecast synchronizer. */
 object BannerSource {
     private const val PREFS = "g_codus"
     private const val CACHE_KEY = "banner_feed"
@@ -18,9 +18,10 @@ object BannerSource {
 
     private const val GENSHIN_HISTORY = "https://r.jina.ai/https://jaeger.moe/ru/banners/"
     private const val GENSHIN_SCHEDULE = "https://r.jina.ai/https://www.genshin-build.com/banners"
-    private const val WUWA_SCHEDULE = "https://r.jina.ai/https://www.pockettactics.com/wuthering-waves-banner"
+    private const val WUWA_SCHEDULE = "https://r.jina.ai/https://www.wuwabuild.com/banners"
     private const val ZZZ_HISTORY = "https://r.jina.ai/https://bannerhistory.app/en/zzz-pickup-history"
     private const val ZZZ_FORECAST = "https://r.jina.ai/https://timesaver.gg/blog/zzz-3-3"
+    private const val ZZZ_FORECAST_FALLBACK = "https://r.jina.ai/https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/"
 
     fun fetchNormalized(context: Context): String {
         val bundled = fetch(FEED_URL) ?: context.assets.open("banner_feed.json").bufferedReader().use { it.readText() }
@@ -29,9 +30,6 @@ object BannerSource {
 
         for (i in 0 until games.length()) {
             val game = games.optJSONObject(i) ?: continue
-            game.optJSONObject("current")?.remove("rerun_labels")
-            game.optJSONObject("next")?.remove("rerun_labels")
-
             when (game.optString("id")) {
                 "genshin" -> syncGenshin(game)
                 "wuwa" -> syncWuwa(game)
@@ -94,27 +92,45 @@ object BannerSource {
         val text = fetch(WUWA_SCHEDULE) ?: return
         val current = game.optJSONObject("current")
         val next = game.optJSONObject("next")
-        val currentRange = Regex("(?is)What's the current Wuthering Waves banner\\?.{0,1800}?(September|October|November|December)\\s+\\d{1,2}\\s*-\\s*(September|October|November|December)\\s+\\d{1,2}")
-            .find(text)
-        val nextRange = Regex("(?is)What's the next Wuthering Waves banner\\?.{0,1800}?(September|October|November|December)\\s+\\d{1,2}\\s*-\\s*(September|October|November|December)\\s+\\d{1,2}")
-            .find(text)
+        val currentMatch = Regex("(?is)Current Banners.{0,3000}?([A-Z]{3})\\s+(\\d{1,2})\\s*([A-Z]{3})\\s+(\\d{1,2})\\s*·\\s*END").find(text)
+        val nextMatch = Regex("(?is)Upcoming Banners.{0,3000}?([A-Z]{3})\\s+(\\d{1,2})\\s*([A-Z]{3})\\s+(\\d{1,2})\\s*·\\s*START").find(text)
+
         if (current != null && text.contains("Hsin", true) && text.contains("Chisa", true) && text.contains("Iuno", true)) {
             current.put("five_star", JSONArray(listOf("Hsin", "Chisa", "Iuno")))
         }
         if (next != null && text.contains("Suoming", true) && text.contains("Lynae", true) && text.contains("Lucilla", true)) {
             next.put("five_star", JSONArray(listOf("Suoming", "Lynae", "Lucilla")))
+            next.put("unconfirmed", false)
         }
-        currentRange?.let { putMonthRange(current, it.value) }
-        nextRange?.let { putMonthRange(next, it.value) }
+
+        if (currentMatch != null) {
+            putMonthRange(current, currentMatch.groupValues[1], currentMatch.groupValues[2], currentMatch.groupValues[3], currentMatch.groupValues[4])
+        }
+        if (nextMatch != null) {
+            putMonthRange(next, nextMatch.groupValues[1], nextMatch.groupValues[2], nextMatch.groupValues[3], nextMatch.groupValues[4])
+        }
     }
 
-    private fun putMonthRange(phase: JSONObject?, context: String) {
+    private fun putMonthRange(
+        phase: JSONObject?,
+        startMonth: String,
+        startDay: String,
+        endMonth: String,
+        endDay: String
+    ) {
         if (phase == null) return
-        val m = Regex("(?i)(January|February|March|April|May|June|July|August|September|October|November|December)\\s+(\\d{1,2})\\s*-\\s*(January|February|March|April|May|June|July|August|September|October|November|December)\\s+(\\d{1,2})")
-            .find(context) ?: return
-        val start = parseEnglishDate(m.groupValues[1] + " " + m.groupValues[2]) ?: return
-        val end = parseEnglishDate(m.groupValues[3] + " " + m.groupValues[4]) ?: return
+        val start = parseMonthDay(startMonth, startDay) ?: return
+        val end = parseMonthDay(endMonth, endDay) ?: return
         putDateRange(phase, start.toString(), end.toString())
+    }
+
+    private fun parseMonthDay(monthText: String, dayText: String): LocalDate? {
+        val month = mapOf(
+            "JAN" to 1, "FEB" to 2, "MAR" to 3, "APR" to 4, "MAY" to 5, "JUN" to 6,
+            "JUL" to 7, "AUG" to 8, "SEP" to 9, "OCT" to 10, "NOV" to 11, "DEC" to 12
+        )[monthText.uppercase(Locale.US)] ?: return null
+        val day = dayText.toIntOrNull() ?: return null
+        return LocalDate.of(2026, month, day)
     }
 
     private fun syncZzz(game: JSONObject) {
@@ -124,8 +140,8 @@ object BannerSource {
         val next = game.optJSONObject("next") ?: return
         if (next.optJSONArray("five_star")?.length() ?: 0 > 0) return
 
-        val forecast = fetch(ZZZ_FORECAST)
-        if (forecast != null && forecast.contains("Phoenix", true)) {
+        val forecast = fetch(ZZZ_FORECAST) ?: fetch(ZZZ_FORECAST_FALLBACK)
+        if (forecast != null && (forecast.contains("Phoenix", true) || forecast.contains("Phoenix Reffaella", true))) {
             next.put("version", "3.3 Phase 1")
             next.put("start", "2026-10-21T06:00:00+08:00")
             next.put("end", "2026-11-11T05:59:59+08:00")
