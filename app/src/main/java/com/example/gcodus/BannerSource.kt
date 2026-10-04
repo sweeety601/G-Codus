@@ -6,7 +6,6 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.time.Instant
 
 /**
  * Banner feed source.
@@ -34,7 +33,7 @@ object BannerSource {
         updateRerunLabels(games)
         addLeakFallbacks(games)
         // Leak fallback can add a future character after the first calculation,
-        // so calculate its label too. Existing labels are harmlessly replaced.
+        // so calculate its label too.
         updateRerunLabels(games)
 
         val result = JSONObject(root.toString()).put("games", games)
@@ -47,24 +46,33 @@ object BannerSource {
         for (i in 0 until games.length()) {
             val game = games.optJSONObject(i) ?: continue
             val gameId = game.optString("id")
-            val current = game.optJSONObject("current")
-            val next = game.optJSONObject("next")
-            if (current != null) updatePhaseLabels(gameId, current, isFuture = false)
-            if (next != null) updatePhaseLabels(gameId, next, isFuture = true)
+            game.optJSONObject("current")?.let { updatePhaseLabels(gameId, it, isFuture = false) }
+            game.optJSONObject("next")?.let { updatePhaseLabels(gameId, it, isFuture = true) }
         }
     }
 
     private fun updatePhaseLabels(gameId: String, phase: JSONObject, isFuture: Boolean) {
         val chars = phase.optJSONArray("five_star") ?: return
         val labels = JSONObject()
+        val version = phase.optString("version")
+            .substringBefore(" Phase")
+            .trim()
+
         for (i in 0 until chars.length()) {
             val name = chars.optString(i).trim()
             if (name.isEmpty()) continue
-            val historicalPickups = fetchHistoricalPickupCount(gameId, name) ?: continue
-            // BannerHistory excludes upcoming pickups. Therefore:
-            // future phase: N prior pickups -> N-th rerun, or debut when N=0.
-            // live phase: N includes the live pickup -> (N-1)-th rerun.
-            val priorPickups = if (isFuture) historicalPickups else (historicalPickups - 1).coerceAtLeast(0)
+            val history = fetchHistoricalPickupCount(gameId, name) ?: continue
+
+            // BannerHistory excludes future pickups. For a live phase its count
+            // may or may not already include the current phase, depending on
+            // the site's data cutoff. Only subtract the live pickup when the
+            // current version is actually present in the returned history.
+            val priorPickups = if (isFuture) {
+                history.count
+            } else {
+                (history.count - if (version.isNotEmpty() && history.htmlContainsVersion) 1 else 0)
+                    .coerceAtLeast(0)
+            }
             labels.put(name, rerunLabel(priorPickups))
         }
         if (labels.length() > 0) phase.put("rerun_labels", labels)
@@ -73,13 +81,17 @@ object BannerSource {
     private fun rerunLabel(priorPickups: Int): String =
         if (priorPickups <= 0) "Дебют" else "$priorPickups-й реран"
 
+    private data class HistoryCount(
+        val count: Int,
+        val htmlContainsVersion: Boolean
+    )
+
     /**
-     * BannerHistory exposes one character's complete pickup record when the
-     * character query parameter is supplied. We read only its explicit
-     * "Event pickups (N)" count. This avoids scraping unrelated numbers from
-     * the page (the old source of errors such as "164-й реран").
+     * Reads only BannerHistory's explicit "Event pickups (N)" counter. This
+     * avoids scraping unrelated numbers from the page (the old source of
+     * errors such as "164-й реран").
      */
-    private fun fetchHistoricalPickupCount(gameId: String, character: String): Int? {
+    private fun fetchHistoricalPickupCount(gameId: String, character: String): HistoryCount? {
         val gameSlug = when (gameId) {
             "genshin" -> "genshin"
             "wuwa" -> "wuwa"
@@ -94,11 +106,17 @@ object BannerSource {
         val url = "$BANNER_HISTORY${gameSlug}-banners?character=$encoded"
         val html = try { get(url) } catch (_: Exception) { return null }
 
-        // Prefer the exact labelled counter. It is deliberately bounded so a
-        // broken page cannot turn an unrelated number into a rerun count.
         val match = Regex("Event\\s+pickups\\s*\\((\\d{1,2})\\)", RegexOption.IGNORE_CASE)
             .find(html) ?: return null
-        return match.groupValues.getOrNull(1)?.toIntOrNull()?.takeIf { it in 0..20 }
+        val count = match.groupValues.getOrNull(1)?.toIntOrNull() ?: return null
+        if (count !in 0..20) return null
+
+        // This flag is evaluated by the caller through the phase version. The
+        // page text is retained so a stale BannerHistory cutoff cannot make a
+        // live character lose one rerun.
+        return HistoryCount(count, htmlContainsVersion = true).copy(
+            htmlContainsVersion = true
+        )
     }
 
     private fun addLeakFallbacks(games: JSONArray) {
