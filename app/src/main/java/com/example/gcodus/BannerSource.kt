@@ -5,15 +5,13 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 
 /**
  * Banner feed source.
  *
- * Banner lineup data remains local (banner_feed.json). BannerHistory is used only
- * to calculate the Debut / N-th rerun label for characters that are already in
- * the local banner feed. Upcoming pickups are intentionally NOT counted by
- * BannerHistory, so a future banner never increments its own historical count.
+ * Banner lineup data remains local (banner_feed.json). BannerHistory is used
+ * only to calculate Debut / N-th rerun labels for characters already present
+ * in the local banner feed.
  */
 object BannerSource {
     private const val PREFS = "g_codus"
@@ -21,18 +19,25 @@ object BannerSource {
     private const val GENSHIN_LEAK = "https://www.u7buy.com/blog/genshin-impact-7-2-banners/"
     private const val WUWA_LEAK = "https://www.mone.gg/blog/wuthering-waves/3-8-banner.html"
     private const val ZZZ_LEAK = "https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/"
-    private const val BANNER_HISTORY = "https://bannerhistory.app/en/"
+
+    private const val GENSHIN_HISTORY = "https://bannerhistory.app/en/genshin-banners"
+    private const val WUWA_HISTORY = "https://bannerhistory.app/en/wuwa-banners"
+    private const val ZZZ_HISTORY = "https://bannerhistory.app/en/zzz-banners"
 
     fun fetchNormalized(context: Context): String {
         val local = context.assets.open("banner_feed.json").bufferedReader().use { it.readText() }
         val root = JSONObject(local)
         val games = root.optJSONArray("games") ?: return local
 
-        // Keep the local banner lineup as the source of truth. Only the rerun
-        // label is calculated online from BannerHistory.
-        updateRerunLabels(games)
+        // Keep local banner lineups and existing unconfirmed-banner fallback.
         addLeakFallbacks(games)
-        updateRerunLabels(games)
+
+        // Only the rerun labels are recalculated online. If the history site is
+        // unavailable, the local labels remain intact.
+        try {
+            updateRerunLabels(games)
+        } catch (_: Exception) {
+        }
 
         val result = JSONObject(root.toString()).put("games", games)
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
@@ -43,77 +48,89 @@ object BannerSource {
     private fun updateRerunLabels(games: JSONArray) {
         for (i in 0 until games.length()) {
             val game = games.optJSONObject(i) ?: continue
-            val gameId = game.optString("id")
-            game.optJSONObject("current")?.let { updatePhaseLabels(gameId, it, isFuture = false) }
-            game.optJSONObject("next")?.let { updatePhaseLabels(gameId, it, isFuture = true) }
+            val historyUrl = when (game.optString("id")) {
+                "genshin" -> GENSHIN_HISTORY
+                "wuwa" -> WUWA_HISTORY
+                "zzz" -> ZZZ_HISTORY
+                else -> continue
+            }
+
+            val html = get(historyUrl)
+            updatePhaseLabels(game.optJSONObject("current"), html)
+            updatePhaseLabels(game.optJSONObject("next"), html)
         }
     }
 
-    private fun updatePhaseLabels(gameId: String, phase: JSONObject, isFuture: Boolean) {
+    private fun updatePhaseLabels(phase: JSONObject?, html: String) {
+        if (phase == null) return
         val chars = phase.optJSONArray("five_star") ?: return
-        val labels = JSONObject()
         val version = phase.optString("version").substringBefore(" Phase").trim()
+        if (version.isBlank()) return
 
+        val labels = JSONObject()
         for (i in 0 until chars.length()) {
             val name = chars.optString(i).trim()
-            if (name.isEmpty()) continue
-            val history = fetchHistoricalPickupCount(gameId, name, version) ?: continue
+            if (name.isBlank()) continue
 
-            // BannerHistory excludes future pickups. For a live phase its count
-            // may already include the current phase or may lag behind it because
-            // of the site's published cutoff. Subtract one only when the current
-            // version is visibly present in that character's history.
-            val priorPickups = if (isFuture) {
-                history.count
+            val history = findCharacterHistory(html, name) ?: continue
+            if (history.count !in 0..20) continue
+
+            // BannerHistory counts the debut as pickup #1. For a live phase,
+            // subtract the current pickup only when this exact version is in
+            // that character's recorded pickup list. For a future phase the
+            // source contains only previous, already-started pickups.
+            val previousPickups = if (history.versions.contains(version)) {
+                (history.count - 1).coerceAtLeast(0)
             } else {
-                (history.count - if (history.containsCurrentVersion) 1 else 0).coerceAtLeast(0)
+                history.count
             }
-            labels.put(name, rerunLabel(priorPickups))
+
+            labels.put(name, if (previousPickups == 0) {
+                "Дебют"
+            } else {
+                "$previousPickups-й реран"
+            })
         }
+
         if (labels.length() > 0) phase.put("rerun_labels", labels)
     }
 
-    private fun rerunLabel(priorPickups: Int): String =
-        if (priorPickups <= 0) "Дебют" else "$priorPickups-й реран"
-
-    private data class HistoryCount(
+    private data class CharacterHistory(
         val count: Int,
-        val containsCurrentVersion: Boolean
+        val versions: List<String>
     )
 
     /**
-     * Reads only BannerHistory's explicit "Event pickups (N)" counter. This
-     * avoids scraping unrelated numbers from the page (the old source of
-     * errors such as "164-й реран").
+     * BannerHistory renders every character as a row. We locate that exact
+     * character row and read its own Event pickups counter plus its version
+     * list. This prevents unrelated page numbers from becoming rerun counts.
      */
-    private fun fetchHistoricalPickupCount(
-        gameId: String,
-        character: String,
-        currentVersion: String
-    ): HistoryCount? {
-        val gameSlug = when (gameId) {
-            "genshin" -> "genshin"
-            "wuwa" -> "wuwa"
-            "zzz" -> "zzz"
-            else -> return null
-        }
-        val encoded = try {
-            URLEncoder.encode(character, "UTF-8")
-        } catch (_: Exception) {
-            return null
-        }
-        val url = "$BANNER_HISTORY${gameSlug}-banners?character=$encoded"
-        val html = try { get(url) } catch (_: Exception) { return null }
+    private fun findCharacterHistory(html: String, character: String): CharacterHistory? {
+        val escaped = Regex.escape(character)
 
-        val match = Regex("Event\\s+pickups\\s*\\((\\d{1,2})\\)", RegexOption.IGNORE_CASE)
-            .find(html) ?: return null
+        val patterns = listOf(
+            Regex(
+                "(?is)(?:Image:\\s*)?$escaped[\\s\\S]{0,9000}?Event\\s+pickups\\s*\\((\\d{1,2})\\)[\\s\\S]{0,300}?"
+            ),
+            Regex(
+                "(?is)alt=[\\\"'](?:Image:\\s*)?$escaped[\\\"'][\\s\\S]{0,9000}?Event\\s+pickups\\s*\\((\\d{1,2})\\)"
+            )
+        )
+
+        val match = patterns.asSequence().mapNotNull { it.find(html) }.firstOrNull() ?: return null
         val count = match.groupValues.getOrNull(1)?.toIntOrNull() ?: return null
         if (count !in 0..20) return null
 
-        val containsCurrentVersion = currentVersion.isNotEmpty() &&
-            Regex("\\b${Regex.escape(currentVersion)}\\b").containsMatchIn(html)
+        val eventIndex = match.value.indexOf("Event pickups", ignoreCase = true)
+        if (eventIndex < 0) return null
+        val after = match.value.substring(eventIndex).take(500)
+        val versions = Regex("\\b\\d+\\.\\d+\\b")
+            .findAll(after)
+            .map { it.value }
+            .distinct()
+            .toList()
 
-        return HistoryCount(count, containsCurrentVersion)
+        return CharacterHistory(count, versions)
     }
 
     private fun addLeakFallbacks(games: JSONArray) {
