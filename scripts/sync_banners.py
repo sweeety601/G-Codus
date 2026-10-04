@@ -12,6 +12,8 @@ PRIMARY = {
     "Genshin Impact": "https://www.prydwen.gg/genshin-impact/banners",
     "Wuthering Waves": "https://www.prydwen.gg/wuthering-waves/banners",
     "Zenless Zone Zero": "https://www.prydwen.gg/zenless/banners",
+    "Honkai: Star Rail": "https://www.prydwen.gg/star-rail/banners",
+    "Arknights: Endfield": "https://www.prydwen.gg/arknights-endfield/banners",
 }
 
 SECONDARY = {
