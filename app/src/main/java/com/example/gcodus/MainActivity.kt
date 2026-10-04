@@ -1049,7 +1049,11 @@ class MainActivity : AppCompatActivity() {
             if (gameId == "zzz") {
                 val hasBillyKid = prepared.any { normalizeCharacterForMatch(it) == "billykid" }
                 prepared.filterNot { hasBillyKid && normalizeCharacterForMatch(it) == "billy" }
-            } else prepared
+            } else {
+                // Dan Heng Imbibitor Lunae and Imbibitor Lunae are the same HSR character.
+                // Keep one card, but always use the full display name.
+                prepared.distinctBy { normalizeCharacterForMatch(characterDisplayName(it)) }
+            }
         } catch (_: Exception) { emptyList() }
     }
 
@@ -1082,7 +1086,7 @@ class MainActivity : AppCompatActivity() {
         if (gameId == "starrail") {
             val key = normalizeCharacterForMatch(cleaned)
             if (key == "danhengimbibitorlunae" || key == "imbibitorlunae") {
-                return "Dan Heng • Imbibitor Lunae"
+                return "Dan Heng Imbibitor Lunae"
             }
         }
         return cleaned
@@ -1100,7 +1104,7 @@ class MainActivity : AppCompatActivity() {
             .trim()
         val normalizedBase = normalizeCharacterForMatch(base)
         if (normalizedBase == "danhengimbibitorlunae" || normalizedBase == "imbibitorlunae") {
-            return "Imbibitor Lunae"
+            return "Dan Heng Imbibitor Lunae"
         }
 
         val overrides = mapOf(
@@ -1735,7 +1739,7 @@ class MainActivity : AppCompatActivity() {
                 val key = normalizeCharacterForMatch(cleaned)
                 return if (game.optString("id").equals("starrail", true) &&
                     key in setOf("danhengimbibitorlunae", "imbibitorlunae")) {
-                    "Imbibitor Lunae"
+                    "Dan Heng Imbibitor Lunae"
                 } else {
                     cleaned
                 }
