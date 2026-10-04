@@ -1,10 +1,12 @@
 {
   "version": 1,
-  "total_images": 241,
+  "total_images": 361,
   "games": {
     "Zenless Zone Zero": 60,
     "Wuthering Waves": 56,
-    "Genshin Impact": 125
+    "Genshin Impact": 125,
+    "Honkai: Star Rail": 90,
+    "Arknights: Endfield": 30
   },
   "images": [
     {
@@ -1211,6 +1213,606 @@
       "game": "Genshin Impact",
       "character": "Zibai",
       "file": "zibai.png"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Acheron",
+      "file": "acheron_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Aglaea",
+      "file": "aglaea_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Aha",
+      "file": "aha_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Akekuri",
+      "file": "akekuri_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Alesh",
+      "file": "alesh_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Anaxa",
+      "file": "anaxa_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Antal",
+      "file": "antal_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Arcane",
+      "file": "arcane_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Archer",
+      "file": "archer_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Arclight",
+      "file": "arclight_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Ardelia",
+      "file": "ardelia_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Argenti",
+      "file": "argenti_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Arlan",
+      "file": "arlan_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Ashveil",
+      "file": "ashveil_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Asta",
+      "file": "asta_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Aventurine Waveflair",
+      "file": "aventurine-waveflair_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Aventurine",
+      "file": "aventurine_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Avywenna",
+      "file": "avywenna_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Bailu",
+      "file": "bailu_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Black Swan",
+      "file": "black-swan_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Mortenax Blade",
+      "file": "blade-mortenax_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Blade",
+      "file": "blade_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Boothill",
+      "file": "boothill_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Bronya",
+      "file": "bronya_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Castorice",
+      "file": "castorice_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Catcher",
+      "file": "catcher_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Cerydra",
+      "file": "cerydra_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Chen Qianyu",
+      "file": "chen-qianyu_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Cipher",
+      "file": "cipher_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Clara",
+      "file": "clara_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Cyrene",
+      "file": "cyrene_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Da Pan",
+      "file": "da-pan_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Dan Heng • Permansor Terrae",
+      "file": "dan-heng-permansor-terrae_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Dan Heng",
+      "file": "dan-heng_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Dr Ratio",
+      "file": "dr-ratio_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Ember",
+      "file": "ember_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Estella",
+      "file": "estella_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Evanescia",
+      "file": "evanescia_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Feixiao",
+      "file": "feixiao_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Firefly",
+      "file": "firefly_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Fluorite",
+      "file": "fluorite_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Fu Xuan",
+      "file": "fu-xuan_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Gallagher",
+      "file": "gallagher_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Gepard",
+      "file": "gepard_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Gilberta",
+      "file": "gilberta_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Gilgamesh",
+      "file": "gilgamesh_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Guinaifen",
+      "file": "guinaifen_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Hanya",
+      "file": "hanya_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Herta",
+      "file": "herta_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Himeko Nova",
+      "file": "himeko-nova_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Himeko",
+      "file": "himeko_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Hook",
+      "file": "hook_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Huohuo",
+      "file": "huohuo_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Hyacine",
+      "file": "hyacine_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Hysilens",
+      "file": "hysilens_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Imbibitor Lunae",
+      "file": "imbibitor-lunae_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Jade",
+      "file": "jade_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Jiaoqiu",
+      "file": "jiaoqiu_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Jing Yuan",
+      "file": "jing-yuan_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Jingliu",
+      "file": "jingliu_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Kafka",
+      "file": "kafka_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Laevatain",
+      "file": "laevatain_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Last Rite",
+      "file": "last-rite_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Lifeng",
+      "file": "lifeng_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Liino",
+      "file": "liino_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Lingsha",
+      "file": "lingsha_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Luka",
+      "file": "luka_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Luocha",
+      "file": "luocha_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Lynx",
+      "file": "lynx_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "March 7th • Evernight",
+      "file": "march-7th-evernight_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "March 7th • The Hunt",
+      "file": "march-7th-swordmaster_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "March 7Th",
+      "file": "march-7th_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Mi Fu",
+      "file": "mi-fu_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Misha",
+      "file": "misha_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Moze",
+      "file": "moze_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Mydei",
+      "file": "mydei_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Natasha",
+      "file": "natasha_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Pearl",
+      "file": "pearl_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Pela",
+      "file": "pela_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Perlica",
+      "file": "perlica_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Phainon",
+      "file": "phainon_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Pogranichnik",
+      "file": "pogranichnik_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Purrchena",
+      "file": "purrchena_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Qingque",
+      "file": "qingque_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Rappa",
+      "file": "rappa_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Rin Tohsaka",
+      "file": "rin-tohsaka_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Robin Summeretto",
+      "file": "robin-summeretto_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Robin",
+      "file": "robin_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Rossi",
+      "file": "rossi_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Ruan Mei",
+      "file": "ruan-mei_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Saber",
+      "file": "saber_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Sampo",
+      "file": "sampo_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Seele",
+      "file": "seele_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Serval",
+      "file": "serval_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Si",
+      "file": "si_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Silver Wolf • Lv. 999",
+      "file": "silver-wolf-lv-999_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Silver Wolf",
+      "file": "silver-wolf_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Snowshine",
+      "file": "snowshine_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Sparkle",
+      "file": "sparkle_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Sparxie",
+      "file": "sparxie_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Sunday",
+      "file": "sunday_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Sushang",
+      "file": "sushang_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Tangtang",
+      "file": "tangtang_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "The Dahlia",
+      "file": "the-dahlia_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "The Herta",
+      "file": "the-herta_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Tingyun • Fugue",
+      "file": "tingyun-fugue_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Tingyun",
+      "file": "tingyun_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Topaz & Numby",
+      "file": "topaz_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Tribbie",
+      "file": "tribbie_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Typhoeus",
+      "file": "typhoeus_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Welt",
+      "file": "welt_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Wulfgard",
+      "file": "wulfgard_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Xaihi",
+      "file": "xaihi_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Xueyi",
+      "file": "xueyi_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Yanqing",
+      "file": "yanqing_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Yao Guang",
+      "file": "yao-guang_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Yukong",
+      "file": "yukong_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
+      "character": "Yunli",
+      "file": "yunli_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Yvonne",
+      "file": "yvonne_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Zhuang Fangyi",
+      "file": "zhuang-fangyi_card.webp"
     }
   ]
 }
