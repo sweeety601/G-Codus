@@ -714,6 +714,8 @@ class MainActivity : AppCompatActivity() {
                 "genshin" -> normalized in setOf("genshin", "genshinimpact", "genshin impact")
                 "wuwa" -> normalized in setOf("wuwa", "wutheringwaves", "wuthering waves", "wutheringwave")
                 "zzz" -> normalized in setOf("zzz", "zenless", "zenlesszonezero", "zenless zone zero")
+                "starrail" -> normalized in setOf("starrail", "honkai star rail", "honkai: star rail", "honkai-star-rail")
+                "endfield" -> normalized in setOf("endfield", "arknights endfield", "arknights: endfield", "arknights-endfield")
                 else -> normalized == gameId.lowercase()
             }
         }
