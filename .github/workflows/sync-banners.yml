@@ -2,6 +2,10 @@ name: Sync banner schedules
 
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "scripts/sync_banners.py"
+      - ".github/workflows/sync-banners.yml"
   schedule:
     - cron: "*/15 * * * *"
 
