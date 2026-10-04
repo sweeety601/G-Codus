@@ -1541,8 +1541,6 @@ class MainActivity : AppCompatActivity() {
                 .format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
         } catch (_: Exception) { }
         return value
-    } catch (_: Exception) {
-        value
     }
 
     private fun gameAccent(id: String): Int = when (id) {
