@@ -66,8 +66,9 @@ object CharacterDatabase {
         return result
             .filterNot { isProtagonist(it.gameId, it.slug, it.name) }
             .filterNot {
-                it.gameId.equals("endfield", true) &&
-                    normalize(it.name) in setOf("storyteller", "thestoryteller", "sunbringer")
+                val n = normalize(it.name)
+                n == "storyteller" || n == "thestoryteller" || n.startsWith("thestoryteller") ||
+                    n == "sunbringer" || n.startsWith("sunbringer")
             }
             .distinctBy { canonicalKey(it.gameId, it.slug, it.name) }
     }
