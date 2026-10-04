@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import json
 import re
-import subprocess
+import shutil
 from pathlib import Path
 
 ROOT = Path('.')
 ASSET_ROOT = ROOT / 'app' / 'src' / 'main' / 'assets'
 MANIFEST = ROOT / 'data' / 'gacha_character_manifest.json'
 
-# Exact Endfield roster currently represented by the uploaded portrait set.
 ENDFIELD = {
     'akekuri','alesh','antal','arcane','arclight','ardelia','avywenna','camille','catcher',
     'chen-qianyu','da-pan','ember','endministrator','estella','fluorite','gilberta',
@@ -19,14 +18,8 @@ ENDFIELD = {
 def stem_name(path: Path) -> str:
     return re.sub(r'_card$', '', path.stem).lower()
 
-def slug(s: str) -> str:
-    s = s.lower().replace('’', '').replace("'", '').replace('&', 'and')
-    return re.sub(r'[^a-z0-9]+', '-', s).strip('-')
-
-# Read old manifest so we never reclassify the existing three games.
 old = json.loads(MANIFEST.read_text())
 old_files = {x['file'] for x in old.get('images', [])}
-
 files = sorted(ROOT.glob('*_card.webp'))
 if not files:
     print('No root *_card.webp files found.')
@@ -39,29 +32,32 @@ hsr_dir.mkdir(parents=True, exist_ok=True)
 
 moved = []
 for src in files:
-    if src.name in old_files:
-        continue
     s = stem_name(src)
     game = 'Arknights: Endfield' if s in ENDFIELD else 'Honkai: Star Rail'
     dst_dir = end_dir if game == 'Arknights: Endfield' else hsr_dir
     dst = dst_dir / src.name
+
+    # The root upload is authoritative. If an older bundled portrait exists
+    # under the same filename, replace it with the newly uploaded bytes.
     if dst.exists():
         if src.read_bytes() == dst.read_bytes():
             src.unlink()
             continue
-        raise SystemExit(f'Collision with different content: {dst}')
-    subprocess.run(['git', 'mv', str(src), str(dst)], check=True)
+        dst.write_bytes(src.read_bytes())
+        src.unlink()
+        moved.append((game, src.name))
+        continue
+
+    shutil.move(str(src), str(dst))
     moved.append((game, src.name))
 
-# Rebuild/extend the manifest using the actual files that now live in the app assets.
 images = [x for x in old.get('images', [])]
 seen = {(x['game'], x['file']) for x in images}
 for game, filename in moved:
     key = (game, filename)
     if key in seen:
         continue
-    name = filename[:-10].replace('-', ' ').strip().title()
-    # Preserve known official spellings where the filename is clear.
+    stem = filename[:-10]
     aliases = {
         'blade-mortenax': 'Mortenax Blade',
         'dan-heng-permansor-terrae': 'Dan Heng • Permansor Terrae',
@@ -82,7 +78,7 @@ for game, filename in moved:
         'mi-fu': 'Mi Fu',
         'pogranichnik': 'Pogranichnik',
     }
-    name = aliases.get(filename[:-10], name)
+    name = aliases.get(stem, stem.replace('-', ' ').strip().title())
     images.append({'game': game, 'character': name, 'file': filename})
     seen.add(key)
 
@@ -93,6 +89,5 @@ old['total_images'] = len(images)
 old['games'] = counts
 old['images'] = images
 MANIFEST.write_text(json.dumps(old, ensure_ascii=False, indent=2) + '\n')
-
-print(f'Integrated {len(moved)} uploaded portraits.')
+print(f'Integrated/replaced {len(moved)} uploaded portraits.')
 print('Counts:', counts)
