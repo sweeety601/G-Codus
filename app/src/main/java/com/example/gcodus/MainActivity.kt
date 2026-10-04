@@ -108,6 +108,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         codesFeed = loadCachedCodes()
+        bannerFeedJson = prefs.getString("banner_feed", null)
         requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
@@ -1474,7 +1475,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadFeed(): List<GameFeed> {
-        val source = bannerFeedJson ?: return emptyList()
+        val source = bannerFeedJson ?: prefs.getString("banner_feed", null) ?: return emptyList()
         return try {
             val games = JSONObject(source).optJSONArray("games") ?: JSONArray()
             val result = mutableListOf<GameFeed>()
