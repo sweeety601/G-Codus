@@ -16,17 +16,23 @@ object CharacterDatabase {
     private const val WUWA_CHARACTERS = "https://www.prydwen.gg/wuthering-waves/characters"
     private const val ZZZ_CHARACTERS = "https://www.prydwen.gg/zenless/characters"
     private const val GENSHIN_CHARACTERS = "https://www.prydwen.gg/genshin-impact/characters"
+    private const val HSR_CHARACTERS = "https://www.prydwen.gg/star-rail/characters"
+    private const val ENDFIELD_CHARACTERS = "https://www.prydwen.gg/arknights-endfield/characters"
 
     private val PROTAGONIST_SLUGS = mapOf(
         "genshin" to setOf("traveler", "aether", "lumine", "traveller"),
         "wuwa" to setOf("rover"),
-        "zzz" to setOf("belle", "wise", "proxy")
+        "zzz" to setOf("belle", "wise", "proxy"),
+        "starrail" to setOf("trailblazer"),
+        "endfield" to setOf("endministrator")
     )
 
     private val ANNOUNCED_ONLY = mapOf(
         "genshin" to setOf("mitya", "valeriy"),
         "wuwa" to setOf("suoming"),
-        "zzz" to emptySet()
+        "zzz" to emptySet(),
+        "starrail" to emptySet(),
+        "endfield" to emptySet()
     )
 
     fun fetch(context: Context): List<OnlineCharacter> {
@@ -34,6 +40,13 @@ object CharacterDatabase {
         result += fetchGame("wuwa", WUWA_CHARACTERS)
         result += fetchGame("zzz", ZZZ_CHARACTERS)
         result += fetchGame("genshin", GENSHIN_CHARACTERS)
+        result += fetchGame("starrail", HSR_CHARACTERS)
+        result += fetchGame("endfield", ENDFIELD_CHARACTERS)
+
+        // Static roster fallback compiled from the current public database lists.
+        // This keeps the Wishlist usable even when a character-list page is down.
+        result += fallbackCharacters("starrail", HSR_FALLBACK)
+        result += fallbackCharacters("endfield", ENDFIELD_FALLBACK)
 
         // Prydwen uses "Billy" for the ordinary playable agent. In G-Codus
         // this is displayed as the official character name "Billy Kid".
@@ -130,11 +143,49 @@ object CharacterDatabase {
             "wuwa" -> wuwaPortrait(slug)
             "zzz" -> "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
             "genshin" -> "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
+            "starrail" -> "https://cdn.prydwen.gg/images/star-rail/characters/card_" + slug + ".webp"
+            "endfield" -> "https://cdn.prydwen.gg/images/arknights-endfield/characters/card_" + slug + ".webp"
             else -> ""
         }
 
     private fun wuwaPortrait(slug: String): String =
         "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
+
+    private fun fallbackCharacters(gameId: String, names: List<String>): List<OnlineCharacter> =
+        names.map { name ->
+            val slug = normalize(name).replace(Regex("[^a-z0-9]+"), "-").trim('-')
+            OnlineCharacter(gameId, name, slug, false, portraitUrl(gameId, slug))
+        }
+
+    // HSR roster assembled from the live Prydwen character database.
+    private val HSR_FALLBACK = listOf(
+        "Acheron","Aglaea","Anaxa","Archer","Argenti","Arlan","Ashveil","Asta",
+        "Aventurine","Aventurine Waveflair","Bailu","Black Swan","Blade","Boothill",
+        "Bronya","Castorice","Cerydra","Cipher","Clara","Cyrene","Dan Heng",
+        "Dan Heng • Imbibitor Lunae","Dan Heng • Permansor Terrae","Dr. Ratio",
+        "Evanescia","Feixiao","Firefly","Fu Xuan","Gallagher","Gepard","Gilgamesh",
+        "Guinaifen","Hanya","Herta","Himeko","Himeko Nova","Hook","Huohuo",
+        "Hyacine","Hysilens","Jade","Jiaoqiu","Jing Yuan","Jingliu","Kafka",
+        "Lingsha","Luka","Luocha","Lynx","March 7th","March 7th • Evernight",
+        "March 7th • The Hunt","Misha","Mortenax Blade","Moze","Mydei","Natasha",
+        "Pearl","Pela","Phainon","Qingque","Rappa","Rin Tohsaka","Robin",
+        "Robin Summeretto","Ruan Mei","Saber","Sampo","Seele","Serval",
+        "Silver Wolf","Silver Wolf • Lv. 999","Sparkle","Sparxie","Sunday",
+        "Sushang","The Dahlia","The Herta","Tingyun","Tingyun • Fugue",
+        "Topaz & Numby","Trailblazer • Destruction","Trailblazer • Elation",
+        "Trailblazer • Harmony","Trailblazer • Preservation","Trailblazer • Remembrance",
+        "Tribbie","Welt","Xueyi","Yanqing","Yao Guang","Yukong","Yunli"
+    )
+
+    // Endfield roster from the current Prydwen operator database.
+    // Purrchena is included from the public free-operator roster.
+    private val ENDFIELD_FALLBACK = listOf(
+        "Akekuri","Alesh","Antal","Arcane","Arclight","Ardelia","Avywenna","Camille",
+        "Catcher","Chen Qianyu","Da Pan","Ember","Endministrator","Estella","Fluorite",
+        "Gilberta","Laevatain","Last Rite","Lifeng","Liino","Mi Fu","Perlica",
+        "Pogranichnik","Purrchena","Rossi","Si","Snowshine","Tangtang","Typhoeus",
+        "Wulfgard","Xaihi","Yvonne","Zhuang Fangyi"
+    )
 
     private fun cleanName(value: String): String {
         var s = value.replace(Regex("\\s+"), " ").trim()
