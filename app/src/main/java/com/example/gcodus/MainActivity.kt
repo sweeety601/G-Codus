@@ -892,9 +892,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (!duplicateLocal) {
                         val file = "__online_" + meta.id + "_" + online.slug + ".webp"
+                        val displayOnlineName = cleanCharacterName(online.name)
                         if ((gameId != null || isTracked(meta.id, file)) &&
-                            (normalizedQuery.isBlank() || online.name.lowercase().contains(normalizedQuery))) {
-                            entries += TrackedCharacter(meta.id, meta.name, online.name, file)
+                            (normalizedQuery.isBlank() || displayOnlineName.lowercase().contains(normalizedQuery))) {
+                            entries += TrackedCharacter(meta.id, meta.name, displayOnlineName, file)
                         }
                     }
                 }
@@ -1067,6 +1068,9 @@ class MainActivity : AppCompatActivity() {
         val slug = file.removePrefix(prefix).removeSuffix(".webp")
         return onlineCharacters.firstOrNull { it.gameId == gameId && it.slug == slug }
     }
+
+    private fun cleanCharacterName(value: String): String =
+        value.replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim()
 
     private fun characterDisplayName(file: String): String {
         // CARD_FILENAME_IDENTITY_FIX_V1
