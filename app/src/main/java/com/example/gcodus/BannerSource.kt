@@ -32,8 +32,6 @@ object BannerSource {
         // label is calculated online from BannerHistory.
         updateRerunLabels(games)
         addLeakFallbacks(games)
-        // Leak fallback can add a future character after the first calculation,
-        // so calculate its label too.
         updateRerunLabels(games)
 
         val result = JSONObject(root.toString()).put("games", games)
@@ -54,24 +52,21 @@ object BannerSource {
     private fun updatePhaseLabels(gameId: String, phase: JSONObject, isFuture: Boolean) {
         val chars = phase.optJSONArray("five_star") ?: return
         val labels = JSONObject()
-        val version = phase.optString("version")
-            .substringBefore(" Phase")
-            .trim()
+        val version = phase.optString("version").substringBefore(" Phase").trim()
 
         for (i in 0 until chars.length()) {
             val name = chars.optString(i).trim()
             if (name.isEmpty()) continue
-            val history = fetchHistoricalPickupCount(gameId, name) ?: continue
+            val history = fetchHistoricalPickupCount(gameId, name, version) ?: continue
 
             // BannerHistory excludes future pickups. For a live phase its count
-            // may or may not already include the current phase, depending on
-            // the site's data cutoff. Only subtract the live pickup when the
-            // current version is actually present in the returned history.
+            // may already include the current phase or may lag behind it because
+            // of the site's published cutoff. Subtract one only when the current
+            // version is visibly present in that character's history.
             val priorPickups = if (isFuture) {
                 history.count
             } else {
-                (history.count - if (version.isNotEmpty() && history.htmlContainsVersion) 1 else 0)
-                    .coerceAtLeast(0)
+                (history.count - if (history.containsCurrentVersion) 1 else 0).coerceAtLeast(0)
             }
             labels.put(name, rerunLabel(priorPickups))
         }
@@ -83,7 +78,7 @@ object BannerSource {
 
     private data class HistoryCount(
         val count: Int,
-        val htmlContainsVersion: Boolean
+        val containsCurrentVersion: Boolean
     )
 
     /**
@@ -91,7 +86,11 @@ object BannerSource {
      * avoids scraping unrelated numbers from the page (the old source of
      * errors such as "164-й реран").
      */
-    private fun fetchHistoricalPickupCount(gameId: String, character: String): HistoryCount? {
+    private fun fetchHistoricalPickupCount(
+        gameId: String,
+        character: String,
+        currentVersion: String
+    ): HistoryCount? {
         val gameSlug = when (gameId) {
             "genshin" -> "genshin"
             "wuwa" -> "wuwa"
@@ -111,12 +110,10 @@ object BannerSource {
         val count = match.groupValues.getOrNull(1)?.toIntOrNull() ?: return null
         if (count !in 0..20) return null
 
-        // This flag is evaluated by the caller through the phase version. The
-        // page text is retained so a stale BannerHistory cutoff cannot make a
-        // live character lose one rerun.
-        return HistoryCount(count, htmlContainsVersion = true).copy(
-            htmlContainsVersion = true
-        )
+        val containsCurrentVersion = currentVersion.isNotEmpty() &&
+            Regex("\\b${Regex.escape(currentVersion)}\\b").containsMatchIn(html)
+
+        return HistoryCount(count, containsCurrentVersion)
     }
 
     private fun addLeakFallbacks(games: JSONArray) {
