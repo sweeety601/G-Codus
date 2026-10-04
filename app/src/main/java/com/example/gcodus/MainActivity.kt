@@ -1503,7 +1503,6 @@ class MainActivity : AppCompatActivity() {
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
-                "topaz", "topazandnumby" -> "topaz"
                 else -> value
             }
             val localCanonical = hsrCanonical(a)
