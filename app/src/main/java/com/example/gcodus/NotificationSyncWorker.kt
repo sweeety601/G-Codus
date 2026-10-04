@@ -28,7 +28,6 @@ class NotificationSyncWorker(
         private const val CHANNEL_ID = "g_codus_updates"
         private const val PREFS = "g_codus_notifications"
         private const val APP_PREFS = "g_codus"
-        private const val CODES_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
         private const val KEY_INITIALIZED = "initialized"
         private const val KEY_CODES_PREFIX = "codes_"
     }
@@ -40,7 +39,7 @@ class NotificationSyncWorker(
         val prefs = applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         return try {
             val bannerJson = BannerSource.fetchNormalized(applicationContext)
-            val codeJson = try { fetch(CODES_URL) } catch (_: Exception) { null }
+            val codeJson = try { PromoCodeSource.fetchJson() } catch (_: Exception) { null }
             applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
                 .edit().putString("banner_feed", bannerJson).apply()
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
@@ -385,9 +384,12 @@ class NotificationSyncWorker(
 
     private fun fetch(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000; connection.readTimeout = 20000
+        connection.connectTimeout = 15000
+        connection.readTimeout = 20000
+        connection.requestMethod = "GET"
         connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-        return connection.inputStream.bufferedReader().use { it.readText() }
+        if (connection.responseCode !in 200..299) throw IllegalStateException("HTTP " + connection.responseCode)
+        return connection.inputStream.use { it.bufferedReader().readText() }
     }
 
     private fun formatDate(value: String): String = try {
