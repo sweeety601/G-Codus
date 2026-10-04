@@ -1,11 +1,13 @@
 {
   "version": 1,
-  "generated_at": "2026-10-03T00:00:00Z",
-  "source": "Prydwen + official publisher notices",
-  "note": "Seed snapshot; GitHub Actions refreshes this file from the configured sources.",
+  "generated_at": "2026-10-04T00:12:03.394223+00:00",
+  "source": "Prydwen",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
+      "fetched_at": "2026-10-04T00:12:03.671390+00:00",
+      "date_hint": null,
+      "status": "source_reachable",
       "current": [
         {
           "phase": "7.1 Phase 1",
@@ -39,6 +41,9 @@
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
+      "fetched_at": "2026-10-04T00:12:03.826312+00:00",
+      "date_hint": null,
+      "status": "source_reachable",
       "current": [
         {
           "phase": "3.7 Phase 1",
@@ -75,6 +80,9 @@
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
+      "fetched_at": "2026-10-04T00:12:03.984208+00:00",
+      "date_hint": null,
+      "status": "source_reachable",
       "current": [
         {
           "phase": "3.2 Phase 2",
@@ -102,4 +110,4 @@
       ]
     }
   }
-}
+}\n
