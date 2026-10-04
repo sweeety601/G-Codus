@@ -894,22 +894,6 @@ class MainActivity : AppCompatActivity() {
             marginEnd = dp(8)
         })
         cell.addView(imageFrame, LinearLayout.LayoutParams(-1, dp(136)))
-        val announced = (onlineCharacterFor(character.gameId, character.file)?.announced == true) ||
-            onlineCharacters.any { it.gameId == character.gameId && normalizeCharacterForMatch(it.name) == normalizeCharacterForMatch(character.name) && it.announced }
-        if (announced) {
-            val badge = TextView(this).apply {
-                text = "✦  АНОНСИРОВАН"
-                textSize = 8.5f
-                setTextColor(Color.rgb(255, 205, 110))
-                gravity = Gravity.CENTER
-                setPadding(dp(5), dp(3), dp(5), dp(3))
-                background = roundedDrawable(Color.argb(85, 20, 18, 12), 10f)
-            }
-            imageFrame.addView(badge, FrameLayout.LayoutParams(-2, dp(24), Gravity.BOTTOM or Gravity.START).apply {
-                bottomMargin = dp(8)
-                marginStart = dp(8)
-            })
-        }
         cell.addView(label(character.name, 11.5f, text, true).apply {
             gravity = Gravity.CENTER
             maxLines = 3
