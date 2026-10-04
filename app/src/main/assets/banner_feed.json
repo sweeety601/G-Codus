@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-04T00:00:00Z",
-  "rerun_source": "https://bannerhistory.app/en",
-  "rerun_source_note": "Rerun counts use only pickup appearances that have actually started. Debut = first pickup; rerun number = completed/started prior pickups minus one. Scheduled future pickups are never counted as completed history.",
+  "rerun_source": "https://bannerhistory.app/en (Genshin/ZZZ), https://wuwatracker.com/ru/banner-history (WuWa)",
+  "rerun_source_note": "Rerun labels are recalculated at runtime. Debut = no previous pickup; rerun number = previous started pickups. Future pickups are never counted as completed history.",
   "games": [
     {
       "id": "genshin",
@@ -26,7 +26,7 @@
         "four_star": [],
         "status": "next",
         "rerun_labels": {
-          "Escoffier": "1-й реран",
+          "Escoffier": "2-й реран",
           "Skirk": "2-й реран"
         }
       }
@@ -43,21 +43,21 @@
         "status": "live",
         "rerun_labels": {
           "Hsin": "Дебют",
-          "Chisa": "2-й реран",
-          "Iuno": "1-й реран"
+          "Chisa": "3-й реран",
+          "Iuno": "3-й реран"
         }
       },
       "next": {
         "version": "3.7 Phase 2",
         "start": "2026-10-22T05:00:00+03:00",
         "end": "2026-11-11T06:59:59+03:00",
+        "status": "next",
         "five_star": ["Suoming", "Lucilla", "Lynae"],
         "four_star": ["Lumi", "Danjin", "Chixia"],
-        "status": "next",
         "rerun_labels": {
           "Suoming": "Дебют",
           "Lucilla": "1-й реран",
-          "Lynae": "2-й реран"
+          "Lynae": "3-й реран"
         }
       }
     },
