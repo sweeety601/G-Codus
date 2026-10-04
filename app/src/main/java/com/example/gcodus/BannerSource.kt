@@ -24,6 +24,7 @@ object BannerSource {
     private const val ZZZ_HISTORY = "https://r.jina.ai/https://bannerhistory.app/en/zzz-pickup-history"
     private const val ZZZ_FORECAST = "https://r.jina.ai/https://timesaver.gg/blog/zzz-3-3"
     private const val ZZZ_FORECAST_FALLBACK = "https://r.jina.ai/https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/"
+    private const val WUWA_SECONDARY = "https://r.jina.ai/https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/"
 
     fun fetchNormalized(context: Context): String {
         val fallback = context.assets.open("banner_feed.json").bufferedReader().use { it.readText() }
@@ -38,6 +39,7 @@ object BannerSource {
                 "wuwa" -> syncWuwa(game)
                 "zzz" -> syncZzz(game)
             }
+            applySecondaryNextSource(game)
         }
 
         val result = root.put("games", games).toString()
@@ -87,6 +89,68 @@ object BannerSource {
         source.optString("status").takeIf { it.isNotBlank() && it != "null" }?.let {
             target.put("source_status", it)
         }
+    }
+
+    private fun hasConfirmedPhase(phase: JSONObject?): Boolean {
+        if (phase == null) return false
+        if ((phase.optJSONArray("five_star")?.length() ?: 0) == 0) return false
+        if (phase.optBoolean("unconfirmed", false)) return false
+        val status = phase.optString("source_status")
+        if (status.equals("confirmed", true)) return true
+        val source = phase.optString("official_source").lowercase()
+        return source.contains("kurogames.com/main/news/detail") ||
+            source.contains("wutheringwaves.kurogames.com") ||
+            source.contains("zenless.hoyoverse.com/en-us/news/") ||
+            source.contains("genshin.hoyoverse.com") ||
+            source.contains("hoyolab.com/article/")
+    }
+
+    private fun applySecondaryNextSource(game: JSONObject) {
+        val next = game.optJSONObject("next") ?: JSONObject()
+        if (hasConfirmedPhase(next)) return
+
+        when (game.optString("id")) {
+            "genshin" -> {
+                val text = fetch("https://r.jina.ai/https://timesaver.gg/blog/genshin-banner-schedule-october-2026") ?: return
+                if (text.contains("Skirk", true) && text.contains("Escoffier", true)) {
+                    next.put("version", "7.1 Phase 2")
+                    next.put("start", "2026-10-13T18:00:00+08:00")
+                    next.put("end", "2026-11-03T18:00:00+08:00")
+                    next.put("five_star", JSONArray(listOf("Skirk", "Escoffier")))
+                    next.put("four_star", JSONArray())
+                    next.put("unconfirmed", true)
+                    next.put("secondary_source", "https://timesaver.gg/blog/genshin-banner-schedule-october-2026")
+                    next.put("source_status", "unconfirmed")
+                }
+            }
+            "wuwa" -> {
+                val text = fetch(WUWA_SECONDARY) ?: return
+                if (text.contains("Suoming", true) && text.contains("Lynae", true) && text.contains("Lucilla", true)) {
+                    next.put("version", "3.7 Phase 2")
+                    next.put("start", "2026-10-22T10:00:00+08:00")
+                    next.put("end", "2026-11-11T10:00:00+08:00")
+                    next.put("five_star", JSONArray(listOf("Suoming", "Lynae", "Lucilla")))
+                    next.put("four_star", JSONArray(listOf("Lumi", "Danjin", "Chixia")))
+                    next.put("unconfirmed", true)
+                    next.put("secondary_source", "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/")
+                    next.put("source_status", "unconfirmed")
+                }
+            }
+            "zzz" -> {
+                val text = fetch(ZZZ_FORECAST_FALLBACK) ?: return
+                if (text.contains("Phoenix", true) && text.contains("Severian", true)) {
+                    next.put("version", "3.3 Phase 1")
+                    next.put("start", "2026-10-21T06:00:00+08:00")
+                    next.put("end", "2026-11-11T06:00:00+08:00")
+                    next.put("five_star", JSONArray(listOf("Phoenix", "Severian")))
+                    next.put("four_star", JSONArray())
+                    next.put("unconfirmed", true)
+                    next.put("secondary_source", "https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/")
+                    next.put("source_status", "unconfirmed")
+                }
+            }
+        }
+        game.put("next", next)
     }
 
     private fun syncGenshin(game: JSONObject) {
