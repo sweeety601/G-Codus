@@ -18,10 +18,13 @@ repls = {
         'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))',
 }
 for old, new in repls.items():
-    if old not in s and new not in s:
+    if old in s:
+        s = s.replace(old, new, 1)
+    elif new not in s:
         raise SystemExit(f"MainActivity replacement target not found: {old}")
-    s = s.replace(old, new, 1) if old in s else s
 
+# The online banner source and local database use reversed HSR names:
+# "Blade Mortenax" vs "Mortenax Blade". Treat them as one identity.
 old = '''    private fun sameCharacterIdentity(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String): Boolean {
         val a = normalizeCharacterForMatch(localName)
         val b = normalizeCharacterForMatch(onlineName)
@@ -34,8 +37,6 @@ new = '''    private fun sameCharacterIdentity(gameId: String, localName: String
         val slug = normalizeCharacterForMatch(onlineSlug)
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
 
-        // HSR uses both "Mortenax Blade" in the local portrait database and
-        // "Blade Mortenax" in banner/online data. They are the same identity.
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
@@ -49,9 +50,25 @@ new = '''    private fun sameCharacterIdentity(gameId: String, localName: String
         }
 
         if (gameId == "zzz") {'''
-if old in s:
-    s = s.replace(old, new, 1)
+if old not in s:
+    raise SystemExit('HSR identity target not found')
+s = s.replace(old, new, 1)
 
+# Make local portrait lookup accept both HSR name orders.
+old = '''            "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
+                listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
+            "corin", "corin-wickes" ->'''
+new = '''            "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
+                listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
+            "mortenax-blade", "blade-mortenax" ->
+                listOf("mortenax-blade", "blade-mortenax")
+            "corin", "corin-wickes" ->'''
+if old not in s:
+    raise SystemExit('HSR portrait alias target not found')
+s = s.replace(old, new, 1)
+MAIN.write_text(s)
+
+# The newly uploaded root HSR logo is authoritative.
 icon = ICON_SYNC.read_text()
 old = '''for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
@@ -72,4 +89,4 @@ new = '''for filename, url in ICONS.items():
 '''
 if old in icon:
     ICON_SYNC.write_text(icon.replace(old, new, 1))
-print('Applied portrait identity, top tile size, and supplied HSR logo fixes.')
+print('Applied current HSR portrait matching, top tile sizing, and supplied logo fixes.')
