@@ -7,21 +7,27 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Online-only banner feed.
+ * Reads the generated GitHub banner feed.
  *
- * The APK contains no banner schedule, dates or character lineup. It downloads
- * the current remote feed and normalizes it into the format used by MainActivity.
+ * The APK does not contain the banner parser. GitHub Actions builds
+ * data/banner_feed.json and the app downloads that ready JSON. A bundled
+ * snapshot is used only as an immediate/offline fallback so the UI can never
+ * get stuck on an endless loading screen.
  */
 object BannerSource {
     private const val FEED_URL =
         "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/banner_feed.json"
 
     fun fetchNormalized(context: Context): String {
-        val source = fetch(FEED_URL)
-        val root = JSONObject(source)
+        return try {
+            normalize(fetch(FEED_URL + "?t=" + (System.currentTimeMillis() / 600000L)))
+        } catch (_: Exception) {
+            loadBundledFeed(context)
+        }
+    }
 
-        // MainActivity consumes a normalized games array. The remote feed
-        // uses a named games object, so always normalize it here.
+    private fun normalize(source: String): String {
+        val root = JSONObject(source)
         val sourceGamesObject = root.optJSONObject("games")
         val sourceGamesArray = root.optJSONArray("games")
         if (sourceGamesObject == null && sourceGamesArray == null) {
@@ -52,6 +58,7 @@ object BannerSource {
                     found
                 }
             } ?: continue
+
             val current = normalizePhase(sourceGame.optJSONArray("current")?.optJSONObject(0))
             val next = normalizePhase(sourceGame.optJSONArray("next")?.optJSONObject(0))
             val upcoming = JSONArray()
@@ -72,12 +79,21 @@ object BannerSource {
             )
         }
 
+        if (games.length() == 0) throw IllegalStateException("Banner feed has no supported games")
+
         return JSONObject()
             .put("version", root.optInt("version", 1))
             .put("generated_at", root.optString("generated_at"))
             .put("source", root.optString("source", "online"))
             .put("games", games)
             .toString()
+    }
+
+    private fun loadBundledFeed(context: Context): String {
+        val bundled = context.assets.open("banner_feed.json").use {
+            it.bufferedReader().readText()
+        }
+        return normalize(bundled)
     }
 
     private fun normalizePhase(source: JSONObject?): JSONObject {
@@ -92,7 +108,10 @@ object BannerSource {
                 .put("source_status", "unconfirmed")
         }
 
-        val characters = copyArray(source.optJSONArray("characters"))
+        val characters = copyArray(
+            source.optJSONArray("characters")
+                ?: source.optJSONArray("five_star")
+        )
         val fourStars = copyArray(
             source.optJSONArray("four_star")
                 ?: source.optJSONArray("fourStars")
@@ -133,14 +152,20 @@ object BannerSource {
 
     private fun fetch(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000
-        connection.readTimeout = 20000
-        connection.requestMethod = "GET"
-        connection.instanceFollowRedirects = true
-        connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-        if (connection.responseCode !in 200..299) {
-            throw IllegalStateException("HTTP " + connection.responseCode)
+        try {
+            connection.connectTimeout = 5000
+            connection.readTimeout = 8000
+            connection.requestMethod = "GET"
+            connection.instanceFollowRedirects = true
+            connection.useCaches = false
+            connection.setRequestProperty("Cache-Control", "no-cache")
+            connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+            if (connection.responseCode !in 200..299) {
+                throw IllegalStateException("HTTP " + connection.responseCode)
+            }
+            return connection.inputStream.use { it.bufferedReader().readText() }
+        } finally {
+            connection.disconnect()
         }
-        return connection.inputStream.use { it.bufferedReader().readText() }
     }
 }
