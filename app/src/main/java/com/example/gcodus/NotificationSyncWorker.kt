@@ -265,30 +265,41 @@ class NotificationSyncWorker(
     }
 
     private fun trackedFiles(gameId: String): List<String> {
+        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+        val prefix = "tracked_" + gameId + "_"
+
+        // The Wish List is the source of truth. Do not require the character to
+        // exist in the local portrait directory: this is what allows reruns,
+        // 4★ characters and online-only portraits to receive notifications too.
+        val tracked = appPrefs.all.entries
+            .filter { it.key.startsWith(prefix) && it.value == true }
+            .map { it.key.removePrefix(prefix) }
+            .filter { it.isNotBlank() }
+            .toMutableSet()
+
         val folder = when (gameId) {
             "genshin" -> "genshin"
             "wuwa" -> "wuthering_waves"
             "zzz" -> "zenless_zone_zero"
-            else -> return emptyList()
+            else -> null
         }
-        return try {
-            val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
-            val files = applicationContext.assets.list(folder).orEmpty()
+
+        if (folder != null) {
+            applicationContext.assets.list(folder).orEmpty()
                 .filter { it.endsWith(".webp", true) }
-                .filter { appPrefs.getBoolean("tracked_" + gameId + "_" + it, false) }
-                .toMutableList()
-            val virtualPrefix = "tracked_" + gameId + "_"
-            appPrefs.all.keys
-                .filter { it.startsWith(virtualPrefix + "__online_") && appPrefs.getBoolean(it, false) }
-                .map { it.removePrefix(virtualPrefix) }
-                .forEach { files += it }
-            if (gameId == "wuwa") {
-                listOf("__wuwa-lucy.webp", "__wuwa-aemeath.webp", "__wuwa-hiyuki.webp").forEach {
-                    if (appPrefs.getBoolean("tracked_wuwa_" + it, false)) files += it
+                .forEach { file ->
+                    if (appPrefs.getBoolean(prefix + file, false)) tracked += file
                 }
+        }
+
+        // Preserve compatibility with the special WuWa virtual portrait keys.
+        if (gameId == "wuwa") {
+            listOf("__wuwa-lucy.webp", "__wuwa-aemeath.webp", "__wuwa-hiyuki.webp").forEach {
+                if (appPrefs.getBoolean(prefix + it, false)) tracked += it
             }
-            files.distinct()
-        } catch (_: Exception) { emptyList() }
+        }
+
+        return tracked.toList().sorted()
     }
 
     private fun sameCharacter(name: String, file: String): Boolean {
