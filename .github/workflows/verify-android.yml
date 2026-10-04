@@ -8,7 +8,7 @@ on:
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle.properties"
-      - "scripts/apply_requested_game_updates.py"
+      - "scripts/run_requested_game_updates.py"
       - ".github/workflows/verify-android.yml"
   workflow_dispatch:
 
@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Apply requested game fixes
-        run: python3 scripts/apply_requested_game_updates.py
+        run: python3 scripts/run_requested_game_updates.py
       - name: Commit requested game fixes
         run: |
           git config user.name "github-actions[bot]"
