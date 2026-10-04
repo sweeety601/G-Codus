@@ -1088,6 +1088,9 @@ class MainActivity : AppCompatActivity() {
             if (key == "danhengimbibitorlunae" || key == "imbibitorlunae") {
                 return "Dan Heng Imbibitor Lunae"
             }
+            if (key == "march7th" || key == "march7" || key == "march7ththehunt" || key == "march7thehunt") {
+                return "March 7th"
+            }
         }
         return cleaned
     }
@@ -1105,6 +1108,9 @@ class MainActivity : AppCompatActivity() {
         val normalizedBase = normalizeCharacterForMatch(base)
         if (normalizedBase == "danhengimbibitorlunae" || normalizedBase == "imbibitorlunae") {
             return "Dan Heng Imbibitor Lunae"
+        }
+        if (normalizedBase == "march7th" || normalizedBase == "march7" || normalizedBase == "march7ththehunt" || normalizedBase == "march7thehunt") {
+            return "March 7th"
         }
 
         val overrides = mapOf(
@@ -1491,6 +1497,8 @@ class MainActivity : AppCompatActivity() {
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
+                "march7", "march7th", "march7thehunt", "march7ththehunt" -> "march7th"
+                "danhengimbibitorlunae", "imbibitorlunae" -> "danhengimbibitorlunae"
                 else -> value
             }
             val localCanonical = hsrCanonical(a)
