@@ -869,7 +869,7 @@ class MainActivity : AppCompatActivity() {
         games.forEach { meta ->
             val localFiles = listCharacterFiles(meta.id)
             localFiles.forEach { file ->
-                val name = characterDisplayName(file)
+                val name = canonicalCharacterDisplayName(meta.id, characterDisplayName(file))
                 if (isMainProtagonist(meta.id, file, name)) return@forEach
                 if ((gameId != null || isTracked(meta.id, file)) &&
                     (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
@@ -892,8 +892,13 @@ class MainActivity : AppCompatActivity() {
                     }
                     if (!duplicateLocal) {
                         val file = "__online_" + meta.id + "_" + online.slug + ".webp"
-                        val displayOnlineName = cleanCharacterName(online.name)
-                        if ((gameId != null || isTracked(meta.id, file)) &&
+                        val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
+                        val duplicateEntry = entries.any { existing ->
+                            existing.gameId == meta.id &&
+                                normalizeCharacterForMatch(existing.name) == normalizeCharacterForMatch(displayOnlineName)
+                        }
+                        if (!duplicateEntry &&
+                            (gameId != null || isTracked(meta.id, file)) &&
                             (normalizedQuery.isBlank() || displayOnlineName.lowercase().contains(normalizedQuery))) {
                             entries += TrackedCharacter(meta.id, meta.name, displayOnlineName, file)
                         }
@@ -1071,6 +1076,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun cleanCharacterName(value: String): String =
         value.replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim()
+
+    private fun canonicalCharacterDisplayName(gameId: String, value: String): String {
+        val cleaned = cleanCharacterName(value)
+        if (gameId == "starrail") {
+            val key = normalizeCharacterForMatch(cleaned)
+            if (key == "danhengimbibitorlunae" || key == "imbibitorlunae") {
+                return "Imbibitor Lunae"
+            }
+        }
+        return cleaned
+    }
 
     private fun characterDisplayName(file: String): String {
         // CARD_FILENAME_IDENTITY_FIX_V1
