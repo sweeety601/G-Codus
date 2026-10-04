@@ -30,6 +30,20 @@ android {
     }
 }
 
+// The icon is kept as images.jpeg in the project root. Copy it into Android's
+// drawable resources automatically before every build, so no manual copying is needed.
+val prepareAppIcon by tasks.registering(Copy::class) {
+    from(rootProject.file("images.jpeg"))
+    into(layout.buildDirectory.dir("generated/res/appIcon/drawable"))
+    rename { "app_icon.jpeg" }
+}
+
+tasks.named("preBuild").configure {
+    dependsOn(prepareAppIcon)
+}
+
+android.sourceSets.getByName("main").res.srcDir(layout.buildDirectory.dir("generated/res/appIcon"))
+
 dependencies {
     implementation("androidx.core:core-ktx:1.17.0")
     implementation("androidx.appcompat:appcompat:1.7.1")
