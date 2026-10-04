@@ -76,7 +76,6 @@ object PromoCodeSource {
     }
 
     private fun parseItems(body: String): List<JSONObject> {
-        val root = JSONObject(body)
         val result = mutableListOf<JSONObject>()
 
         fun consume(value: Any?) {
@@ -89,8 +88,9 @@ object PromoCodeSource {
                     }
                 }
                 is JSONObject -> {
-                    if (value.has("code") || value.has("key")) result += value
-                    else {
+                    if (value.has("code") || value.has("key")) {
+                        result += value
+                    } else {
                         consume(value.optJSONArray("codes"))
                         consume(value.optJSONArray("active"))
                         consume(value.optJSONArray("data"))
@@ -100,11 +100,12 @@ object PromoCodeSource {
             }
         }
 
-        consume(root.optJSONArray("codes"))
-        consume(root.optJSONArray("active"))
-        consume(root.optJSONArray("data"))
-        consume(root.optJSONArray("results"))
-        if (result.isEmpty()) consume(root)
+        val trimmed = body.trim()
+        if (trimmed.startsWith("[")) {
+            consume(JSONArray(trimmed))
+        } else {
+            consume(JSONObject(trimmed))
+        }
         return result
     }
 
