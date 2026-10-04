@@ -1324,10 +1324,11 @@ class MainActivity : AppCompatActivity() {
             val localStarlight = a.contains("starlight") || file.contains("starlight")
             val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
             if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
-            val ordinary = setOf("billy", "billykid")
-            val localBilly = a in ordinary || file in ordinary
-            val onlineBilly = b in ordinary || slug in ordinary
-            if (localBilly || onlineBilly) return localBilly && onlineBilly
+            // Billy Kid and Starlight Billy are separate characters.
+            // Ordinary Billy aliases only match each other; Starlight is never merged.
+            val localBillyKid = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
+            val onlineBillyKid = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
+            if (localBillyKid || onlineBillyKid) return localBillyKid && onlineBillyKid
         }
         return a == b || file == slug
     }
