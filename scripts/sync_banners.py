@@ -350,6 +350,13 @@ def main():
             "upcoming": dedupe(upcoming)[:12],
         }
 
+        print(
+            game,
+            "current=", [x.get("characters", []) for x in current[:6]],
+            "next=", [x.get("characters", []) for x in next_phase[:6]],
+            "upcoming=", [x.get("characters", []) for x in upcoming[:12]],
+        )
+
     OUT.write_text(json.dumps(output, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print("Online banner sync completed:", OUT)
 
