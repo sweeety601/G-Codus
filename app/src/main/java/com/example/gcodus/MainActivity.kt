@@ -1318,6 +1318,19 @@ class MainActivity : AppCompatActivity() {
             else -> return
         }
 
+        // Perlica is an Arknights: Endfield character. Force the exact
+        // bundled Endfield portrait and never allow a same-named portrait
+        // from another game/fallback to be selected.
+        if (gameId == "endfield" && normalized == "perlica") {
+            try {
+                assets.open("arknights_endfield/perlica_card.webp").use { input ->
+                    val bitmap = android.graphics.BitmapFactory.decodeStream(input)
+                    if (bitmap != null) image.setImageBitmap(bitmap)
+                }
+            } catch (_: Exception) { }
+            return
+        }
+
         // Resolve against the ACTUAL bundled filenames. This is important for
         // 4-star portraits because their source filenames can differ from the
         // display name (spaces, punctuation, alternate naming, etc.).
