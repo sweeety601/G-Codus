@@ -40,7 +40,7 @@ class NotificationSyncWorker(
         val prefs = applicationContext.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         return try {
             val bannerJson = BannerSource.fetchNormalized(applicationContext)
-            val codeJson = fetch(CODES_URL)
+            val codeJson = try { fetch(CODES_URL) } catch (_: Exception) { null }
             applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
                 .edit().putString("banner_feed", bannerJson).apply()
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
@@ -48,7 +48,7 @@ class NotificationSyncWorker(
             // first sync if the tracked character is already in the relevant state.
             notifyFollowedGames(prefs, bannerJson, initialized)
             notifyTrackedCharacters(prefs, bannerJson)
-            if (initialized) notifyNewCodes(prefs, codeJson)
+            if (initialized && codeJson != null) notifyNewCodes(prefs, codeJson)
             prefs.edit().putBoolean(KEY_INITIALIZED, true).apply()
             Result.success()
         } catch (_: Exception) { Result.retry() }
