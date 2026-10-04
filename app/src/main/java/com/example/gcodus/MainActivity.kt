@@ -50,7 +50,7 @@ data class Banner(
 )
 
 class MainActivity : AppCompatActivity() {
-    companion object
+    companion object {}
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val countdownExecutor = Executors.newSingleThreadScheduledExecutor()
     private val imageExecutor = Executors.newFixedThreadPool(4)
