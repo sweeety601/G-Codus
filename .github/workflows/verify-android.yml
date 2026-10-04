@@ -1,5 +1,5 @@
 name: Verify Android build
-# Verification includes bundled game icons.
+# Verification includes bundled game icons, portraits, and supplied HSR logo.
 
 on:
   push:
@@ -10,7 +10,9 @@ on:
       - "settings.gradle.kts"
       - "gradle.properties"
       - "scripts/run_requested_game_updates.py"
+      - "scripts/apply_current_portrait_fixes.py"
       - "scripts/sync_game_icons.py"
+      - "data/gacha_character_manifest.json"
       - ".github/workflows/verify-android.yml"
       - "gradle/**"
       - "gradlew"
@@ -28,8 +30,13 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
+
+      - name: Apply current portrait, logo and matching fixes
+        run: python3 scripts/apply_current_portrait_fixes.py
+
       - name: Apply requested game fixes
         run: python3 scripts/run_requested_game_updates.py
+
       - name: Fix horizontal LayoutParams
         run: |
           python3 - <<'PY'
@@ -39,18 +46,20 @@ jobs:
           s=s.replace('icons.addView(iconRow, HorizontalScrollView.LayoutParams(-2, dp(100)))','icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(100)))')
           p.write_text(s)
           PY
-      - name: Commit requested fixes
+
+      - name: Commit generated fixes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/PromoCodeSource.kt scripts/sync_banners.py scripts/sync_game_icons.py app/src/main/res/drawable-nodpi/game_starrail.png
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/PromoCodeSource.kt scripts/sync_banners.py scripts/sync_game_icons.py scripts/apply_current_portrait_fixes.py data/gacha_character_manifest.json app/src/main/res/drawable-nodpi/game_starrail.png
           git diff --cached --check
           if git diff --cached --quiet; then
-            echo "No requested fixes to commit."
+            echo "No generated fixes to commit."
           else
-            git commit -m "Fix requested game UI compilation"
+            git commit -m "Finalize portrait logo and matching fixes"
             git push
           fi
+
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
