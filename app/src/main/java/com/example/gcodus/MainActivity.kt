@@ -1091,6 +1091,9 @@ class MainActivity : AppCompatActivity() {
             if (key == "march7th" || key == "march7" || key == "march7ththehunt" || key == "march7thehunt") {
                 return "March 7th"
             }
+            if (key == "topaz" || key == "topazandnumby") {
+                return "Topaz & Numby"
+            }
         }
         return cleaned
     }
@@ -1111,6 +1114,9 @@ class MainActivity : AppCompatActivity() {
         }
         if (normalizedBase == "march7th" || normalizedBase == "march7" || normalizedBase == "march7ththehunt" || normalizedBase == "march7thehunt") {
             return "March 7th"
+        }
+        if (normalizedBase == "topaz" || normalizedBase == "topazandnumby") {
+            return "Topaz & Numby"
         }
 
         val overrides = mapOf(
@@ -1497,6 +1503,7 @@ class MainActivity : AppCompatActivity() {
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
+                "topaz", "topazandnumby" -> "topaz"
                 else -> value
             }
             val localCanonical = hsrCanonical(a)
