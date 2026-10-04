@@ -1,11 +1,11 @@
 {
   "version": 3,
-  "generated_at": "2026-10-04T09:22:19.936323+00:00",
+  "generated_at": "2026-10-04T11:10:46.970684+00:00",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-04T09:22:22.729772+00:00",
+      "fetched_at": "2026-10-04T11:10:49.451237+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -50,11 +50,12 @@
           ]
         }
       ],
-      "upcoming": []
+      "upcoming": [],
+      "leak_sources": []
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-04T09:22:25.019428+00:00",
+      "fetched_at": "2026-10-04T11:10:51.453726+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -101,11 +102,12 @@
           ]
         }
       ],
-      "upcoming": []
+      "upcoming": [],
+      "leak_sources": []
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-04T09:22:27.770272+00:00",
+      "fetched_at": "2026-10-04T11:10:53.903453+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -141,11 +143,12 @@
           "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
         }
       ],
-      "upcoming": []
+      "upcoming": [],
+      "leak_sources": []
     },
     "Honkai: Star Rail": {
       "source_url": "https://www.prydwen.gg/star-rail/banners",
-      "fetched_at": "2026-10-04T09:22:29.893502+00:00",
+      "fetched_at": "2026-10-04T11:10:56.165005+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -191,11 +194,15 @@
           ]
         }
       ],
-      "upcoming": []
+      "upcoming": [],
+      "leak_sources": [
+        "https://hsr.hakush.in/",
+        "https://www.reddit.com/r/HonkaiStarRail_leaks/"
+      ]
     },
     "Arknights: Endfield": {
       "source_url": "https://www.prydwen.gg/arknights-endfield/banners",
-      "fetched_at": "2026-10-04T09:22:32.044270+00:00",
+      "fetched_at": "2026-10-04T11:10:58.170423+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -215,7 +222,11 @@
         }
       ],
       "next": [],
-      "upcoming": []
+      "upcoming": [],
+      "leak_sources": [
+        "https://www.reddit.com/r/ArknightsEndfieldLeak/",
+        "https://www.pocketgamer.com/arknights-endfield/upcoming-banners/"
+      ]
     }
   }
 }
