@@ -50,9 +50,7 @@ data class Banner(
 )
 
 class MainActivity : AppCompatActivity() {
-    companion object {
-        const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
-    }
+    companion object
     private val executor = Executors.newSingleThreadScheduledExecutor()
     private val countdownExecutor = Executors.newSingleThreadScheduledExecutor()
     private val imageExecutor = Executors.newFixedThreadPool(4)
@@ -590,42 +588,36 @@ class MainActivity : AppCompatActivity() {
     private fun refreshCodesInBackground() {
         executor.execute {
             try {
-                val connection = java.net.URL(CODE_FEED_URL).openConnection()
-                connection.connectTimeout = 12000
-                connection.readTimeout = 20000
-                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                val json = connection.getInputStream().bufferedReader().use { it.readText() }
+                val json = PromoCodeSource.fetchJson()
                 codesFeed = parseCodesFeed(json)
-                prefs.edit().putString("codes_feed", json).apply()
-                runOnUiThread { showHome() }
+                val old = prefs.getString("codes_feed", null)
+                if (old != json) {
+                    prefs.edit().putString("codes_feed", json).apply()
+                    runOnUiThread { if (!isFinishing) refreshCurrentScreen() }
+                }
             } catch (_: Exception) { }
         }
+        executor.scheduleAtFixedRate({
+            try {
+                val json = PromoCodeSource.fetchJson()
+                val old = prefs.getString("codes_feed", null)
+                if (old != json) {
+                    prefs.edit().putString("codes_feed", json).apply()
+                    codesFeed = parseCodesFeed(json)
+                    runOnUiThread { if (!isFinishing) refreshCurrentScreen() }
+                }
+            } catch (_: Exception) { }
+        }, 15, 15, TimeUnit.MINUTES)
     }
 
     private fun loadCachedCodes(): CodesFeed {
-        // Prefer the last successfully downloaded feed. On a fresh install there
-        // is no SharedPreferences entry yet, so immediately fall back to the
-        // codes_feed.json bundled into the APK. This guarantees that the code
-        // page is populated even before the first background HTTP refresh.
+        // This is only the last successful network snapshot. Live sources are
+        // the source of truth; no bundled promo-code database is used.
         val cached = prefs.getString("codes_feed", null)
         if (!cached.isNullOrBlank()) {
-            try {
-                val parsed = parseCodesFeed(cached)
-                // An old empty cache must never hide a valid bundled feed.
-                if (parsed.active.isNotEmpty() || parsed.expired.isNotEmpty()) {
-                    return parsed
-                }
-            } catch (_: Exception) {
-                // Continue to the bundled feed.
-            }
+            try { return parseCodesFeed(cached) } catch (_: Exception) { }
         }
-
-        return try {
-            val bundled = assets.open("codes_feed.json").bufferedReader().use { it.readText() }
-            parseCodesFeed(bundled)
-        } catch (_: Exception) {
-            CodesFeed.empty()
-        }
+        return CodesFeed.empty()
     }
 
     private fun parseCodesFeed(json: String): CodesFeed {
