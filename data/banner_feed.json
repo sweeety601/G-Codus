@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated_at": "2026-10-04T01:40:11.198Z",
+  "generated_at": "2026-10-04T01:46:29.270Z",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
@@ -41,9 +41,10 @@
           "start_date": "2026-10-13",
           "end_date": "2026-11-03",
           "status": "next",
-          "official_source": "https://www.hoyolab.com/circles/2/57/feed",
-          "source_status": "unconfirmed",
-          "unconfirmed": true
+          "official_source": "https://www.prydwen.gg/genshin-impact/banners",
+          "source_status": "confirmed",
+          "unconfirmed": false,
+          "confirmation_source": "https://www.prydwen.gg/genshin-impact/banners"
         }
       ]
     },
