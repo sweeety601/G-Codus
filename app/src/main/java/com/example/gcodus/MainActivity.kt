@@ -508,7 +508,7 @@ class MainActivity : AppCompatActivity() {
         info.addView(label(banner.version, 13f, muted, false))
 
         if (banner.unconfirmed) {
-            info.addView(label("НЕ ПОДТВЕРЖДЕНО", 11f, Color.rgb(255, 170, 80), true).apply {
+            info.addView(label("Не подтверждено", 11f, Color.rgb(255, 170, 80), true).apply {
                 setPadding(0, dp(5), 0, dp(2))
             })
         }
