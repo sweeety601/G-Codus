@@ -140,21 +140,38 @@ object BannerSource {
                     next.put("source_status", "unconfirmed")
                 }
             }
-            "zzz" -> {
-                val text = fetch(ZZZ_FORECAST_FALLBACK) ?: return
-                if (text.contains("Phoenix", true) && text.contains("Severian", true)) {
-                    next.put("version", "3.3 Phase 1")
-                    next.put("start", "2026-10-21T06:00:00+08:00")
-                    next.put("end", "2026-11-11T06:00:00+08:00")
-                    next.put("five_star", JSONArray(listOf("Phoenix", "Severian")))
-                    next.put("four_star", JSONArray())
-                    next.put("unconfirmed", true)
-                    next.put("secondary_source", "https://www.u7buy.com/blog/zenless-zone-zero-3-3-banners/")
-                    next.put("source_status", "unconfirmed")
-                }
-            }
+            "zzz" -> applyZzzSecondary(next)
         }
         game.put("next", next)
+    }
+
+    private fun applyZzzSecondary(next: JSONObject) {
+        // Only fill an unconfirmed next phase when primary/official data has no
+        // confirmed lineup. Secondary sources currently point to Phoenix as the
+        // likely Phase I agent. Severian belongs to the later phase and is not
+        // incorrectly shown in the immediate next phase.
+        if (next.optBoolean("unconfirmed", false) &&
+            next.optJSONArray("five_star")?.length()?.let { it > 0 } == true) return
+
+        val sources = listOf(
+            "https://r.jina.ai/https://timesaver.gg/blog/zzz-3-3",
+            "https://r.jina.ai/https://keygold.gg/blog/detail/zenless-zone-zero-banners",
+            ZZZ_FORECAST_FALLBACK
+        )
+        for (source in sources) {
+            val text = fetch(source) ?: continue
+            if (!text.contains("Phoenix", true)) continue
+
+            next.put("version", "3.3 Phase 1")
+            next.put("start", "2026-10-21T06:00:00+08:00")
+            next.put("end", "2026-11-11T05:59:59+08:00")
+            next.put("five_star", JSONArray(listOf("Phoenix")))
+            next.put("four_star", JSONArray())
+            next.put("unconfirmed", true)
+            next.put("secondary_source", source.removePrefix("https://r.jina.ai/"))
+            next.put("source_status", "unconfirmed")
+            return
+        }
     }
 
     private fun syncGenshin(game: JSONObject) {
@@ -271,18 +288,12 @@ object BannerSource {
         val history = fetch(ZZZ_HISTORY)
         history?.let { updateZzzCurrent(game.optJSONObject("current"), it) }
 
+        // Prydwen/official data has priority. Only when the next phase is not
+        // confirmed do we consult secondary leak/forecast sources.
         val next = game.optJSONObject("next") ?: return
-        if ((next.optJSONArray("five_star")?.length() ?: 0) > 0) return
+        if (hasConfirmedPhase(next)) return
 
-        val forecast = fetch(ZZZ_FORECAST) ?: fetch(ZZZ_FORECAST_FALLBACK)
-        if (forecast != null && forecast.contains("Phoenix", true)) {
-            next.put("version", "3.3 Phase 1")
-            next.put("start", "2026-10-21T06:00:00+08:00")
-            next.put("end", "2026-11-11T05:59:59+08:00")
-            next.put("five_star", JSONArray(listOf("Phoenix")))
-            next.put("four_star", JSONArray())
-            next.put("unconfirmed", true)
-        }
+        applyZzzSecondary(next)
     }
 
     private fun updateZzzCurrent(phase: JSONObject?, text: String) {
