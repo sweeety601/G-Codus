@@ -1,3 +1,4 @@
+# Final icon sync source: HSR uses the transparent wordmark with the game name.
 #!/usr/bin/env python3
 from pathlib import Path
 from urllib.request import Request, urlopen
