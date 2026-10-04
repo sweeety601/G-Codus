@@ -55,6 +55,7 @@ class MainActivity : AppCompatActivity() {
         const val CODE_FEED_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/app/src/main/assets/codes_feed.json"
     }
     private val executor = Executors.newSingleThreadScheduledExecutor()
+    private val countdownExecutor = Executors.newSingleThreadScheduledExecutor()
     private val imageExecutor = Executors.newFixedThreadPool(4)
     private val portraitCache = LruCache<String, Bitmap>(48)
     private val countdownViews = mutableListOf<Pair<TextView, String>>()
@@ -1365,12 +1366,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startCountdownTicker() {
-        executor.scheduleAtFixedRate({
+        countdownExecutor.scheduleAtFixedRate({
             runOnUiThread {
                 val now = Instant.now()
                 countdownViews.forEach { pair ->
                     try {
-                        val target = OffsetDateTime.parse(pair.second).toInstant()
+                        val target = try {
+                            OffsetDateTime.parse(pair.second).toInstant()
+                        } catch (_: Exception) {
+                            try { Instant.parse(pair.second) } catch (_: Exception) { null }
+                        } ?: return@forEach
                         val seconds = Duration.between(now, target).seconds.coerceAtLeast(0)
                         pair.first.text = "До окончания\n" + formatCountdown(seconds)
                     } catch (_: Exception) { }
