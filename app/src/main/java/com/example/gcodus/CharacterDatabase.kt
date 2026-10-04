@@ -47,6 +47,7 @@ object CharacterDatabase {
         // Static roster fallback compiled from the current public database lists.
         // This keeps the Wishlist usable even when a character-list page is down.
         result += fallbackCharacters("starrail", HSR_FALLBACK)
+        result += fallbackCharacters("zzz", ZZZ_FALLBACK)
         result += fallbackCharacters("endfield", ENDFIELD_FALLBACK)
 
         // Prydwen uses "Billy" for the ordinary playable agent. In G-Codus
@@ -184,6 +185,11 @@ object CharacterDatabase {
             else -> 0
         }
     }
+
+    private val ZZZ_FALLBACK = listOf(
+        "Severian",
+        "Phoenix"
+    )
 
     // HSR roster assembled from the live Prydwen character database.
     private val HSR_FALLBACK = listOf(

@@ -1105,7 +1105,11 @@ class MainActivity : AppCompatActivity() {
         value.replace("•", " ").replace("·", " ").replace(Regex("\\s+"), " ").trim()
 
     private fun stripZzzVersion(value: String): String =
-        value.replace(Regex("(?<![A-Za-z0-9])3\\.\\d+(?![A-Za-z0-9])"), " ")
+        value
+            .replace(
+                Regex("(?i)(?:\\s*[\\[({_-]?\\s*)3\\.(?:\\d+|x)(?:\\s*[\\])}]?\\s*)"),
+                " "
+            )
             .replace(Regex("\\s+"), " ")
             .trim()
 
@@ -1236,8 +1240,34 @@ class MainActivity : AppCompatActivity() {
         var changed = false
 
         prefs.all.forEach { (key, value) ->
-            if (!key.startsWith("tracked_") || key.startsWith("tracked_v2_")) return@forEach
             val enabled = value as? Boolean ?: return@forEach
+
+            if (key.startsWith("tracked_v2_")) {
+                val remainder = key.removePrefix("tracked_v2_")
+                val separator = remainder.indexOf('_')
+                if (separator <= 0 || separator >= remainder.lastIndex) return@forEach
+
+                val gameId = remainder.substring(0, separator)
+                val identity = remainder.substring(separator + 1)
+                if (gameId == "zzz") {
+                    val identityWithoutVersion = identity.replace(
+                        Regex("(?i)3x$|3\\d+$"),
+                        ""
+                    )
+                    val canonicalIdentity = normalizeCharacterForMatch(
+                        canonicalCharacterDisplayName("zzz", identityWithoutVersion)
+                    )
+                    val canonicalKey = "tracked_v2_zzz_" + canonicalIdentity
+                    if (canonicalKey != key) {
+                        if (enabled) editor.putBoolean(canonicalKey, true)
+                        editor.remove(key)
+                        changed = true
+                    }
+                }
+                return@forEach
+            }
+
+            if (!key.startsWith("tracked_")) return@forEach
 
             val remainder = key.removePrefix("tracked_")
             val separator = remainder.indexOf('_')
