@@ -7,17 +7,13 @@ MAIN = ROOT / "app/src/main/java/com/example/gcodus/MainActivity.kt"
 ICON_SYNC = ROOT / "scripts/sync_game_icons.py"
 MANIFEST = ROOT / "data/gacha_character_manifest.json"
 
-# Current fixes: local HSR/Endfield portraits, HSR name aliases, and larger top game tiles.
+# Current fixes: local HSR/Endfield portraits, HSR name aliases, larger top game tiles, and Perlica mapping.
 s = MAIN.read_text()
 repls = {
-    'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))':
-        'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))',
-    'iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))':
-        'iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))',
-    'item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))':
-        'item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))',
-    'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))':
-        'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))',
+    'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))': 'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))',
+    'iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))': 'iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))',
+    'item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))': 'item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))',
+    'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))': 'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))',
 }
 for old, new in repls.items():
     if old in s:
@@ -88,7 +84,6 @@ new = '''for filename, url in ICONS.items():
 if old in icon:
     ICON_SYNC.write_text(icon.replace(old, new, 1))
 
-# Repair the manifest after the old integration pass placed Perlica in HSR.
 if MANIFEST.exists():
     data = json.loads(MANIFEST.read_text())
     images = data.get("images", [])
