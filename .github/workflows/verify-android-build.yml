@@ -15,12 +15,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Install Android SDK
-        run: |
-          yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - uses: android-actions/setup-android@v3
+      - name: Install SDK packages
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Build APK
-        id: build
         run: |
           set +e
           ./gradlew clean assembleDebug --stacktrace 2>&1 | tee /tmp/build.log
@@ -32,12 +30,9 @@ jobs:
         run: |
           rc=$(cat /tmp/build_rc 2>/dev/null || echo 1)
           mkdir -p .ci
-          if [ "$rc" -eq 0 ]; then
-            printf 'PASS\ncommit=%s\nrun=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > .ci/build-status.txt
-          else
-            printf 'FAIL\ncommit=%s\nrun=%s\n' "$GITHUB_SHA" "$GITHUB_RUN_ID" > .ci/build-status.txt
-          fi
-          tail -n 160 /tmp/build.log 2>/dev/null > .ci/build-log.txt || true
+          if [ "$rc" -eq 0 ]; then status=PASS; else status=FAIL; fi
+          printf '%s\ncommit=%s\nrun=%s\n' "$status" "$GITHUB_SHA" "$GITHUB_RUN_ID" > .ci/build-status.txt
+          tail -n 240 /tmp/build.log 2>/dev/null > .ci/build-log.txt || true
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .ci/build-status.txt .ci/build-log.txt
