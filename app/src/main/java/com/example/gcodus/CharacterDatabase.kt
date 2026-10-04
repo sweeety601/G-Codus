@@ -135,6 +135,8 @@ object CharacterDatabase {
             val s = normalize(slug)
             val n = normalize(name)
             if (s == "blademortenax" || s == "mortenaxblade" || n == "blademortenax" || n == "mortenaxblade") return "starrail|mortenaxblade"
+            if (s == "imbibitorlunae" || s == "danhengimbibitorlunae" ||
+                n == "imbibitorlunae" || n == "danhengimbibitorlunae") return "starrail|imbibitorlunae"
         }
         if (gameId == "zzz") {
             val s = normalize(slug)
