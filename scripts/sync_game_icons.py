@@ -45,4 +45,4 @@ for filename in ICONS:
     canvas.save(out, "PNG", optimize=True)
     rendered.unlink(missing_ok=True)
 
-print("Downloaded and integrated 3 game icons with preserved proportions.")
+print("Downloaded and integrated all five game icons with transparent backgrounds.")
