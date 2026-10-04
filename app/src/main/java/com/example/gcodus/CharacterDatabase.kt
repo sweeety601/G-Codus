@@ -63,7 +63,13 @@ object CharacterDatabase {
             }
         }
 
-        return result.filterNot { isProtagonist(it.gameId, it.slug, it.name) }.distinctBy { canonicalKey(it.gameId, it.slug, it.name) }
+        return result
+            .filterNot { isProtagonist(it.gameId, it.slug, it.name) }
+            .filterNot {
+                it.gameId.equals("endfield", true) &&
+                    normalize(it.name) in setOf("storyteller", "thestoryteller", "sunbringer")
+            }
+            .distinctBy { canonicalKey(it.gameId, it.slug, it.name) }
     }
 
     private fun fetchGame(gameId: String, listUrl: String): List<OnlineCharacter> {
