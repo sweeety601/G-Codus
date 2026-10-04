@@ -912,6 +912,10 @@ class MainActivity : AppCompatActivity() {
         // duplicate aliases that can come from either local assets or the
         // online character list. One game + one canonical character = one card.
         val entries = rawEntries
+            .filterNot {
+                it.gameId == "endfield" && normalizeCharacterForMatch(it.name) in
+                    setOf("storyteller", "thestoryteller", "sunbringer")
+            }
             .groupBy { trackedIdentityKey(it.gameId, it.file) }
             .values
             .map { group ->
@@ -1238,6 +1242,23 @@ class MainActivity : AppCompatActivity() {
     private fun migrateTrackingKeys() {
         val editor = prefs.edit()
         var changed = false
+
+        // These Endfield characters must never appear in Tracking/Wishlist.
+        prefs.all.keys.filter { key ->
+            val normalized = key.lowercase()
+                .replace("’", "")
+                .replace("'", "")
+                .replace(Regex("[^a-z0-9]+"), "")
+            normalized.contains("trackedv2endfieldthestoryteller") ||
+                normalized.contains("trackedv2endfieldstoryteller") ||
+                normalized.contains("trackedv2endfieldsunbringer") ||
+                normalized.contains("trackedendfieldthestoryteller") ||
+                normalized.contains("trackedendfieldstoryteller") ||
+                normalized.contains("trackedendfieldsunbringer")
+        }.forEach {
+            editor.remove(it)
+            changed = true
+        }
 
         prefs.all.forEach { (key, value) ->
             val enabled = value as? Boolean ?: return@forEach
