@@ -108,7 +108,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         codesFeed = loadCachedCodes()
-        bannerFeedJson = prefs.getString("banner_feed", null)
+        bannerFeedJson = loadCachedBannerFeed()
         requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
@@ -158,11 +158,9 @@ class MainActivity : AppCompatActivity() {
         countdownViews.clear()
         val game = loadFeed().firstOrNull { it.id == gameId }
         if (game == null) {
-            // The banner feed is online and loads asynchronously. Do not make
-            // the game button appear dead while that first request is running.
-            // Open the game shell immediately and let the feed refresh redraw it.
             val root = findViewById<FrameLayout>(R.id.root)
             root.removeAllViews()
+
             val column = makeColumn()
             val header = LinearLayout(this).apply {
                 gravity = Gravity.CENTER_VERTICAL
@@ -178,41 +176,39 @@ class MainActivity : AppCompatActivity() {
             addPressEffect(back)
             header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
             val meta = gameMeta.firstOrNull { it.id == gameId }
-            header.addView(label(meta?.name ?: gameId, 22f, text, true),
-                LinearLayout.LayoutParams(0, -2, 1f))
+            header.addView(
+                label(meta?.name ?: gameId, 22f, text, true),
+                LinearLayout.LayoutParams(0, -2, 1f)
+            )
             column.addView(header)
-            column.addView(emptyCard("Загрузка данных…").apply {
-                setOnClickListener {
-                    executor.execute {
-                        try {
-                            val fresh = BannerSource.fetchNormalized(this@MainActivity)
-                            JSONObject(fresh).getJSONArray("games")
-                            bannerFeedJson = fresh
-                            runOnUiThread {
-                                if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
-                                    showGame(gameId)
-                                }
+
+            val retry = emptyCard("Данные баннеров недоступны. Нажмите для повтора.")
+            retry.setOnClickListener {
+                executor.execute {
+                    try {
+                        val fresh = BannerSource.fetchNormalized(this@MainActivity)
+                        JSONObject(fresh).getJSONArray("games")
+                        prefs.edit().putString("banner_feed", fresh).apply()
+                        bannerFeedJson = fresh
+                        runOnUiThread {
+                            if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
+                                showGame(gameId)
                             }
-                        } catch (_: Exception) { }
+                        }
+                    } catch (_: Exception) {
+                        runOnUiThread {
+                            if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
+                                Toast.makeText(this@MainActivity, "Не удалось обновить баннеры", Toast.LENGTH_SHORT).show()
+                            }
+                        }
                     }
                 }
-            })
+            }
+            column.addView(retry)
+
             val scroll = makeScroll()
             scroll.addView(column)
             root.addView(scroll)
-            // Start a direct refresh for the selected game.
-            executor.execute {
-                try {
-                    val fresh = BannerSource.fetchNormalized(this@MainActivity)
-                    JSONObject(fresh).getJSONArray("games")
-                    bannerFeedJson = fresh
-                    runOnUiThread {
-                        if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
-                            showGame(gameId)
-                        }
-                    }
-                } catch (_: Exception) { }
-            }
             return
         }
         // Always reload the latest live promo snapshot when entering a game.
@@ -1474,10 +1470,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun loadFeed(): List<GameFeed> {
-        val source = bannerFeedJson ?: prefs.getString("banner_feed", null) ?: return emptyList()
+    private fun loadCachedBannerFeed(): String? {
+        val cached = prefs.getString("banner_feed", null)
+        if (!cached.isNullOrBlank()) {
+            try {
+                val games = JSONObject(cached).optJSONArray("games")
+                if (games != null && games.length() > 0) return cached
+            } catch (_: Exception) { }
+        }
+
         return try {
-            val games = JSONObject(source).optJSONArray("games") ?: JSONArray()
+            assets.open("banner_feed.json").use { it.bufferedReader().readText() }
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    private fun loadFeed(): List<GameFeed> {
+        val source = bannerFeedJson ?: return emptyList()
+        return try {
+            val games = JSONObject(source).optJSONArray("games") ?: return emptyList()
             val result = mutableListOf<GameFeed>()
             for (i in 0 until games.length()) {
                 val g = games.optJSONObject(i) ?: continue
@@ -1494,7 +1506,7 @@ class MainActivity : AppCompatActivity() {
                     )
                 } catch (_: Exception) { }
             }
-            return result
+            result
         } catch (_: Exception) {
             emptyList()
         }
@@ -1504,15 +1516,19 @@ class MainActivity : AppCompatActivity() {
         fun refreshOnce() {
             try {
                 val fresh = BannerSource.fetchNormalized(this@MainActivity)
-                JSONObject(fresh).getJSONArray("games")
+                val games = JSONObject(fresh).getJSONArray("games")
+                if (games.length() == 0) return
+
                 if (bannerFeedJson != fresh) {
                     bannerFeedJson = fresh
+                    prefs.edit().putString("banner_feed", fresh).apply()
                     runOnUiThread {
                         if (!isFinishing) refreshCurrentScreen()
                     }
                 }
             } catch (_: Exception) { }
         }
+
         executor.execute { refreshOnce() }
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
     }
