@@ -15,15 +15,14 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Check Android SDK
-        run: |
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
-          ls -la "$ANDROID_HOME" 2>/dev/null || true
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: '8.13'
       - name: Build APK
         run: |
           set +e
-          ./gradlew clean assembleDebug --stacktrace 2>&1 | tee /tmp/build.log
+          gradle clean assembleDebug --stacktrace 2>&1 | tee /tmp/build.log
           rc=${PIPESTATUS[0]}
           echo "$rc" > /tmp/build_rc
           exit $rc
