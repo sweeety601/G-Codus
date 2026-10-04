@@ -153,7 +153,13 @@ object CharacterDatabase {
 
     private fun fallbackCharacters(gameId: String, names: List<String>): List<OnlineCharacter> =
         names.map { name ->
-            val slug = normalize(name).replace(Regex("[^a-z0-9]+"), "-").trim('-')
+            val slug = name.lowercase()
+                .replace("’", "")
+                .replace("'", "")
+                .replace("•", "-")
+                .replace("&", "and")
+                .replace(Regex("[^a-z0-9]+"), "-")
+                .trim('-')
             OnlineCharacter(gameId, name, slug, false, portraitUrl(gameId, slug))
         }
 
