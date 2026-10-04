@@ -1542,7 +1542,9 @@ class MainActivity : AppCompatActivity() {
             val definitions = listOf(
                 "genshin" to "Genshin Impact",
                 "wuwa" to "Wuthering Waves",
-                "zzz" to "Zenless Zone Zero"
+                "zzz" to "Zenless Zone Zero",
+                "starrail" to "Honkai: Star Rail",
+                "endfield" to "Arknights: Endfield"
             )
 
             for ((wantedId, wantedName) in definitions) {
@@ -1710,6 +1712,43 @@ class MainActivity : AppCompatActivity() {
                     .put("start", "2026-10-21")
                     .put("end", "2026-11-11")
                     .put("five_star", JSONArray().put("Phoenix"))
+                    .put("four_star", JSONArray())
+                    .put("unconfirmed", true)))
+            put(JSONObject()
+                .put("id", "starrail")
+                .put("name", "Honkai: Star Rail")
+                .put("current", JSONObject()
+                    .put("version", "4.6 Phase 1")
+                    .put("start", "2026-09-28")
+                    .put("end", "2026-10-21")
+                    .put("five_star", JSONArray().put("Pearl").put("Evanescia"))
+                    .put("four_star", JSONArray().put("Qingque").put("Xueyi").put("Misha"))
+                    .put("unconfirmed", false)
+                    .put("source_status", "confirmed"))
+                .put("next", JSONObject()
+                    .put("version", "4.6 Phase 2")
+                    .put("start", "2026-10-21")
+                    .put("end", "2026-11-10")
+                    .put("five_star", JSONArray().put("Pearl").put("Mortenax Blade"))
+                    .put("four_star", JSONArray().put("Qingque").put("Xueyi").put("Misha"))
+                    .put("unconfirmed", false)
+                    .put("source_status", "confirmed")))
+            put(JSONObject()
+                .put("id", "endfield")
+                .put("name", "Arknights: Endfield")
+                .put("current", JSONObject()
+                    .put("version", "1.5 Phase 2")
+                    .put("start", "2026-09-24")
+                    .put("end", "2026-10-21")
+                    .put("five_star", JSONArray().put("Yvonne"))
+                    .put("four_star", JSONArray())
+                    .put("unconfirmed", false)
+                    .put("source_status", "confirmed"))
+                .put("next", JSONObject()
+                    .put("version", "")
+                    .put("start", JSONObject.NULL)
+                    .put("end", JSONObject.NULL)
+                    .put("five_star", JSONArray())
                     .put("four_star", JSONArray())
                     .put("unconfirmed", true)))
         }).toString()
