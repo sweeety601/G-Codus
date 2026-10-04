@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "total_images": 362,
+  "total_images": 363,
   "games": {
     "Zenless Zone Zero": 60,
     "Wuthering Waves": 56,
     "Genshin Impact": 125,
-    "Honkai: Star Rail": 89,
+    "Honkai: Star Rail": 90,
     "Arknights: Endfield": 32
   },
   "images": [
@@ -1816,6 +1816,11 @@
     },
     {
       "game": "Arknights: Endfield",
+      "character": "Perlica",
+      "file": "perlica_card.webp"
+    },
+    {
+      "game": "Honkai: Star Rail",
       "character": "Perlica",
       "file": "perlica_card.webp"
     }
