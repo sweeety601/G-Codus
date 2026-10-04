@@ -46,8 +46,7 @@ data class Banner(
     val characters: List<String>,
     val fourStars: List<String>,
     val next: Boolean,
-    val unconfirmed: Boolean = false,
-    val rerunLabels: Map<String, String> = emptyMap()
+    val unconfirmed: Boolean = false
 )
 
 class MainActivity : AppCompatActivity() {
@@ -507,10 +506,6 @@ class MainActivity : AppCompatActivity() {
             maxLines = 2
         })
         info.addView(label(banner.version, 13f, muted, false))
-        val rerun = banner.characters.mapNotNull { banner.rerunLabels[it] }.distinct().joinToString(" • ").ifBlank { null }
-        if (rerun != null) {
-            info.addView(label(rerun, 13f, muted, true))
-        }
 
         if (banner.unconfirmed) {
             info.addView(label("НЕ ПОДТВЕРЖДЕНО", 11f, Color.rgb(255, 170, 80), true).apply {
@@ -1445,17 +1440,6 @@ class MainActivity : AppCompatActivity() {
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
     }
 
-    private fun parseRerunLabels(b: JSONObject): Map<String, String> {
-        val obj = b.optJSONObject("rerun_labels") ?: return emptyMap()
-        val result = mutableMapOf<String, String>()
-        val keys = obj.keys()
-        while (keys.hasNext()) {
-            val k = keys.next()
-            result[k] = obj.optString(k)
-        }
-        return result
-    }
-
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
         val b = game.getJSONObject(key)
         val arr = b.optJSONArray("five_star") ?: JSONArray()
@@ -1479,8 +1463,7 @@ class MainActivity : AppCompatActivity() {
                 listOf(five),
                 fourStars,
                 key == "next",
-                b.optBoolean("unconfirmed", false),
-                parseRerunLabels(b)
+                b.optBoolean("unconfirmed", false)
             )
         }
     }
