@@ -1,5 +1,4 @@
-# Trigger fix workflow.
-"+""+"from pathlib import Path
+from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
