@@ -1082,7 +1082,7 @@ class MainActivity : AppCompatActivity() {
         if (gameId == "starrail") {
             val key = normalizeCharacterForMatch(cleaned)
             if (key == "danhengimbibitorlunae" || key == "imbibitorlunae") {
-                return "Imbibitor Lunae"
+                return "Dan Heng • Imbibitor Lunae"
             }
         }
         return cleaned
