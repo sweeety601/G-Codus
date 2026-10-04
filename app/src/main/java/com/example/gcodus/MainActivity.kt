@@ -1469,10 +1469,8 @@ class MainActivity : AppCompatActivity() {
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
 
         if (gameId == "starrail") {
-            fun hsrCanonical(value: String): String = when {
-                value == "mortenaxblade" || value == "blademortenax" -> "mortenaxblade"
-                value == "danhengimbibitorlunae" || value == "imbibitorlunae" ||
-                    value == "danhengimbibitorlunae5star" -> "imbibitorlunae"
+            fun hsrCanonical(value: String): String = when (value) {
+                "mortenaxblade", "blademortenax" -> "mortenaxblade"
                 else -> value
             }
             val localCanonical = hsrCanonical(a)
