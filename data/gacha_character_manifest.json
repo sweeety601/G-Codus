@@ -1,12 +1,12 @@
 {
   "version": 1,
-  "total_images": 361,
+  "total_images": 362,
   "games": {
     "Zenless Zone Zero": 60,
     "Wuthering Waves": 56,
     "Genshin Impact": 125,
     "Honkai: Star Rail": 90,
-    "Arknights: Endfield": 30
+    "Arknights: Endfield": 31
   },
   "images": [
     {
@@ -1813,6 +1813,11 @@
       "game": "Arknights: Endfield",
       "character": "Zhuang Fangyi",
       "file": "zhuang-fangyi_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Camille",
+      "file": "camille_card.webp"
     }
   ]
 }
