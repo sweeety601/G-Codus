@@ -1082,6 +1082,11 @@ class MainActivity : AppCompatActivity() {
             .replace("·", " ")
             .replace(Regex("\\s+"), " ")
             .trim()
+        val normalizedBase = normalizeCharacterForMatch(base)
+        if (normalizedBase == "danhengimbibitorlunae" || normalizedBase == "imbibitorlunae") {
+            return "Imbibitor Lunae"
+        }
+
         val overrides = mapOf(
             "__wuwa-lucy" to "Lucy",
             "__wuwa-aemeath" to "Aemeath",
@@ -1464,8 +1469,10 @@ class MainActivity : AppCompatActivity() {
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
 
         if (gameId == "starrail") {
-            fun hsrCanonical(value: String): String = when (value) {
-                "mortenaxblade", "blademortenax" -> "mortenaxblade"
+            fun hsrCanonical(value: String): String = when {
+                value == "mortenaxblade" || value == "blademortenax" -> "mortenaxblade"
+                value == "danhengimbibitorlunae" || value == "imbibitorlunae" ||
+                    value == "danhengimbibitorlunae5star" -> "imbibitorlunae"
                 else -> value
             }
             val localCanonical = hsrCanonical(a)
