@@ -155,8 +155,66 @@ class MainActivity : AppCompatActivity() {
         currentScreen = Screen.GAME
         currentGameId = gameId
         countdownViews.clear()
-        val game = loadFeed().firstOrNull { it.id == gameId } ?: return
-        // Always reload the latest persisted/bundled promo feed when entering a game.
+        val game = loadFeed().firstOrNull { it.id == gameId }
+        if (game == null) {
+            // The banner feed is online and loads asynchronously. Do not make
+            // the game button appear dead while that first request is running.
+            // Open the game shell immediately and let the feed refresh redraw it.
+            val root = findViewById<FrameLayout>(R.id.root)
+            root.removeAllViews()
+            val column = makeColumn()
+            val header = LinearLayout(this).apply {
+                gravity = Gravity.CENTER_VERTICAL
+                setPadding(0, 0, 0, dp(12))
+            }
+            val back = TextView(this).apply {
+                text = "‹"
+                textSize = 38f
+                setTextColor(this@MainActivity.text)
+                gravity = Gravity.CENTER
+                setOnClickListener { showHome() }
+            }
+            addPressEffect(back)
+            header.addView(back, LinearLayout.LayoutParams(dp(42), dp(50)))
+            val meta = gameMeta.firstOrNull { it.id == gameId }
+            header.addView(label(meta?.name ?: gameId, 22f, text, true),
+                LinearLayout.LayoutParams(0, -2, 1f))
+            column.addView(header)
+            column.addView(emptyCard("Загрузка данных…").apply {
+                setOnClickListener {
+                    executor.execute {
+                        try {
+                            val fresh = BannerSource.fetchNormalized(this@MainActivity)
+                            JSONObject(fresh).getJSONArray("games")
+                            bannerFeedJson = fresh
+                            runOnUiThread {
+                                if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
+                                    showGame(gameId)
+                                }
+                            }
+                        } catch (_: Exception) { }
+                    }
+                }
+            })
+            val scroll = makeScroll()
+            scroll.addView(column)
+            root.addView(scroll)
+            // Start a direct refresh for the selected game.
+            executor.execute {
+                try {
+                    val fresh = BannerSource.fetchNormalized(this@MainActivity)
+                    JSONObject(fresh).getJSONArray("games")
+                    bannerFeedJson = fresh
+                    runOnUiThread {
+                        if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
+                            showGame(gameId)
+                        }
+                    }
+                } catch (_: Exception) { }
+            }
+            return
+        }
+        // Always reload the latest live promo snapshot when entering a game.
         // This prevents an old empty SharedPreferences cache from hiding valid codes.
         codesFeed = loadCachedCodes()
         val root = findViewById<FrameLayout>(R.id.root)
