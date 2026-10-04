@@ -407,7 +407,7 @@ class MainActivity : AppCompatActivity() {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
         }
-        icons.addView(iconRow, HorizontalScrollView.LayoutParams(-2, dp(100)))
+        icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(100)))
 
         gameMeta.forEach { meta ->
             val item = LinearLayout(this).apply {
