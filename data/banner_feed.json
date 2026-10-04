@@ -1,13 +1,12 @@
 {
   "version": 3,
-  "generated_at": "2026-10-04T01:52:38.175Z",
+  "generated_at": "2026-10-04T02:01:04.977779+00:00",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-04T00:12:03.671390+00:00",
-      "date_hint": null,
-      "status": "source_reachable",
+      "fetched_at": "2026-10-04T02:02:35.783187+00:00",
+      "status": "source_unavailable",
       "current": [
         {
           "phase": "7.1 Phase 1",
@@ -40,19 +39,18 @@
           ],
           "start_date": "2026-10-13",
           "end_date": "2026-11-03",
-          "status": "next",
-          "official_source": "https://www.prydwen.gg/genshin-impact/banners",
-          "source_status": "confirmed",
-          "unconfirmed": false,
-          "confirmation_source": "https://www.prydwen.gg/genshin-impact/banners"
+          "status": "upcoming",
+          "unconfirmed": true,
+          "source_status": "unconfirmed",
+          "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026"
         }
-      ]
+      ],
+      "upcoming": []
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-04T00:12:03.826312+00:00",
-      "date_hint": null,
-      "status": "source_reachable",
+      "fetched_at": "2026-10-04T02:04:06.356542+00:00",
+      "status": "source_unavailable",
       "current": [
         {
           "phase": "3.7 Phase 1",
@@ -87,24 +85,23 @@
           ],
           "start_date": "2026-10-22",
           "end_date": "2026-11-11",
-          "start_time_local": "10:00:00",
-          "status": "next",
-          "official_source": "https://mc.kurogames.com/main/news/detail/5569",
-          "source_status": "confirmed",
-          "unconfirmed": false,
+          "status": "upcoming",
+          "unconfirmed": true,
+          "source_status": "unconfirmed",
+          "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
           "four_star": [
             "Lumi",
             "Danjin",
             "Chixia"
           ]
         }
-      ]
+      ],
+      "upcoming": []
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-04T00:12:03.984208+00:00",
-      "date_hint": null,
-      "status": "source_reachable",
+      "fetched_at": "2026-10-04T02:05:37.770502+00:00",
+      "status": "source_unavailable",
       "current": [
         {
           "phase": "3.2 Phase 2",
