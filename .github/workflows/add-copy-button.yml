@@ -1,0 +1,88 @@
+name: Add promo copy button
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Patch promo code card
+        shell: python
+        run: |
+          from pathlib import Path
+          p = Path('app/src/main/java/com/example/gcodus/MainActivity.kt')
+          s = p.read_text(encoding='utf-8')
+          old = '''        if (code.status == "active") {
+            card.setOnClickListener {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("G-Codus", code.code))
+                Toast.makeText(this, "Код скопирован", Toast.LENGTH_SHORT).show()
+            }
+        }
+        return card.apply {'''
+          new = '''        if (code.status == "active") {
+            val copyButton = TextView(this).apply {
+                text = "Копировать"
+                textSize = 12f
+                gravity = Gravity.CENTER
+                setTextColor(Color.WHITE)
+                background = roundedDrawable(gameAccent(normalizeGameIdForCode(code.game)), 12f)
+                setPadding(dp(12), dp(10), dp(12), dp(10))
+                setOnClickListener {
+                    val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    clipboard.setPrimaryClip(android.content.ClipData.newPlainText("G-Codus", code.code))
+                    text = "Скопировано"
+                    postDelayed({ text = "Копировать" }, 1200)
+                }
+            }
+            addPressEffect(copyButton)
+            card.addView(copyButton, LinearLayout.LayoutParams(-1, dp(42)).apply {
+                topMargin = dp(10)
+            })
+            card.setOnClickListener {
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("G-Codus", code.code))
+                Toast.makeText(this, "Код скопирован", Toast.LENGTH_SHORT).show()
+            }
+        }
+        return card.apply {'''
+          if old not in s:
+              raise SystemExit('Target codeCard block not found; aborting without changes')
+          s = s.replace(old, new, 1)
+          marker = '''    private fun showWishlist() {'''
+          helper = '''    private fun normalizeGameIdForCode(value: String): String = when (value.trim().lowercase()) {
+        "genshin", "genshinimpact", "genshin impact" -> "genshin"
+        "wuwa", "wutheringwaves", "wuthering waves", "wutheringwave" -> "wuwa"
+        "zzz", "zenless", "zenlesszonezero", "zenless zone zero" -> "zzz"
+        else -> "genshin"
+    }
+
+'''
+          if 'private fun normalizeGameIdForCode' not in s:
+              if marker not in s:
+                  raise SystemExit('Insertion marker not found; aborting without changes')
+              s = s.replace(marker, helper + marker, 1)
+          p.write_text(s, encoding='utf-8')
+
+      - name: Commit patch and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt .github/workflows/add-copy-button.yml
+          git rm .github/workflows/add-copy-button.yml
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Add one-tap copy button for promo codes"
+          git push
