@@ -1095,6 +1095,7 @@ class MainActivity : AppCompatActivity() {
             "luuk-herssen" to "Luuk Herssen",
             "billy-kid" to "Billy Kid",
             "billy" to "Billy Kid"
+            "blade-mortenax" to "Mortenax Blade"
         )
         overrides[base]?.let { return it }
         return base.split("-").joinToString(" ") { word ->
@@ -1455,17 +1456,16 @@ class MainActivity : AppCompatActivity() {
             if (localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical) return true
         }
 
-        if (gameId == "zzz") {
-            val localStarlight = a.contains("starlight") || file.contains("starlight")
-            val onlineStarlight = b.contains("starlight") || slug.contains("starlight")
-            if (localStarlight || onlineStarlight) return localStarlight && onlineStarlight
-            // Billy Kid and Starlight Billy are separate characters.
-            // Ordinary Billy aliases only match each other; Starlight is never merged.
-            val localBillyKid = a == "billy" || a == "billykid" || file == "billy" || file == "billykid"
-            val onlineBillyKid = b == "billy" || b == "billykid" || slug == "billy" || slug == "billykid"
-            if (localBillyKid || onlineBillyKid) return localBillyKid && onlineBillyKid
+        return when (gameId) {
+            "zzz" -> {
+                val local = normalizeCharacterForMatch(localName)
+                val online = normalizeCharacterForMatch(onlineName)
+                val localSlug = normalizeCharacterForMatch(localFile)
+                local == online || localSlug == normalizeCharacterForMatch(onlineSlug)
+            }
+            else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
+                normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
         }
-        return a == b || file == slug
     }
 
     private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {

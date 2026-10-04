@@ -5,8 +5,8 @@
     "Zenless Zone Zero": 60,
     "Wuthering Waves": 56,
     "Genshin Impact": 125,
-    "Honkai: Star Rail": 90,
-    "Arknights: Endfield": 31
+    "Honkai: Star Rail": 89,
+    "Arknights: Endfield": 32
   },
   "images": [
     {
@@ -1611,11 +1611,6 @@
     },
     {
       "game": "Honkai: Star Rail",
-      "character": "Perlica",
-      "file": "perlica_card.webp"
-    },
-    {
-      "game": "Honkai: Star Rail",
       "character": "Phainon",
       "file": "phainon_card.webp"
     },
@@ -1818,6 +1813,11 @@
       "game": "Arknights: Endfield",
       "character": "Camille",
       "file": "camille_card.webp"
+    },
+    {
+      "game": "Arknights: Endfield",
+      "character": "Perlica",
+      "file": "perlica_card.webp"
     }
   ]
 }
