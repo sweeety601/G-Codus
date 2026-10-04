@@ -1003,6 +1003,15 @@ class MainActivity : AppCompatActivity() {
                 )
                 .build()
             WorkManager.getInstance(this).enqueue(request)
+        } else {
+            // Reset per-character notification state so re-adding a character
+            // to the Wish List can notify again for a later/active banner.
+            getSharedPreferences("g_codus_notifications", Context.MODE_PRIVATE).edit()
+                .remove("appearance_" + gameId + "_" + file)
+                .remove("wishlist_next_" + gameId + "_" + file)
+                .remove("date_" + gameId + "_" + file)
+                .remove("ending_" + gameId + "_" + file)
+                .apply()
         }
     }
 
