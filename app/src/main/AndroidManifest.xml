@@ -7,6 +7,7 @@
         android:enableOnBackInvokedCallback="true"
         android:label="G-Codus"
         android:supportsRtl="true"
+        android:icon="@drawable/app_icon"
         android:theme="@style/Theme.GCodus">
         <activity
             android:name=".MainActivity"
