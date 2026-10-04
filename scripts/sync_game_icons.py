@@ -20,6 +20,11 @@ ICONS = {
 
 for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
+    supplied = ROOT / "Honkai_Star_Rail_logo.png" if filename == "game_starrail.png" else None
+    if supplied is not None and supplied.exists():
+        target.write_bytes(supplied.read_bytes())
+        print(f"Using supplied HSR logo: {supplied.name}")
+        continue
     req = Request(url, headers={"User-Agent": "G-Codus/1.0"})
     with urlopen(req, timeout=30) as response:
         target.write_bytes(response.read())
