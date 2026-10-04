@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generated_at": "2026-10-04T00:12:03.394223+00:00",
-  "source": "Prydwen",
+  "generated_at": "2026-10-04T01:40:11.198Z",
+  "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
@@ -21,7 +21,13 @@
           "end_time_local": "17:59:59",
           "timezone": "server",
           "status": "live",
-          "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/"
+          "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/",
+          "source_status": "confirmed",
+          "four_star": [
+            "Diona",
+            "Faruzan",
+            "Chongyun"
+          ]
         }
       ],
       "next": [
@@ -35,7 +41,9 @@
           "start_date": "2026-10-13",
           "end_date": "2026-11-03",
           "status": "next",
-          "official_source": "https://www.hoyolab.com/circles/2/57/feed"
+          "official_source": "https://www.hoyolab.com/circles/2/57/feed",
+          "source_status": "unconfirmed",
+          "unconfirmed": true
         }
       ]
     },
@@ -58,7 +66,13 @@
           "end_time_local": "09:59:59",
           "timezone": "UTC+8 server time",
           "status": "live",
-          "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528"
+          "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528",
+          "source_status": "confirmed",
+          "four_star": [
+            "Buling",
+            "Taoqi",
+            "Youhu"
+          ]
         }
       ],
       "next": [
@@ -74,7 +88,14 @@
           "end_date": "2026-11-11",
           "start_time_local": "10:00:00",
           "status": "next",
-          "official_source": "https://mc.kurogames.com/main/news/detail/5569"
+          "official_source": "https://mc.kurogames.com/main/news/detail/5569",
+          "source_status": "confirmed",
+          "unconfirmed": false,
+          "four_star": [
+            "Lumi",
+            "Danjin",
+            "Chixia"
+          ]
         }
       ]
     },
@@ -96,18 +117,29 @@
           "end_time_local": "14:59:59",
           "timezone": "server",
           "status": "live",
-          "official_source": "https://zenless.hoyoverse.com/en-us/news/166475"
+          "official_source": "https://zenless.hoyoverse.com/en-us/news/166475",
+          "source_status": "confirmed",
+          "four_star": [
+            "Corin",
+            "Billy"
+          ]
         }
       ],
       "next": [
         {
-          "phase": "3.3",
+          "phase": "3.3 Phase 1",
           "type": "character",
-          "characters": [],
+          "characters": [
+            "Phoenix"
+          ],
+          "start_date": "2026-10-21",
+          "end_date": "2026-11-11",
           "status": "upcoming",
-          "official_source": "https://zenless.hoyoverse.com/en-us/news/"
+          "unconfirmed": true,
+          "source_status": "unconfirmed",
+          "secondary_source": "https://timesaver.gg/blog/zzz-3-3"
         }
       ]
     }
   }
-}\n
+}
