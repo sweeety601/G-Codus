@@ -361,7 +361,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun roundedDrawable(color: Int, radius: Float) =
         android.graphics.drawable.GradientDrawable().apply {
             setColor(color)
-            cornerRadius = dp(radius).toFloat()
+            cornerRadius = radius * resources.displayMetrics.density
         }
 
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(24), dp(24), dp(24)); setBackgroundColor(bg) }
@@ -369,7 +369,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun wrap(v: View): FrameLayout = FrameLayout(this).apply { addView(v, FrameLayout.LayoutParams(-1, -1)); setBackgroundColor(bg) }
     private fun title(t: String) = TextView(this).apply { text = t; setTextColor(ink); textSize = 24f; setTypeface(typeface, Typeface.BOLD); setPadding(0, 0, 0, dp(12)) }
     private fun label(t: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { text = t; setTextColor(color); textSize = size; if (bold) setTypeface(typeface, Typeface.BOLD); setPadding(0, dp(4), 0, dp(8)) }
-    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
+    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(ink); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
     private fun spinner(items: List<String>, selected: String?) = Spinner(this).apply {
         adapter = object : ArrayAdapter<String>(
             this@AdminMainActivity,
