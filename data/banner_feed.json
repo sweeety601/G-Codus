@@ -1,168 +1,52 @@
 {
-  "version": 3,
-  "generated_at": "2026-10-05T13:15:47.102658+00:00",
-  "source": "G-Codus database",
+  "version": 6,
+  "generated_at": "2026-10-05T13:51:30.199321+00:00",
+  "source": "G-Codus banner Excel tables",
   "games": {
-    "Genshin Impact": {
-      "current": [
-        {
-          "phase": "7.1 Phase 1",
-          "type": "character",
-          "characters": [
-            "Vesna",
-            "Vodyanitsa"
-          ],
-          "start_date": "2026-09-23",
-          "end_date": "2026-10-13",
-          "status": "live",
-          "source_status": "confirmed",
-          "four_star": [
-            "Diona",
-            "Faruzan",
-            "Chongyun"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "7.1 Phase 2",
-          "type": "character",
-          "characters": [
-            "Escoffier",
-            "Skirk"
-          ],
-          "start_date": "2026-10-13",
-          "end_date": "2026-11-03",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "four_star": [
-            "Diona",
-            "Faruzan",
-            "Chongyun"
-          ]
-        }
-      ],
-      "upcoming": []
-    },
     "Wuthering Waves": {
-      "current": [
-        {
-          "phase": "3.7 Phase 1",
-          "type": "character",
-          "characters": [
-            "Hsin",
-            "Chisa",
-            "Iuno"
-          ],
-          "start_date": "2026-09-30",
-          "end_date": "2026-10-22",
-          "status": "live",
-          "source_status": "confirmed",
-          "four_star": [
-            "Buling",
-            "Taoqi",
-            "Youhu"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "3.7 Phase 2",
-          "type": "character",
-          "characters": [
-            "Suoming",
-            "Lucilla",
-            "Lynae"
-          ],
-          "start_date": "2026-10-22",
-          "end_date": "2026-11-11",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "four_star": [
-            "Lumi",
-            "Danjin",
-            "Chixia"
-          ]
-        }
-      ],
-      "upcoming": []
-    },
-    "Zenless Zone Zero": {
+      "id": "wuwa",
+      "name": "Wuthering Waves",
       "current": [],
-      "next": [
-        {
-          "phase": "3.3 Phase 1",
-          "type": "character",
-          "characters": [
-            "Phoenix"
-          ],
-          "start_date": "2026-10-21",
-          "end_date": "2026-11-11",
-          "status": "upcoming",
-          "unconfirmed": true,
-          "source_status": "unconfirmed"
-        }
-      ],
-      "upcoming": []
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Genshin Impact": {
+      "id": "genshin",
+      "name": "Genshin Impact",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
     },
     "Honkai: Star Rail": {
-      "current": [
-        {
-          "phase": "4.6 Phase 1",
-          "type": "character",
-          "characters": [
-            "Pearl",
-            "Evanescia"
-          ],
-          "start_date": "2026-09-28",
-          "end_date": "2026-10-21",
-          "status": "live",
-          "source_status": "confirmed",
-          "four_star": [
-            "Qingque",
-            "Xueyi",
-            "Misha"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "4.6 Phase 2",
-          "type": "character",
-          "characters": [
-            "Pearl",
-            "Mortenax Blade"
-          ],
-          "start_date": "2026-10-21",
-          "end_date": "2026-11-10",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "four_star": [
-            "Qingque",
-            "Xueyi",
-            "Misha"
-          ]
-        }
-      ],
-      "upcoming": []
+      "id": "starrail",
+      "name": "Honkai: Star Rail",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
     },
     "Arknights: Endfield": {
-      "current": [
-        {
-          "phase": "1.5 Phase 2",
-          "type": "character",
-          "characters": [
-            "Yvonne"
-          ],
-          "start_date": "2026-09-24",
-          "end_date": "2026-10-21",
-          "status": "live",
-          "source_status": "confirmed",
-          "four_star": []
-        }
-      ],
+      "id": "endfield",
+      "name": "Arknights: Endfield",
+      "current": [],
       "next": [],
-      "upcoming": []
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Zenless Zone Zero": {
+      "id": "zzz",
+      "name": "Zenless Zone Zero",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
     }
   }
 }
