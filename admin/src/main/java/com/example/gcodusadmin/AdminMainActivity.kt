@@ -47,28 +47,46 @@ class AdminMainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById<View>(android.R.id.content)) { v, insets ->
+
+        val loading = vertical()
+        loading.addView(title("G-Codus Admin"))
+        loading.addView(label("Проверка GitHub…", muted, 14f))
+        setContentView(wrap(loading))
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(v.paddingLeft, bars.top, v.paddingRight, bars.bottom)
             insets
         }
-        if (!connect()) {
+
+        val savedToken = tokenStore.get()
+        if (savedToken.isNullOrBlank()) {
             showTokenScreen()
-        } else {
-            showHome()
+            return
         }
+
+        runBackground({
+            val c = GitHubClient(savedToken)
+            c.testToken()
+            c
+        }, { c ->
+            github = c
+            repo = AdminRepository(c)
+            showHome()
+        }, { e ->
+            tokenStore.clear()
+            github = null
+            repo = null
+            showTokenScreen("Сохранённый токен не имеет доступа: " + (e.message ?: "неизвестная ошибка"))
+        })
     }
 
-    private fun connect(): Boolean {
-        val token = tokenStore.get() ?: return false
-        github = GitHubClient(token)
-        repo = AdminRepository(github!!)
-        return true
-    }
-
-    private fun showTokenScreen() {
+    private fun showTokenScreen(errorMessage: String? = null) {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
+        if (!errorMessage.isNullOrBlank()) {
+            box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
+        }
         box.addView(label("G-Codus Admin v1.0.1 — проверка доступа к sweeety601/G-Codus.", muted, 14f))
         box.addView(space(10))
         box.addView(label("Создай GitHub Fine-grained token с правом Contents: Read and write и вставь его ниже.", muted, 14f))
@@ -94,7 +112,8 @@ class AdminMainActivity : AppCompatActivity() {
                 tokenStore.save(token)
             }, {
                 save.isEnabled = true
-                connect()
+                github = c
+                repo = AdminRepository(c)
                 showHome()
             }, { error ->
                 save.isEnabled = true
