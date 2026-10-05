@@ -1,3 +1,4 @@
+# Repository character migration V2: Excel -> JSON metadata + images/<id>.webp.
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,12 +31,10 @@ object CharacterDatabase {
     fun fetch(context: Context): List<OnlineCharacter> {
         val json = try { get(FEED_URL) } catch (_: Exception) { null }
         if (!json.isNullOrBlank()) {
-            context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-                .edit().putString(CACHE_KEY, json).apply()
+            context.getSharedPreferences("g_codus", Context.MODE_PRIVATE).edit().putString(CACHE_KEY, json).apply()
             return parse(json)
         }
-        val cached = context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-            .getString(CACHE_KEY, null)
+        val cached = context.getSharedPreferences("g_codus", Context.MODE_PRIVATE).getString(CACHE_KEY, null)
         return if (!cached.isNullOrBlank()) parse(cached) else emptyList()
     }
 
@@ -53,14 +52,9 @@ object CharacterDatabase {
                 val name = c.optString("name").trim()
                 if (id.isBlank() || name.isBlank()) continue
                 result += OnlineCharacter(
-                    gameId = gameId,
-                    name = name,
-                    slug = c.optString("slug", name.lowercase()),
-                    announced = c.optBoolean("announced", false),
-                    portraitUrl = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp",
-                    rarity = c.optInt("rarity", 0),
-                    element = c.optString("element", ""),
-                    id = id
+                    gameId, name, c.optString("slug", name.lowercase()), c.optBoolean("announced", false),
+                    "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp",
+                    c.optInt("rarity", 0), c.optString("element", ""), id
                 )
             }
         }
@@ -88,14 +82,11 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
         val games = if (gameId == null) gameMeta else gameMeta.filter { it.id == gameId }
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
         val entries = games.flatMap { meta ->
-            onlineCharacters
-                .filter { it.gameId == meta.id }
+            onlineCharacters.filter { it.gameId == meta.id }
                 .filterNot { isForbiddenTrackingCharacter(meta.id, it.name, it.id) }
                 .filterNot { isMainProtagonist(meta.id, it.id, it.name) }
                 .filter { normalizedQuery.isBlank() || it.name.lowercase().contains(normalizedQuery) }
-                .map { online ->
-                    TrackedCharacter(meta.id, meta.name, canonicalCharacterDisplayName(meta.id, online.name), online.id + ".webp", online.element, online.rarity)
-                }
+                .map { online -> TrackedCharacter(meta.id, meta.name, canonicalCharacterDisplayName(meta.id, online.name), online.id + ".webp", online.element, online.rarity) }
         }.distinctBy { it.gameId + "|" + it.file }
             .sortedWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.gameName }.thenBy { it.name.lowercase() })
 
@@ -103,7 +94,6 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
             holder.addView(emptyCard(if (normalizedQuery.isBlank()) "Персонажей пока нет" else "Ничего не найдено"))
             return holder
         }
-
         var row: LinearLayout? = null
         entries.forEachIndexed { index, character ->
             if (index % 3 == 0) {
@@ -113,9 +103,7 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
             val cell = trackingCharacterCell(character)
             animateReveal(cell, index)
             row?.addView(cell, LinearLayout.LayoutParams(0, dp(194), 1f).apply {
-                marginStart = if (index % 3 == 0) 0 else dp(3)
-                marginEnd = dp(3)
-                bottomMargin = dp(8)
+                marginStart = if (index % 3 == 0) 0 else dp(3); marginEnd = dp(3); bottomMargin = dp(8)
             })
             if (index == entries.lastIndex && (index + 1) % 3 != 0) {
                 repeat(3 - ((index + 1) % 3)) {
