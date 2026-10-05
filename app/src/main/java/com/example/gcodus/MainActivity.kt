@@ -440,7 +440,7 @@ class MainActivity : AppCompatActivity() {
                 setPadding(dp(7), dp(7), dp(7), dp(7))
             }
             val resId = resources.getIdentifier("game_" + meta.resourceName, "drawable", packageName)
-            if (resId != 0) icon.setImageResource(resId) else loadGameLogo(icon, meta.id)
+            if (resId != 0) icon.setImageResource(resId)
             iconFrame.addView(icon, FrameLayout.LayoutParams(-1, -1))
             addPressEffect(item)
             item.addView(iconFrame, LinearLayout.LayoutParams(dp(72), dp(72)))
@@ -1370,7 +1370,7 @@ class MainActivity : AppCompatActivity() {
 
         val online = onlineCharacterFor(gameId, file)
         if (online != null) {
-            loadRemoteImage(image, listOf(CharacterDatabase.imageUrl(online.id)))
+            loadDatabasePortrait(image, online)
             return
         }
 
@@ -1496,21 +1496,59 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun loadPortrait(image: ImageView, character: String, gameId: String) {
-        // Portraits are STRICTLY LOCAL. The only source is the user-provided
-        // images_big/<game>/ files bundled into the APK. No CDN/network fallback.
         image.setImageDrawable(null)
 
-        val normalizedForRemote = character.trim().lowercase()
-            .replace("’", "").replace("'", "")
-            .replace(Regex("[^a-z0-9]+"), "-").trim('-')
-        // Local bundled portrait has priority. If it is absent, Prydwen is
-        // the second priority for every character, including ordinary Billy.
-        // Never substitute a portrait from another site/character.
+        // Character identity and portrait URL come exclusively from the
+        // G-Codus character database. No Prydwen or game API is queried.
+        val normalized = normalizeCharacterForMatch(character)
+        val online = onlineCharacters.firstOrNull {
+            it.gameId == gameId &&
+                (normalizeCharacterForMatch(it.name) == normalized ||
+                 normalizeCharacterForMatch(it.id) == normalized)
+        }
 
+        if (online != null) {
+            loadDatabasePortrait(image, online)
+            return
+        }
 
-        // Kuro's WuWa endpoint can return Chinese display names even when the
-        // app UI is English/Russian. Convert only those names to the existing
-        // local portrait filenames; never download or substitute a portrait.
+        // Existing bundled portraits are a local fallback only.
+        loadBundledPortrait(image, character, gameId)
+    }
+
+    private fun loadDatabasePortrait(image: ImageView, character: OnlineCharacter) {
+        val url = character.portraitUrl.ifBlank { CharacterDatabase.imageUrl(character.id) }
+        if (url.isBlank()) return
+
+        val cacheKey = "db:" + character.id
+        portraitCache.get(cacheKey)?.let {
+            image.setImageBitmap(it)
+            return
+        }
+
+        imageExecutor.execute {
+            try {
+                val connection = URL(url).openConnection() as HttpURLConnection
+                connection.connectTimeout = 5000
+                connection.readTimeout = 8000
+                connection.instanceFollowRedirects = true
+                connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+                val bitmap = connection.inputStream.use {
+                    android.graphics.BitmapFactory.decodeStream(it)
+                }
+                connection.disconnect()
+
+                if (bitmap != null) {
+                    portraitCache.put(cacheKey, bitmap)
+                    runOnUiThread {
+                        if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    private fun loadBundledPortrait(image: ImageView, character: String, gameId: String) {
         val localizedAlias = when (character.trim()) {
             "卜灵", "卜靈" -> "Buling"
             "桃祈" -> "Taoqi"
@@ -1529,117 +1567,11 @@ class MainActivity : AppCompatActivity() {
             .replace(Regex("[^a-z0-9]+"), "-")
             .trim('-')
 
-        val gameFolder = when (gameId) {
-            "genshin" -> "genshin"
-            "wuwa" -> "wuthering_waves"
-            "zzz" -> "zenless_zone_zero"
-            "starrail" -> "honkai_star_rail"
-            "endfield" -> "arknights_endfield"
-            else -> return
-        }
-
-        // Perlica is an Arknights: Endfield character. Force the exact
-        // bundled Endfield portrait and never allow a same-named portrait
-        // from another game/fallback to be selected.
-        if (gameId == "endfield" && normalized == "perlica") {
-            // Perlica must use the exact portrait from Prydwen's Endfield
-            // character page. Do not let the generic local-name matcher pick
-            // another Perlica image.
-            loadRemotePortrait(
-                image,
-                listOf("https://cdn.prydwen.gg/images/arknights-endfield/characters/perlica_card.webp")
-            )
-            return
-        }
-
-        // Resolve against the ACTUAL bundled filenames. This is important for
-        // 4-star portraits because their source filenames can differ from the
-        // display name (spaces, punctuation, alternate naming, etc.).
-        val exactAssetByCharacter = when {
-            gameId == "wuwa" && normalized == "buling" -> "buling.webp"
-            gameId == "wuwa" && normalized == "taoqi" -> "taoqi.webp"
-            gameId == "wuwa" && normalized == "youhu" -> "youhu.webp"
-            gameId == "wuwa" && normalized == "lumi" -> "lumi.webp"
-            gameId == "wuwa" && normalized == "danjin" -> "danjin.webp"
-            gameId == "wuwa" && normalized == "chixia" -> "chixia.webp"
-            gameId == "zzz" && normalized == "corin" -> "corin.webp"
-            gameId == "zzz" && normalized == "yuzuha" -> "ukinami-yuzuha.webp"
-            gameId == "zzz" && normalized == "anby" -> "anby-demara.webp"
-            gameId == "zzz" && normalized == "grace" -> "grace-howard.webp"
-            gameId == "zzz" && normalized == "lucy" -> "lucy_alt.webp"
-            gameId == "zzz" && normalized == "nicole" -> "nicole-demara.webp"
-            gameId == "zzz" && normalized == "billy-starlight" -> "billy-starlight.webp"
-            gameId == "starrail" && normalized in setOf("mortenax-blade", "blade-mortenax") -> "blade-mortenax_card.webp"
-            gameId == "endfield" && normalized == "perlica" -> "perlica_card.webp"
-            gameId == "endfield" && normalized == "camille" -> "camille_card.webp"
-            gameId == "endfield" && normalized == "si" -> "si_card.webp"
-            else -> null
-        }
-
-        val aliases = when (normalized) {
-            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" ->
-                listOf("anby-demara-soldier-0", "anby-soldier-0")
-            "billy", "billy-kid" ->
-                listOf("billy-kid", "billy")
-            "billy-starlight", "starlight-billy", "starlight-billy-kid" ->
-                listOf("billy-starlight", "starlight-billy", "starlight-billy-kid")
-            "mortenax-blade", "blade-mortenax" ->
-                listOf("mortenax-blade", "blade-mortenax")
-            "corin", "corin-wickes" ->
-                listOf("corin", "corin-wickes")
-            "buling" -> listOf("buling", "bulin")
-            "taoqi" -> listOf("taoqi", "tao-qi")
-            "youhu" -> listOf("youhu", "you-hu")
-            "lumi" -> listOf("lumi", "dengdeng", "deng-deng")
-            "danjin" -> listOf("danjin")
-            "chixia" -> listOf("chixia")
-            "aalto" -> listOf("aalto")
-            "aug", "augusta" -> listOf("aug", "augusta")
-            "baizhi" -> listOf("baizhi")
-            "cartethyia" -> listOf("cartethyia")
-            "chisa" -> listOf("chisa")
-            "ciaccona" -> listOf("ciaccona")
-            "denia" -> listOf("denia")
-            "encore" -> listOf("encore")
-            "galbrena" -> listOf("galbrena")
-            "hsin" -> listOf("hsin")
-            "iuno" -> listOf("iuno")
-            "jingran" -> listOf("jingran")
-            "jinhsi" -> listOf("jinhsi")
-            "jiyan" -> listOf("jiyan")
-            "ling" -> listOf("ling")
-            "lucilla" -> listOf("lucilla")
-            "lupa" -> listOf("lupa")
-            "luuk-herssen", "luukherssen" -> listOf("luuk-herssen", "luukherssen")
-            "lynae" -> listOf("lynae")
-            "mornye" -> listOf("mornye")
-            "mortefi" -> listOf("mortefi")
-            "phrolova" -> listOf("phrolova")
-            "qingxiao" -> listOf("qingxiao")
-            "qiuyuan" -> listOf("qiuyuan")
-            "rebecca" -> listOf("rebecca")
-            "sanhua" -> listOf("sanhua")
-            "sigrika" -> listOf("sigrika")
-            "suisui" -> listOf("suisui")
-            "suoming" -> listOf("suoming")
-            "yangyang-xuanling", "yangyangxuanling" -> listOf("yangyang-xuanling", "yangyangxuanling")
-            "yangyang" -> listOf("yangyang")
-            "yinlin" -> listOf("yinlin")
-            "yuanwu" -> listOf("yuanwu")
-            "komano-manato" -> listOf("komano-manato", "manato")
-            else -> listOf(normalized)
-        }
-
-        val specialFile = when (normalized) {
-            "anby-soldier-0", "soldier-0-anby", "anby-demara-soldier-0" -> "anby-demara-soldier-0.webp"
-            else -> null
-        }
+        val gameFolder = gameFolder(gameId) ?: return
 
         try {
             val files = assets.list(gameFolder)?.toList().orEmpty()
-            val exact = exactAssetByCharacter?.takeIf { files.contains(it) }
-                ?: specialFile?.takeIf { files.contains(it) }
-            val target = exact ?: files.firstOrNull { file ->
+            val target = files.firstOrNull { file ->
                 val stem = file.substringBeforeLast('.')
                     .removeSuffix("_card")
                     .removeSuffix("_full")
@@ -1652,22 +1584,16 @@ class MainActivity : AppCompatActivity() {
                     .replace("·", "-")
                     .replace(Regex("[^a-z0-9]+"), "-")
                     .trim('-')
-                val compact = stem.replace("-", "")
-                aliases.any { alias ->
-                    val a = alias.replace("-", "")
-                    a == compact ||
-                        (a.length >= 4 && compact.length >= 4 &&
-                            (compact.startsWith(a) || a.startsWith(compact)))
-                }
+
+                stem.replace("-", "") == normalized.replace("-", "")
             } ?: return
 
             assets.open("$gameFolder/$target").use { input ->
-                val bitmap = android.graphics.BitmapFactory.decodeStream(input)
-                if (bitmap != null) image.setImageBitmap(bitmap)
+                android.graphics.BitmapFactory.decodeStream(input)?.let {
+                    image.setImageBitmap(it)
+                }
             }
-        } catch (_: Exception) {
-            // Missing mapping = blank image. Never substitute another character.
-        }
+        } catch (_: Exception) { }
     }
 
     private fun isMainProtagonist(gameId: String, file: String, name: String): Boolean {
@@ -1699,61 +1625,6 @@ class MainActivity : AppCompatActivity() {
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
             else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
-        }
-    }
-
-    private fun loadPrydwenPortrait(image: ImageView, gameId: String, normalizedSlug: String) {
-        val slug = normalizedSlug.trim('-')
-        if (slug.isBlank()) return
-        val urls = mutableListOf<String>()
-        when (gameId) {
-            "wuwa" -> {
-                urls += "https://cdn.prydwen.gg/images/ww/characters/card_" + slug + ".webp"
-                urls += "https://api.resonance.rest/characters/" +
-                    URLEncoder.encode(slug.replace("-", " "), "UTF-8") + "/portrait"
-            }
-            "genshin" -> {
-                urls += "https://cdn.prydwen.gg/images/genshin-impact/characters/" + slug + "_full.webp"
-                urls += "https://genshin.jmp.blue/characters/" + slug + "/portrait"
-            }
-            "zzz" -> urls += "https://cdn.prydwen.gg/images/zzz/characters/card_" + slug + ".webp"
-            "starrail" -> {
-                urls += "https://cdn.prydwen.gg/images/star-rail/characters/card_" + slug + ".webp"
-                urls += "https://cdn.prydwen.gg/images/star-rail/characters/" + slug + ".webp"
-            }
-            "endfield" -> {
-                urls += "https://cdn.prydwen.gg/images/arknights-endfield/characters/card_" + slug + ".webp"
-                urls += "https://cdn.prydwen.gg/images/arknights-endfield/characters/" + slug + ".webp"
-            }
-            else -> return
-        }
-        loadRemotePortrait(image, urls)
-    }
-
-    private fun loadRemotePortrait(image: ImageView, urls: List<String>) {
-        if (urls.isEmpty()) return
-        val cacheKey = urls.first()
-        portraitCache.get(cacheKey)?.let { image.setImageBitmap(it); return }
-        imageExecutor.execute {
-            var bitmap: Bitmap? = null
-            for (url in urls) {
-                try {
-                    val connection = URL(url).openConnection() as HttpURLConnection
-                    connection.connectTimeout = 3500
-                    connection.readTimeout = 5000
-                    connection.instanceFollowRedirects = true
-                    connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                    connection.setRequestProperty("Accept", "image/avif,image/webp,image/png,image/*")
-                    bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
-                    if (bitmap != null) break
-                } catch (_: Exception) { }
-            }
-            if (bitmap != null) {
-                portraitCache.put(cacheKey, bitmap)
-                runOnUiThread {
-                    if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
-                }
-            }
         }
     }
 
@@ -1819,8 +1690,7 @@ class MainActivity : AppCompatActivity() {
                 assets.open("banner_feed.json").use { it.bufferedReader().readText() }
             } catch (_: Exception) {
                 null
-            },
-            emergencyBannerFeed()
+            }
         )
         return candidates.firstOrNull { isUsableBannerFeed(it) }
     }
@@ -2117,45 +1987,6 @@ class MainActivity : AppCompatActivity() {
         return value
     }
 
-    private fun loadGameLogo(image: ImageView, gameId: String) {
-        val urls = when (gameId) {
-            "starrail" -> listOf(
-                "https://www.pngall.com/wp-content/uploads/17/Honkai-Star-Rail-Visual-Identity-Symbol-PNG-thumb.png"
-            )
-            "endfield" -> listOf(
-                "https://arknights.win/images/logo/endfield-logo.png"
-            )
-            else -> emptyList()
-        }
-        loadRemoteImage(image, urls)
-    }
-
-    private fun loadRemoteImage(image: ImageView, urls: List<String>) {
-        if (urls.isEmpty()) return
-        val cacheKey = urls.first()
-        portraitCache.get(cacheKey)?.let { image.setImageBitmap(it); return }
-        imageExecutor.execute {
-            var bitmap: Bitmap? = null
-            for (url in urls) {
-                try {
-                    val connection = URL(url).openConnection() as HttpURLConnection
-                    connection.connectTimeout = 3500
-                    connection.readTimeout = 5000
-                    connection.instanceFollowRedirects = true
-                    connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-                    connection.setRequestProperty("Accept", "image/avif,image/webp,image/png,image/*")
-                    bitmap = connection.inputStream.use { android.graphics.BitmapFactory.decodeStream(it) }
-                    if (bitmap != null) break
-                } catch (_: Exception) { }
-            }
-            if (bitmap != null) {
-                portraitCache.put(cacheKey, bitmap)
-                runOnUiThread {
-                    if (!isFinishing && image.isAttachedToWindow) image.setImageBitmap(bitmap)
-                }
-            }
-        }
-    }
 
     private fun gameAccent(id: String): Int = when (id) {
         "genshin" -> Color.rgb(155, 114, 255)
