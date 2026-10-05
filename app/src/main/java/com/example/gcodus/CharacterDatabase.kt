@@ -76,7 +76,7 @@ object CharacterDatabase {
     private fun fetchGame(gameId: String, listUrl: String): List<OnlineCharacter> {
         val html = try { get(listUrl) } catch (_: Exception) { return emptyList() }
         val pattern = Regex(
-            "href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\"?#/]+)[\\\"][^>]*>(.*?)</a>",
+            "href=[\\\"]/(?:wuthering-waves|zenless|genshin-impact|star-rail|arknights-endfield)/characters/([^\\\"?#/]+)[\\\"][^>]*>(.*?)</a>",
             RegexOption.IGNORE_CASE
         )
         val result = mutableListOf<OnlineCharacter>()
@@ -150,9 +150,53 @@ object CharacterDatabase {
                 n == "topaz" || n == "topazandnumby") return "starrail|topaz"
         }
         if (gameId == "zzz") {
-            return "zzz|" + normalize(canonicalZzzName(name.ifBlank { slug }))
+            return "zzz|" + canonicalIdentity(gameId, name.ifBlank { slug })
         }
+        if (gameId == "genshin") return "genshin|" + canonicalIdentity(gameId, slug.ifBlank { name })
+        if (gameId == "wuwa") return "wuwa|" + canonicalIdentity(gameId, slug.ifBlank { name })
+        if (gameId == "endfield") return "endfield|" + canonicalIdentity(gameId, slug.ifBlank { name })
         return "$gameId|" + normalize(slug).ifBlank { normalize(name) }
+    }
+
+    private fun canonicalIdentity(gameId: String, value: String): String {
+        val n = normalize(value)
+        return when (gameId) {
+            "genshin" -> when (n) {
+                "kaedeharakazuha", "kazuha" -> "kazuha"
+                "raidenshogun", "raiden" -> "raidenshogun"
+                "tartaglia", "childe" -> "tartaglia"
+                "wanderer", "scaramouche" -> "wanderer"
+                "kamisatoayaka", "ayaka" -> "kamisatoayaka"
+                "kamisatoayato", "ayato" -> "kamisatoayato"
+                else -> n
+            }
+            "wuwa" -> when (n) {
+                "theshorekeeper", "shorekeeper" -> "shorekeeper"
+                "yangyangxuanling", "yangyang" -> "yangyang"
+                else -> n
+            }
+            "zzz" -> when (n) {
+                "billy", "billykid" -> "billykid"
+                "anby", "anbydemara", "anbysoldier0", "soldier0anby" -> "anby"
+                "grace", "gracehoward" -> "grace"
+                "lucy", "lucyalt", "lucialt" -> "lucy"
+                "yuzuha", "ukinamiyuzuha" -> "yuzuha"
+                "nicole", "nicoledemara" -> "nicole"
+                "orphieandmagus", "orhpieandmagus", "orhpiemagus" -> "orphieandmagus"
+                else -> n
+            }
+            "starrail" -> when (n) {
+                "blademortenax", "mortenaxblade" -> "mortenaxblade"
+                "imbibitorlunae", "danhengimbibitorlunae" -> "imbibitorlunae"
+                "topaz", "topazandnumby" -> "topaz"
+                else -> n
+            }
+            "endfield" -> when (n) {
+                "orhpieandmagus", "orhpiemagus", "orphieandmagus" -> "orphieandmagus"
+                else -> n
+            }
+            else -> n
+        }
     }
 
     private fun portraitUrl(gameId: String, slug: String): String =
@@ -209,7 +253,7 @@ object CharacterDatabase {
         "Hyacine","Hysilens","Jade","Jiaoqiu","Jing Yuan","Jingliu","Kafka",
         "Lingsha","Luka","Luocha","Lynx","March 7th","March 7th • Evernight",
         "March 7th • The Hunt","Misha","Mortenax Blade","Moze","Mydei","Natasha",
-        "Pearl","Pela","Phainon","Qingque","Rappa","Rin Tohsaka","Robin",
+        "Pela","Phainon","Qingque","Rappa","Rin Tohsaka","Robin",
         "Robin Summeretto","Ruan Mei","Saber","Sampo","Seele","Serval",
         "Silver Wolf","Silver Wolf • Lv. 999","Sparkle","Sparxie","Sunday",
         "Sushang","The Dahlia","The Herta","Tingyun","Tingyun • Fugue",
@@ -239,7 +283,7 @@ object CharacterDatabase {
         "Akekuri","Alesh","Antal","Arcane","Arclight","Ardelia","Avywenna","Camille",
         "Catcher","Chen Qianyu","Da Pan","Ember","Endministrator","Estella","Fluorite",
         "Gilberta","Laevatain","Last Rite","Lifeng","Liino","Mi Fu","Perlica",
-        "Pogranichnik","Purrchena","Rossi","Si","Snowshine","Tangtang","Typhoeus",
+        "Pogranichnik","Purrchena","Rossi","Snowshine","Tangtang","Typhoeus",
         "Wulfgard","Xaihi","Yvonne","Zhuang Fangyi"
     )
 

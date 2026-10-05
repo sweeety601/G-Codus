@@ -265,7 +265,7 @@ class NotificationSyncWorker(
         val prefix = "tracked_v2_${gameId}_"
         return appPrefs.all.entries
             .filter { it.key.startsWith(prefix) && it.value == true }
-            .map { it.key.removePrefix(prefix) }
+            .map { canonicalCharacterId(gameId, it.key.removePrefix(prefix)) }
             .filter { it.isNotBlank() }
             .filterNot {
                 val n = normalizeIdentity(it)
@@ -280,34 +280,48 @@ class NotificationSyncWorker(
      * while the online banner feed may use a different display/slug form.
      */
     private fun sameCharacter(gameId: String, name: String, identity: String): Boolean {
-        val a = normalizeIdentity(name)
-        val b = normalizeIdentity(identity)
-        if (a == b) return true
+        return canonicalCharacterId(gameId, name) == canonicalCharacterId(gameId, identity)
+    }
 
-        val aliases = when (gameId) {
-            "zzz" -> mapOf(
-                "anby" to setOf("anbydemara", "anbysoldier0", "soldier0anby"),
-                "billy" to setOf("billykid"),
-                "grace" to setOf("gracehoward"),
-                "lucy" to setOf("lucyalt", "lucialt"),
-                "yuzuha" to setOf("ukinamiyuzuha"),
-                "nicole" to setOf("nicoledemara")
-            )
-            "starrail" -> mapOf(
-                "mortenaxblade" to setOf("blademortenax"),
-                "blademortenax" to setOf("mortenaxblade"),
-                "danhengimbibitorlunae" to setOf("imbibitorlunae"),
-                "imbibitorlunae" to setOf("danhengimbibitorlunae"),
-                "topaz" to setOf("topazandnumby")
-            )
-            "endfield" -> mapOf(
-                "orhpieandmagus" to setOf("orhpieandmagus", "orhpiemagus"),
-                "orhpiemagus" to setOf("orhpieandmagus")
-            )
-            else -> emptyMap()
+    private fun canonicalCharacterId(gameId: String, value: String): String {
+        val n = normalizeIdentity(value)
+        return when (gameId) {
+            "genshin" -> when (n) {
+                "kaedeharakazuha", "kazuha" -> "kazuha"
+                "raidenshogun", "raiden" -> "raidenshogun"
+                "tartaglia", "childe" -> "tartaglia"
+                "wanderer", "scaramouche" -> "wanderer"
+                "kamisatoayaka", "ayaka" -> "kamisatoayaka"
+                "kamisatoayato", "ayato" -> "kamisatoayato"
+                else -> n
+            }
+            "wuwa" -> when (n) {
+                "theshorekeeper", "shorekeeper" -> "shorekeeper"
+                "yangyangxuanling", "yangyang" -> "yangyang"
+                else -> n
+            }
+            "zzz" -> when (n) {
+                "billy", "billykid" -> "billykid"
+                "anby", "anbydemara", "anbysoldier0", "soldier0anby" -> "anby"
+                "grace", "gracehoward" -> "grace"
+                "lucy", "lucyalt", "lucialt" -> "lucy"
+                "yuzuha", "ukinamiyuzuha" -> "yuzuha"
+                "nicole", "nicoledemara" -> "nicole"
+                "orphieandmagus", "orhpieandmagus", "orhpiemagus" -> "orphieandmagus"
+                else -> n
+            }
+            "starrail" -> when (n) {
+                "blademortenax", "mortenaxblade" -> "mortenaxblade"
+                "imbibitorlunae", "danhengimbibitorlunae" -> "imbibitorlunae"
+                "topaz", "topazandnumby" -> "topaz"
+                else -> n
+            }
+            "endfield" -> when (n) {
+                "orhpieandmagus", "orhpiemagus", "orphieandmagus" -> "orphieandmagus"
+                else -> n
+            }
+            else -> n
         }
-
-        return aliases[a]?.contains(b) == true || aliases[b]?.contains(a) == true
     }
 
     private fun normalizeIdentity(value: String): String = value.lowercase()
