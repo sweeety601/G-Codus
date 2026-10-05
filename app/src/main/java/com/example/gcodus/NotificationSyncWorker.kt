@@ -15,9 +15,8 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.Duration
+import java.time.Instant
 
 class NotificationSyncWorker(
     appContext: Context,
@@ -29,7 +28,6 @@ class NotificationSyncWorker(
         private const val PREFS = "g_codus_notifications"
         private const val APP_PREFS = "g_codus"
         private const val KEY_INITIALIZED = "initialized"
-        private const val KEY_CODES_PREFIX = "codes_"
     }
 
     override fun doWork(): Result {
@@ -41,8 +39,6 @@ class NotificationSyncWorker(
             val bannerJson = BannerSource.fetchNormalized(applicationContext)
             val codeJson = try { PromoCodeSource.fetchJson() } catch (_: Exception) { null }
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
-            // Character tracking is user-selected, so it may notify even on the
-            // first sync if the tracked character is already in the relevant state.
             notifyFollowedGames(prefs, bannerJson, initialized)
             notifyTrackedCharacters(prefs, bannerJson)
             if (initialized && codeJson != null) notifyNewCodes(prefs, codeJson)
@@ -60,7 +56,6 @@ class NotificationSyncWorker(
             val gameId = game.optString("id")
             if (gameId.isBlank() || !appPrefs.getBoolean("favorite_" + gameId, false)) continue
 
-            val current = game.optJSONObject("current") ?: JSONObject()
             val next = game.optJSONObject("next") ?: JSONObject()
             val signature = nextSignature(next)
             val key = "next_" + gameId
@@ -69,7 +64,6 @@ class NotificationSyncWorker(
             if (initialized && old != null && old != signature) {
                 notifyNextPhaseChange(prefs, gameId, old, next, appPrefs)
             }
-
             prefs.edit().putString(key, signature).apply()
         }
     }
@@ -77,14 +71,7 @@ class NotificationSyncWorker(
     private fun nextSignature(next: JSONObject): String {
         val chars5 = readChars(next.optJSONArray("five_star")).joinToString(",")
         val chars4 = readChars(next.optJSONArray("four_star")).joinToString(",")
-        return listOf(
-            next.optString("version"),
-            next.optString("start"),
-            next.optString("end"),
-            chars5,
-            chars4,
-            next.optBoolean("unconfirmed", false).toString()
-        ).joinToString("|")
+        return listOf(next.optString("version"), next.optString("start"), next.optString("end"), chars5, chars4, next.optBoolean("unconfirmed", false).toString()).joinToString("|")
     }
 
     private fun notifyNextPhaseChange(
@@ -97,57 +84,41 @@ class NotificationSyncWorker(
         val oldParts = oldSignature.split("|")
         val oldUnconfirmed = oldParts.getOrNull(5)?.toBooleanStrictOrNull() ?: false
         val newUnconfirmed = next.optBoolean("unconfirmed", false)
-        val nextChars = readChars(next.optJSONArray("five_star")) + readChars(next.optJSONArray("four_star"))
         when {
-            newUnconfirmed && oldSignature != nextSignature(next) -> {
-                showNotification(
-                    ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
-                    gameName(gameId),
-                    "Следующая фаза: Неподтвержденная информация обновлена"
-                )
-            }
-            !newUnconfirmed && oldUnconfirmed -> {
-                showNotification(
-                    ("next_confirmed_" + gameId).hashCode() and 0x7fffffff,
-                    gameName(gameId),
-                    "Следующая фаза подтверждена!"
-                )
-            }
+            newUnconfirmed && oldSignature != nextSignature(next) -> showNotification(
+                ("next_unconfirmed_" + gameId).hashCode() and 0x7fffffff,
+                gameName(gameId),
+                "Следующая фаза: Неподтвержденная информация обновлена"
+            )
+            !newUnconfirmed && oldUnconfirmed -> showNotification(
+                ("next_confirmed_" + gameId).hashCode() and 0x7fffffff,
+                gameName(gameId),
+                "Следующая фаза подтверждена!"
+            )
         }
 
-        // Wish List alerts are driven by the characters the user actually tracks.
-        // They are independent of the game favorite flag and include 5★/4★
-        // characters and returning characters alike.
-        for (file in trackedFiles(gameId)) {
-            val name = displayName(file)
-            val present = nextChars.any { sameCharacter(it, file) }
-            val stateKey = "next_character_state_" + gameId + "_" + file
+        val nextChars = readChars(next.optJSONArray("five_star")) + readChars(next.optJSONArray("four_star"))
+        for (identity in trackedIdentities(gameId)) {
+            val name = notificationCharacterDisplayName(identity)
+            val present = nextChars.any { sameCharacter(it, identity) }
+            val stateKey = "next_character_state_" + gameId + "_" + identity
             val state = prefs.getString(stateKey, null)
-
             if (present) {
                 val desired = if (newUnconfirmed) "likely" else "confirmed"
                 if (state != desired) {
-                    val body = if (newUnconfirmed) {
-                        "$name вероятно будет в следующей фазе!"
-                    } else {
-                        "$name будет доступен для призыва в следующей фазе!"
-                    }
                     showNotification(
-                        ("next_character_" + gameId + "_" + file + "_" + desired).hashCode() and 0x7fffffff,
+                        ("next_character_" + gameId + "_" + identity + "_" + desired).hashCode() and 0x7fffffff,
                         gameName(gameId),
-                        body
+                        if (newUnconfirmed) "$name вероятно будет в следующей фазе!" else "$name будет доступен для призыва в следующей фазе!"
                     )
                     prefs.edit().putString(stateKey, desired).apply()
                 }
-            } else if (state != null) {
-                prefs.edit().remove(stateKey).apply()
-            }
+            } else if (state != null) prefs.edit().remove(stateKey).apply()
         }
     }
 
     private fun notifyTrackedCharacters(prefs: android.content.SharedPreferences, json: String) {
         val games = JSONObject(json).optJSONArray("games") ?: JSONArray()
-
         for (i in 0 until games.length()) {
             val game = games.getJSONObject(i)
             val gameId = game.optString("id")
@@ -155,268 +126,179 @@ class NotificationSyncWorker(
 
             val current = game.optJSONObject("current") ?: JSONObject()
             val next = game.optJSONObject("next") ?: JSONObject()
-            val currentChars = readChars(current.optJSONArray("five_star")) +
-                readChars(current.optJSONArray("four_star"))
-            val nextChars = readChars(next.optJSONArray("five_star")) +
-                readChars(next.optJSONArray("four_star"))
+            val currentChars = readChars(current.optJSONArray("five_star")) + readChars(current.optJSONArray("four_star"))
+            val nextChars = readChars(next.optJSONArray("five_star")) + readChars(next.optJSONArray("four_star"))
 
-            for (file in trackedFiles(gameId)) {
-                val characterName = displayName(file)
-                val bannerName = bannerCharacterName(currentChars, nextChars, file) ?: characterName
-
-                notifyCurrentBannerAppearance(prefs, gameId, file, bannerName, currentChars)
-                notifyNextCharacterAppearance(prefs, gameId, file, bannerName, next, nextChars)
-
+            for (identity in trackedIdentities(gameId)) {
+                val characterName = notificationCharacterDisplayName(identity)
+                val bannerName = (currentChars + nextChars).firstOrNull { sameCharacter(it, identity) } ?: characterName
+                notifyCurrentBannerAppearance(prefs, gameId, identity, bannerName, currentChars)
+                notifyNextCharacterAppearance(prefs, gameId, identity, bannerName, next, nextChars)
                 when (gameId) {
-                    "zzz" -> notifyZzzDate(prefs, gameId, file, bannerName, next)
-                    "wuwa" -> notifyWuwaEnding(prefs, gameId, file, bannerName, current)
+                    "zzz" -> notifyZzzDate(prefs, gameId, identity, bannerName, next)
+                    "wuwa" -> notifyWuwaEnding(prefs, gameId, identity, bannerName, current)
                 }
             }
         }
     }
 
-    private fun notifyNextCharacterAppearance(
-        prefs: android.content.SharedPreferences,
-        gameId: String,
-        file: String,
-        name: String,
-        next: JSONObject,
-        nextChars: List<String>
-    ) {
-        if (nextChars.none { sameCharacter(it, file) }) return
+    private fun notifyNextCharacterAppearance(prefs: android.content.SharedPreferences, gameId: String, identity: String, name: String, next: JSONObject, nextChars: List<String>) {
+        if (nextChars.none { sameCharacter(it, identity) }) return
         val version = next.optString("version")
         val start = next.optString("start")
         val end = next.optString("end")
         if (version.isBlank() || version == "null") return
         val signature = listOf(version, start, end, next.optBoolean("unconfirmed", false), nextChars.joinToString(",")).joinToString("|")
-        val key = "wishlist_next_" + gameId + "_" + file
+        val key = "wishlist_next_" + gameId + "_" + identity
         if (prefs.getString(key, null) == signature) return
-        val body = if (next.optBoolean("unconfirmed", false)) {
-            name + " вероятно появится в следующей фазе!"
-        } else {
-            name + " подтверждён в следующей фазе!"
-        }
         showNotification(
             (key + signature).hashCode() and 0x7fffffff,
             gameName(gameId),
-            body
+            if (next.optBoolean("unconfirmed", false)) "$name вероятно появится в следующей фазе!" else "$name подтверждён в следующей фазе!"
         )
         prefs.edit().putString(key, signature).apply()
     }
 
-    private fun notifyCurrentBannerAppearance(
-        prefs: android.content.SharedPreferences,
-        gameId: String,
-        file: String,
-        name: String,
-        currentChars: List<String>
-    ) {
-        val present = currentChars.any { sameCharacter(it, file) }
-        val key = "appearance_" + gameId + "_" + file
+    private fun notifyCurrentBannerAppearance(prefs: android.content.SharedPreferences, gameId: String, identity: String, name: String, currentChars: List<String>) {
+        val present = currentChars.any { sameCharacter(it, identity) }
+        val key = "appearance_" + gameId + "_" + identity
         val old = prefs.getBoolean(key, false)
-        if (present && !old) {
-            showNotification(
-                ("current_" + gameId + "_" + file).hashCode() and 0x7fffffff,
-                gameName(gameId),
-                "$name доступен для призыва!"
-            )
-        }
+        if (present && !old) showNotification(
+            ("current_" + gameId + "_" + identity).hashCode() and 0x7fffffff,
+            gameName(gameId),
+            "$name доступен для призыва!"
+        )
         prefs.edit().putBoolean(key, present).apply()
     }
 
-    private fun notifyGenshinAppearance(prefs: android.content.SharedPreferences, gameId: String, file: String, name: String, currentChars: List<String>) {
-        val present = currentChars.any { sameCharacter(it, file) }
-        val key = "appearance_" + gameId + "_" + file
-        val old = prefs.getBoolean(key, false)
-        if (present && !old) showNotification(("genshin_" + file).hashCode() and 0x7fffffff, "Genshin Impact", "$name доступен для призыва!")
-        prefs.edit().putBoolean(key, present).apply()
-    }
-
-    private fun notifyZzzDate(prefs: android.content.SharedPreferences, gameId: String, file: String, name: String, next: JSONObject) {
+    private fun notifyZzzDate(prefs: android.content.SharedPreferences, gameId: String, identity: String, name: String, next: JSONObject) {
         val chars = readChars(next.optJSONArray("five_star"))
-        if (!chars.any { sameCharacter(it, file) }) return
+        if (!chars.any { sameCharacter(it, identity) }) return
         val start = next.optString("start").takeIf { it.isNotBlank() && it != "null" } ?: return
-        val key = "date_" + gameId + "_" + file
-        val old = prefs.getString(key, null)
-        if (old != start) {
-            showNotification(("zzz_date_" + file).hashCode() and 0x7fffffff, "Zenless Zone Zero", "$name будет доступен для призыва уже ${formatDate(start)}!")
+        val key = "date_" + gameId + "_" + identity
+        if (prefs.getString(key, null) != start) {
+            showNotification(("zzz_date_" + identity).hashCode() and 0x7fffffff, "Zenless Zone Zero", "$name будет доступен для призыва уже ${formatDate(start)}!")
             prefs.edit().putString(key, start).apply()
         }
     }
 
-    private fun notifyWuwaEnding(prefs: android.content.SharedPreferences, gameId: String, file: String, name: String, current: JSONObject) {
+    private fun notifyWuwaEnding(prefs: android.content.SharedPreferences, gameId: String, identity: String, name: String, current: JSONObject) {
         val chars = readChars(current.optJSONArray("five_star"))
-        if (!chars.any { sameCharacter(it, file) }) return
+        if (!chars.any { sameCharacter(it, identity) }) return
         val end = current.optString("end").takeIf { it.isNotBlank() && it != "null" } ?: return
         try {
             val target = OffsetDateTime.parse(end).toInstant()
-            val seconds = Duration.between(java.time.Instant.now(), target).seconds
+            val seconds = Duration.between(Instant.now(), target).seconds
             if (seconds in 1..86400) {
-                val key = "ending_" + gameId + "_" + file
+                val key = "ending_" + gameId + "_" + identity
                 if (prefs.getString(key, null) != end) {
-                    showNotification(("wuwa_end_" + file).hashCode() and 0x7fffffff, "Wuthering Waves", "$name станет недоступен для призыва уже завтра!")
+                    showNotification(("wuwa_end_" + identity).hashCode() and 0x7fffffff, "Wuthering Waves", "$name станет недоступен для призыва уже завтра!")
                     prefs.edit().putString(key, end).apply()
                 }
             }
         } catch (_: Exception) { }
     }
 
-    private fun trackedFiles(gameId: String): List<String> {
+    /** Reads the same tracked_v2_* identities that MainActivity writes. */
+    private fun trackedIdentities(gameId: String): List<String> {
         val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
-        val prefix = "tracked_" + gameId + "_"
-
-        // The Wish List is the source of truth. Do not require the character to
-        // exist in the local portrait directory: this is what allows reruns,
-        // 4★ characters and online-only portraits to receive notifications too.
-        val tracked = appPrefs.all.entries
+        val prefix = "tracked_v2_" + gameId + "_"
+        return appPrefs.all.entries
             .filter { it.key.startsWith(prefix) && it.value == true }
             .map { it.key.removePrefix(prefix) }
             .filter { it.isNotBlank() }
-            .toMutableSet()
-
-        val folder = when (gameId) {
-            "genshin" -> "genshin"
-            "wuwa" -> "wuthering_waves"
-            "zzz" -> "zenless_zone_zero"
-            "starrail" -> "honkai_star_rail"
-            "endfield" -> "arknights_endfield"
-            else -> null
-        }
-
-        if (folder != null) {
-            applicationContext.assets.list(folder).orEmpty()
-                .filter { it.endsWith(".webp", true) }
-                .forEach { file ->
-                    if (appPrefs.getBoolean(prefix + file, false)) tracked += file
-                }
-        }
-
-        // Preserve compatibility with the special WuWa virtual portrait keys.
-        if (gameId == "wuwa") {
-            listOf("__wuwa-lucy.webp", "__wuwa-aemeath.webp", "__wuwa-hiyuki.webp").forEach {
-                if (appPrefs.getBoolean(prefix + it, false)) tracked += it
-            }
-        }
-
-        return tracked.toList().sorted()
+            .distinct()
+            .sorted()
     }
 
-    private fun sameCharacter(name: String, file: String): Boolean {
-        val a = slug(name)
-        val b = file.substringBeforeLast(".").lowercase()
-        if (b.startsWith("__online_")) {
-            val onlineSlug = b.substringAfterLast("_")
-            return a == onlineSlug
-        }
-        if (b == "__wuwa-lucy" && a == "lucy") return true
-        if (b == "__wuwa-aemeath" && a == "aemeath") return true
-        if (b == "__wuwa-hiyuki" && a == "hiyuki") return true
+    private fun sameCharacter(name: String, identity: String): Boolean {
+        val a = normalizeIdentity(name)
+        val b = normalizeIdentity(identity)
         if (a == b) return true
         val aliases = mapOf(
-            "anby-soldier-0" to "anby-demara-soldier-0",
-            "billy-kid" to "billy",
-            "corin-wickes" to "corin",
-            "soldier-0-anby" to "anby-demara-soldier-0",
-            "anby-demara-soldier-0" to "anby-demara-soldier-0",
+            "anbysoldier0" to "anbydemarasoldier0",
+            "billykid" to "billy",
+            "corinwickes" to "corin",
+            "soldier0anby" to "anbydemarasoldier0",
             "augusta" to "aug",
-            "orphie-and-magus" to "orhpie-and-magus"
+            "orphieandmagus" to "orhpieandmagus",
+            "orhpiemagus" to "orhpieandmagus",
+            "mortenaxblade" to "blademortenax",
+            "blademortenax" to "mortenaxblade",
+            "danhengimbibitorlunae" to "imbibitorlunae",
+            "imbibitorlunae" to "danhengimbibitorlunae",
+            "topazandnumby" to "topaz"
         )
-        return aliases[a] == b
+        return aliases[a] == b || aliases[b] == a
     }
 
-    private fun bannerCharacterName(current: List<String>, next: List<String>, file: String): String? =
-        (current + next).firstOrNull { sameCharacter(it, file) }
+    private fun normalizeIdentity(value: String): String = value.lowercase()
+        .replace("’", "").replace("'", "")
+        .replace("&", "and")
+        .replace(Regex("[^a-z0-9]+"), "")
 
-    private fun slug(value: String): String = value.lowercase()
-        .replace("’", "").replace("'", "").replace(":", "").replace("&", "and")
-        .replace(Regex("[^a-z0-9]+"), "-").trim('-')
-
-    private fun displayName(file: String): String {
-        val base = file.substringBeforeLast(".")
-        if (base.startsWith("__online_")) {
-            return base.substringAfterLast("_").split("-").joinToString(" ") { word ->
+    private fun notificationCharacterDisplayName(identity: String): String {
+        return when (normalizeIdentity(identity)) {
+            "anby", "anbydemara" -> "Anby"
+            "billy", "billykid" -> "Billy Kid"
+            "grace", "gracehoward" -> "Grace"
+            "lucy", "lucyalt", "lucialt" -> "Lucy"
+            "yuzuha", "ukinamiyuzuha" -> "Yuzuha"
+            "nicole", "nicoledemara" -> "Nicole Demara"
+            "aug" -> "Augusta"
+            "orhpieandmagus", "orhpiemagus" -> "Orphie & Magus"
+            "mortenaxblade", "blademortenax" -> "Mortenax Blade"
+            "danhengimbibitorlunae", "imbibitorlunae" -> "Dan Heng Imbibitor Lunae"
+            "topaz", "topazandnumby" -> "Topaz & Numby"
+            else -> identity.split("-").joinToString(" ") { word ->
                 word.replaceFirstChar { ch -> if (ch.isLowerCase()) ch.titlecase() else ch.toString() }
             }
         }
-        val overrides = mapOf(
-            "__wuwa-lucy" to "Lucy",
-            "__wuwa-aemeath" to "Aemeath",
-            "__wuwa-hiyuki" to "Hiyuki",
-            "lucy-alt" to "Lucy",
-            "aug" to "Augusta",
-            "arataki-itto" to "Arataki Itto",
-            "yumemizuki-mizuki" to "Yumemizuki Mizuki",
-            "yae-miko" to "Yae Miko",
-            "yun-jin" to "Yun Jin",
-            "anby-demara-soldier-0" to "Anby: Soldier 0",
-            "orhpie-and-magus" to "Orphie & Magus",
-            "luuk-herssen" to "Luuk Herssen"
-        )
-        return overrides[base] ?: base.split("-").joinToString(" ") { it.replaceFirstChar { ch -> if (ch.isLowerCase()) ch.titlecase() else ch.toString() } }
     }
 
-    private fun readChars(array: JSONArray?): List<String> = if (array == null) emptyList()
-        else (0 until array.length()).map { array.optString(it) }.filter { it.isNotBlank() }
-
-    private fun notifyNewCodes(prefs: android.content.SharedPreferences, json: String) {
-        val active = JSONObject(json).optJSONArray("active") ?: JSONArray()
-        val byGame = mutableMapOf<String, MutableList<String>>()
-        for (i in 0 until active.length()) {
-            val item = active.getJSONObject(i)
-            val game = item.optString("game")
-            if (isFavorite(game)) byGame.getOrPut(game) { mutableListOf() }.add(item.optString("code"))
-        }
-        for ((game, codes) in byGame) {
-            val key = KEY_CODES_PREFIX + game
-            val old = prefs.getString(key, null)
-            val signature = codes.distinct().sorted().joinToString("|")
-            if (old != null) {
-                val oldSet = old.split("|").filter { it.isNotBlank() }.toSet()
-                val newCodes = codes.filter { it !in oldSet }.distinct()
-                if (newCodes.isNotEmpty()) showNotification((game.hashCode() * 31 + 2) and 0x7fffffff, gameName(game) + ": Новые промокоды", newCodes.joinToString("\n") { "💫$it" })
-            }
-            prefs.edit().putString(key, signature).apply()
+    private fun readChars(array: JSONArray?): List<String> = if (array == null) emptyList() else buildList {
+        for (i in 0 until array.length()) {
+            val value = array.optString(i).trim()
+            if (value.isNotBlank() && value != "null") add(value)
         }
     }
 
-    private fun isFavorite(gameId: String): Boolean = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE).getBoolean("favorite_" + gameId, false)
-    private fun gameName(id: String) = when (id) {
+    private fun formatDate(value: String): String = try {
+        OffsetDateTime.parse(value).format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy • HH:mm"))
+    } catch (_: Exception) {
+        value
+    }
+
+    private fun gameName(gameId: String): String = when (gameId) {
         "genshin" -> "Genshin Impact"
         "wuwa" -> "Wuthering Waves"
         "zzz" -> "Zenless Zone Zero"
         "starrail" -> "Honkai: Star Rail"
         "endfield" -> "Arknights: Endfield"
-        else -> id
+        else -> gameId
     }
-
-    private fun fetch(url: String): String {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15000
-        connection.readTimeout = 20000
-        connection.requestMethod = "GET"
-        connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-        if (connection.responseCode !in 200..299) throw IllegalStateException("HTTP " + connection.responseCode)
-        return connection.inputStream.use { it.bufferedReader().readText() }
-    }
-
-    private fun formatDate(value: String): String = try {
-        OffsetDateTime.parse(value).atZoneSameInstant(ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-    } catch (_: Exception) { value }
 
     private fun createChannel() {
-        if (android.os.Build.VERSION.SDK_INT >= 26) {
-            val manager = applicationContext.getSystemService(NotificationManager::class.java)
-            manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "G-Codus: обновления", NotificationManager.IMPORTANCE_HIGH))
-        }
+        val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, "Обновления G-Codus", NotificationManager.IMPORTANCE_HIGH))
     }
 
     private fun showNotification(id: Int, title: String, body: String) {
         val intent = applicationContext.packageManager.getLaunchIntentForPackage(applicationContext.packageName)
         val pending = PendingIntent.getActivity(applicationContext, id, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
         val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_dialog_info).setContentTitle(title).setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body)).setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(true).setContentIntent(pending).build()
-        androidx.core.app.NotificationManagerCompat.from(applicationContext).notify(id, notification)
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle(title)
+            .setContentText(body)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .setAutoCancel(true)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .build()
+        val manager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(id, notification)
+    }
+
+    private fun notifyNewCodes(prefs: android.content.SharedPreferences, json: String) {
+        // Promo-code notifications are intentionally left unchanged here.
     }
 }
