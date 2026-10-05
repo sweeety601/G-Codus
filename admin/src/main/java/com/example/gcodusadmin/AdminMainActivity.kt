@@ -22,6 +22,7 @@ import java.time.LocalDate
 import java.util.concurrent.Executors
 
 class AdminMainActivity : AppCompatActivity() {
+    private var isHomeScreen = true
     private val tokenStore by lazy { TokenStore(this) }
     private var github: GitHubClient? = null
     private var repo: AdminRepository? = null
@@ -49,6 +50,16 @@ class AdminMainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (isHomeScreen) {
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                } else {
+                    showHome()
+                }
+            }
+        })
         val loading = vertical()
         loading.addView(title("G-Codus Admin"))
         loading.addView(label("Проверка GitHub…", muted, 14f))
@@ -69,6 +80,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showTokenScreen(errorMessage: String? = null) {
+        isHomeScreen = true
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
         if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
@@ -96,6 +108,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showHome() {
+        isHomeScreen = true
         val box = vertical()
         box.addView(title("G-Codus Admin"))
         box.addView(label("Редактор онлайн-базы G-Codus • v2.0.12", muted, 14f))
@@ -108,11 +121,13 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun chooseGame(onSelected: (GameMeta) -> Unit) {
+        isHomeScreen = false
         val names = GameCatalog.games.map { it.name }.toTypedArray()
         AlertDialog.Builder(this).setTitle("Выбери игру").setItems(names) { _, which -> onSelected(GameCatalog.games[which]) }.show()
     }
 
     private fun showCharacterEditor(game: GameMeta, existing: AdminCharacter?) {
+        isHomeScreen = false
         val r = repo ?: return
         runBackground({ r.loadCharacters(game) }, { list ->
             val id = existing?.id ?: r.nextId(game, list)
@@ -168,6 +183,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showCharacterDatabase() {
+        isHomeScreen = false
         val r = repo ?: return
         runBackground({ r.loadAllCharacters() }, { all ->
             val box = vertical()
@@ -208,7 +224,9 @@ class AdminMainActivity : AppCompatActivity() {
                     gravity = Gravity.CENTER_HORIZONTAL
                     setPadding(dp(7), dp(7), dp(7), dp(7))
                     background = roundedDrawable(surface, 16f)
+                    elevation = dp(3).toFloat()
                     isClickable = true
+                    isFocusable = true
                     setOnClickListener { openCharacter(c) }
                 }
                 val image = ImageView(this).apply {
@@ -216,23 +234,26 @@ class AdminMainActivity : AppCompatActivity() {
                     setBackgroundColor(bg)
                     contentDescription = c.name
                 }
-                card.addView(image, LinearLayout.LayoutParams(-1, dp(118)).apply {
+                card.addView(image, LinearLayout.LayoutParams(-1, dp(112)).apply {
                     setMargins(0, 0, 0, dp(6))
                 })
                 card.addView(TextView(this).apply {
                     text = c.name
                     setTextColor(ink)
-                    textSize = 14f
+                    textSize = 13f
                     gravity = Gravity.CENTER
-                    maxLines = 2
+                    maxLines = 3
                     ellipsize = android.text.TextUtils.TruncateAt.END
-                }, LinearLayout.LayoutParams(-1, dp(38)))
+                    includeFontPadding = false
+                    setAutoSizeTextTypeUniformWithConfiguration(dp(10), dp(13), dp(1), android.util.TypedValue.COMPLEX_UNIT_SP)
+                }, LinearLayout.LayoutParams(-1, dp(48)))
                 card.addView(TextView(this).apply {
                     text = c.id + " • ★" + c.rarity
-                    setTextColor(ink)
+                    setTextColor(0xFFBDB9C8.toInt())
                     textSize = 11f
                     gravity = Gravity.CENTER
-                }, LinearLayout.LayoutParams(-1, dp(22)))
+                    includeFontPadding = false
+                }, LinearLayout.LayoutParams(-1, dp(20)))
                 loadCurrentPortrait(c.id, image)
                 return card
             }
@@ -257,13 +278,13 @@ class AdminMainActivity : AppCompatActivity() {
                     chunk.forEach { c ->
                         row.addView(
                             makeCharacterCard(c),
-                            LinearLayout.LayoutParams(0, dp(190), 1f).apply {
+                            LinearLayout.LayoutParams(0, dp(194), 1f).apply {
                                 setMargins(dp(3), 0, dp(3), 0)
                             }
                         )
                     }
                     repeat(3 - chunk.size) {
-                        row.addView(Space(this), LinearLayout.LayoutParams(0, dp(190), 1f))
+                        row.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f))
                     }
                     grid.addView(row)
                 }
@@ -277,6 +298,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showBannerTypes(game: GameMeta) {
+        isHomeScreen = false
         val box = vertical(); box.addView(title(game.name + " — график баннеров"))
         val confirmed = bigButton("Редактировать график подтверждённых баннеров"); box.addView(confirmed, lp(0, 64)); confirmed.setOnClickListener { showBannerList(game, true) }
         val leaks = bigButton("Редактировать график неподтверждённых баннеров"); box.addView(leaks, lp(0, 64)); leaks.setOnClickListener { showBannerList(game, false) }
@@ -284,6 +306,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showBannerList(game: GameMeta, confirmed: Boolean) {
+        isHomeScreen = false
         val r = repo ?: return
         runBackground({ r.loadBanners(game, confirmed).first }, { rows ->
             val box = vertical(); box.addView(title(if (confirmed) "Подтверждённые баннеры" else "Неподтверждённые баннеры"))
@@ -293,6 +316,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun showBannerEditor(game: GameMeta, confirmed: Boolean, existing: BannerRow?) {
+        isHomeScreen = false
         val r = repo ?: return
         runBackground({ r.loadCharacters(game) }, { chars ->
             val box = vertical(); box.addView(title(if (existing == null) "Новый баннер" else "Редактирование баннера"))
@@ -349,7 +373,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun runBackground(work: () -> Unit, ok: () -> Unit) { executor.execute { try { work(); runOnUiThread(ok) } catch (e: Exception) { runOnUiThread { toast(e.message ?: "Ошибка") } } } }
     private fun <T> runBackground(work: () -> T, ok: (T) -> Unit, fail: (Exception) -> Unit) { executor.execute { try { val value = work(); runOnUiThread { ok(value) } } catch (e: Exception) { runOnUiThread { fail(e) } } } }
     private fun addBack(box: LinearLayout) {
-        val back = button("← Назад").also { it.setOnClickListener { showHome() } }
+        val back = button("‹  Назад").also { it.setOnClickListener { showHome() } }
         box.addView(back, 0, lp(120, 48))
     }
     private fun makeScroll() = ScrollView(this).apply {
@@ -369,7 +393,16 @@ class AdminMainActivity : AppCompatActivity() {
     private fun wrap(v: View): FrameLayout = FrameLayout(this).apply { addView(v, FrameLayout.LayoutParams(-1, -1)); setBackgroundColor(bg) }
     private fun title(t: String) = TextView(this).apply { text = t; setTextColor(ink); textSize = 24f; setTypeface(typeface, Typeface.BOLD); setPadding(0, 0, 0, dp(12)) }
     private fun label(t: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { text = t; setTextColor(color); textSize = size; if (bold) setTypeface(typeface, Typeface.BOLD); setPadding(0, dp(4), 0, dp(8)) }
-    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(ink); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
+    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply {
+        this.hint = hint
+        setText(value)
+        isEnabled = enabled
+        setTextColor(ink)
+        setHintTextColor(0xFF9E9AA8.toInt())
+        setSingleLine(true)
+        setPadding(dp(14), dp(10), dp(14), dp(10))
+        background = roundedDrawable(surface, 12f)
+    }
     private fun spinner(items: List<String>, selected: String?) = Spinner(this).apply {
         adapter = object : ArrayAdapter<String>(
             this@AdminMainActivity,
@@ -396,8 +429,25 @@ class AdminMainActivity : AppCompatActivity() {
             if (i >= 0) setSelection(i)
         }
     }
-    private fun button(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setBackgroundColor(surface) }
-    private fun bigButton(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setTextSize(15f); setBackgroundColor(surface); gravity = Gravity.CENTER_VERTICAL; setPadding(dp(16), dp(8), dp(16), dp(8)) }
+    private fun button(text: String) = Button(this).apply {
+        this.text = text
+        isAllCaps = false
+        setTextColor(ink)
+        textSize = 14f
+        background = roundedDrawable(surface, 12f)
+        elevation = dp(2).toFloat()
+        setPadding(dp(12), dp(6), dp(12), dp(6))
+    }
+    private fun bigButton(text: String) = Button(this).apply {
+        this.text = text
+        isAllCaps = false
+        setTextColor(ink)
+        setTextSize(15f)
+        background = roundedDrawable(surface, 14f)
+        elevation = dp(2).toFloat()
+        gravity = Gravity.CENTER_VERTICAL
+        setPadding(dp(16), dp(8), dp(16), dp(8))
+    }
     private fun space(h: Int) = Space(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(h)) }
     private fun lp(w: Int = -1, h: Int = -2) = LinearLayout.LayoutParams(if (w == 0) -1 else dp(w), if (h == 0) -2 else dp(h)).apply { setMargins(0, dp(5), 0, dp(5)) }
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
