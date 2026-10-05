@@ -18,6 +18,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: android-build-verify
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
