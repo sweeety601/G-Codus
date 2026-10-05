@@ -4,8 +4,12 @@ on:
   repository_dispatch:
     types: [gcodus-data-sync]
   push:
+    paths:
+      - "banners/**"
+      - "scripts/generate_banner_data.py"
+      - ".github/workflows/generate-banner-data.yml"
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '17 */6 * * *'
   workflow_dispatch:
 
 concurrency:
