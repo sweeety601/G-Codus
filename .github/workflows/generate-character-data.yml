@@ -3,7 +3,7 @@ name: Generate character data
 on:
   push:
     paths:
-      - 'data/characters/*.xlsx'
+      - 'library/*.xlsx'
       - 'images/*.webp'
       - 'scripts/generate_character_data.py'
       - '.github/workflows/generate-character-data.yml'
@@ -33,19 +33,19 @@ jobs:
           python - <<'PY'
           import json
           from pathlib import Path
-          data = json.loads(Path('data/generated/characters.json').read_text(encoding='utf-8'))
-          missing = []
+          data = json.loads(Path('library/generated/characters.json').read_text(encoding='utf-8'))
+          errors = []
           seen = set()
           for game in data['games']:
               for c in game['characters']:
                   cid = c['id']
                   if cid in seen:
-                      missing.append(f'duplicate ID: {cid}')
+                      errors.append(f'duplicate ID: {cid}')
                   seen.add(cid)
                   if not Path('images', f'{cid}.webp').exists():
-                      missing.append(f'missing portrait: images/{cid}.webp')
-          if missing:
-              print('\n'.join(missing))
+                      errors.append(f'missing portrait: images/{cid}.webp')
+          if errors:
+              print('\n'.join(errors))
               raise SystemExit(1)
           PY
 
@@ -53,10 +53,10 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/generated/characters.json data/characters/*.xlsx
+          git add library/generated/characters.json library/*.xlsx
           if git diff --cached --quiet; then
             echo 'No generated changes.'
           else
-            git commit -m 'Sync character data from Excel'
+            git commit -m 'Sync character library from Excel'
             git push
           fi
