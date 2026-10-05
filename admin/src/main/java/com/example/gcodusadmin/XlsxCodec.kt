@@ -41,7 +41,7 @@ object XlsxCodec {
                 val raw = childText(cell, "v").orEmpty()
                 val value = when (type) {
                     "s" -> shared.getOrNull(raw.toIntOrNull() ?: -1) ?: raw
-                    "inlineStr" -> childText(cell, "t").orEmpty()
+                    "inlineStr" -> descendantText(cell, "t").orEmpty()
                     else -> raw
                 }
                 values[col] = value
@@ -94,6 +94,13 @@ object XlsxCodec {
             if (children.item(i).nodeName == name) return children.item(i).textContent
         }
         return null
+    }
+
+    private fun descendantText(node: org.w3c.dom.Node, name: String): String? {
+        val element = node as? org.w3c.dom.Element ?: return null
+        val nodes = element.getElementsByTagName(name)
+        if (nodes.length == 0) return null
+        return nodes.item(0).textContent
     }
 
     private fun columnIndex(ref: String): Int {
