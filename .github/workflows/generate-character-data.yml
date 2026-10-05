@@ -4,8 +4,10 @@ on:
   push:
     paths:
       - 'library/*.xlsx'
+      - 'library/seed/**'
       - 'images_big/**'
       - 'app/src/main/assets/**'
+      - 'scripts/ensure_library_xlsx.py'
       - 'scripts/generate_character_data.py'
       - 'scripts/sync_library_portraits.py'
       - '.github/workflows/generate-character-data.yml'
@@ -28,6 +30,9 @@ jobs:
 
       - name: Install Excel parser
         run: pip install openpyxl
+
+      - name: Repair invalid library Excel files
+        run: python scripts/ensure_library_xlsx.py
 
       - name: Normalize Excel, assign IDs and generate JSON
         run: python scripts/generate_character_data.py
