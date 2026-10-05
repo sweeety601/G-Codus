@@ -1,4 +1,4 @@
-# Repository character migration V3: Excel -> JSON metadata + images/<id>.webp.
+# Repository character migration V4: Excel -> JSON metadata + images/<id>.webp.
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
