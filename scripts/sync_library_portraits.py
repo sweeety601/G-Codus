@@ -164,8 +164,9 @@ def main():
             target = IMAGES / f"{cid}.webp"
             shutil.copyfile(source, target)
             report["copied"].append({"id": cid, "game": game_name, "name": name, "source": str(source.relative_to(ROOT))})
-    (LIBRARY / "generated").mkdir(parents=True, exist_ok=True)
-    (LIBRARY / "generated" / "portrait_sync_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
+    OUT = ROOT / "library" / "generated"
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "portrait_sync_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     if report["duplicates"]:
         raise SystemExit(f"Duplicate IDs: {report['duplicates']}")
     print(f"Copied portraits: {len(report['copied'])}")
