@@ -1671,8 +1671,7 @@ class MainActivity : AppCompatActivity() {
 
     // Banner source of truth: only the current G-Codus GitHub database.
     private fun loadFeed(): List<GameFeed> {
-        val source = bannerFeedJson ?: loadCachedBannerFeed()?.also { bannerFeedJson = it }
-            ?: return emptyList()
+        val source = bannerFeedJson ?: return emptyList()
 
         return try {
             val root = JSONObject(source)
