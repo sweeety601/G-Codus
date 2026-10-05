@@ -1,1 +1,0 @@
-Actions trigger marker. Data source remains the live Excel tables in the repository.
