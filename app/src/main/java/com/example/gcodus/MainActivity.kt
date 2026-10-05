@@ -79,6 +79,30 @@ class MainActivity : AppCompatActivity() {
         GameMeta("endfield", "Arknights: Endfield", "endfield")
     )
 
+    override fun onResume() {
+        super.onResume()
+        executor.execute {
+            try {
+                val freshCharacters = CharacterDatabase.fetch(this@MainActivity)
+                if (freshCharacters.isNotEmpty()) {
+                    onlineCharacters = freshCharacters
+                    runOnUiThread {
+                        if (!isFinishing) refreshCurrentScreen()
+                    }
+                }
+            } catch (_: Exception) { }
+
+            try {
+                val freshFeed = BannerSource.fetchNormalized(this@MainActivity)
+                JSONObject(freshFeed).getJSONArray("games")
+                bannerFeedJson = freshFeed
+                runOnUiThread {
+                    if (!isFinishing) refreshCurrentScreen()
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.enableEdgeToEdge(window)
@@ -1172,7 +1196,7 @@ class MainActivity : AppCompatActivity() {
                 if (fresh.isNotEmpty()) {
                     onlineCharacters = fresh
                     runOnUiThread {
-                        if (!isFinishing && currentScreen != Screen.GAME) refreshCurrentScreen()
+                        if (!isFinishing) refreshCurrentScreen()
                     }
                 }
             } catch (_: Exception) { }
@@ -1255,7 +1279,7 @@ class MainActivity : AppCompatActivity() {
         val url = character.portraitUrl.ifBlank { CharacterDatabase.imageUrl(character.id) }
         if (url.isBlank()) return
 
-        val cacheKey = "db:" + character.id
+        val cacheKey = "db:" + character.id + ":" + character.portraitUrl
         portraitCache.get(cacheKey)?.let {
             image.setImageBitmap(it)
             return
