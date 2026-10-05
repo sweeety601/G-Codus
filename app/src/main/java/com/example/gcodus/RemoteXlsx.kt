@@ -1,0 +1,138 @@
+package com.example.gcodus
+
+import org.w3c.dom.Node
+import java.io.ByteArrayInputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.util.zip.ZipInputStream
+import javax.xml.parsers.DocumentBuilderFactory
+
+object RemoteXlsx {
+    fun fetchRows(pathCandidates: List<String>): MutableList<MutableList<String>> {
+        var lastError: Exception? = null
+        for (path in pathCandidates) {
+            try {
+                return read(fetchBytes(path))
+            } catch (e: Exception) {
+                lastError = e
+            }
+        }
+        throw lastError ?: IllegalStateException("Не удалось получить Excel")
+    }
+
+    private fun fetchBytes(path: String): ByteArray {
+        val encodedPath = path.split('/').joinToString("/") {
+            java.net.URLEncoder.encode(it, "UTF-8").replace("+", "%20")
+        }
+        val url = URL(
+            "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" +
+                encodedPath + "?v=" + System.currentTimeMillis()
+        )
+        val connection = url.openConnection() as HttpURLConnection
+        return try {
+            connection.connectTimeout = 15_000
+            connection.readTimeout = 20_000
+            connection.requestMethod = "GET"
+            connection.instanceFollowRedirects = true
+            connection.useCaches = false
+            connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
+            connection.setRequestProperty("Pragma", "no-cache")
+            connection.setRequestProperty("User-Agent", "G-Codus/1.0")
+            if (connection.responseCode !in 200..299) {
+                error("HTTP " + connection.responseCode + " for " + path)
+            }
+            connection.inputStream.use { it.readBytes() }
+        } finally {
+            connection.disconnect()
+        }
+    }
+
+    private fun read(bytes: ByteArray): MutableList<MutableList<String>> {
+        val entries = HashMap<String, ByteArray>()
+        ZipInputStream(ByteArrayInputStream(bytes)).use { zip ->
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                entries[entry.name] = zip.readBytes()
+            }
+        }
+
+        val sheet = entries["xl/worksheets/sheet1.xml"]
+            ?: throw IllegalStateException("В Excel не найден первый лист")
+        val shared = parseSharedStrings(entries["xl/sharedStrings.xml"])
+
+        val doc = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(ByteArrayInputStream(sheet))
+        val rows = doc.getElementsByTagName("row")
+        val result = mutableListOf<MutableList<String>>()
+
+        for (i in 0 until rows.length) {
+            val row = rows.item(i)
+            var maxCol = -1
+            val values = HashMap<Int, String>()
+            val children = row.childNodes
+
+            for (j in 0 until children.length) {
+                val cell = children.item(j)
+                if (cell.nodeName != "c") continue
+                val ref = cell.attributes?.getNamedItem("r")?.nodeValue ?: continue
+                val col = columnIndex(ref)
+                maxCol = maxOf(maxCol, col)
+                val type = cell.attributes?.getNamedItem("t")?.nodeValue
+                val raw = childText(cell, "v").orEmpty()
+                val value = when (type) {
+                    "s" -> shared.getOrNull(raw.toIntOrNull() ?: -1) ?: raw
+                    "inlineStr" -> descendantText(cell, "t").orEmpty()
+                    else -> raw
+                }
+                values[col] = value
+            }
+
+            if (maxCol >= 0) {
+                val rowValues = MutableList(maxCol + 1) { "" }
+                values.forEach { (col, value) -> rowValues[col] = value }
+                result += rowValues
+            }
+        }
+        return result
+    }
+
+    private fun parseSharedStrings(bytes: ByteArray?): List<String> {
+        if (bytes == null) return emptyList()
+        val doc = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder()
+            .parse(ByteArrayInputStream(bytes))
+        val nodes = doc.getElementsByTagName("si")
+        val result = ArrayList<String>(nodes.length)
+        for (i in 0 until nodes.length) {
+            val si = nodes.item(i)
+            val texts = (si as org.w3c.dom.Element).getElementsByTagName("t")
+            val b = StringBuilder()
+            for (j in 0 until texts.length) b.append(texts.item(j).textContent)
+            result += b.toString()
+        }
+        return result
+    }
+
+    private fun childText(node: Node, name: String): String? {
+        val children = node.childNodes
+        for (i in 0 until children.length) {
+            if (children.item(i).nodeName == name) return children.item(i).textContent
+        }
+        return null
+    }
+
+    private fun descendantText(node: Node, name: String): String? {
+        val element = node as? org.w3c.dom.Element ?: return null
+        val nodes = element.getElementsByTagName(name)
+        if (nodes.length == 0) return null
+        return nodes.item(0).textContent
+    }
+
+    private fun columnIndex(ref: String): Int {
+        val letters = ref.takeWhile { it.isLetter() }
+        var value = 0
+        for (c in letters) value = value * 26 + (c.uppercaseChar() - 'A' + 1)
+        return value - 1
+    }
+}
