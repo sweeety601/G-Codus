@@ -61,7 +61,9 @@ object CharacterDatabase {
                             name = name,
                             slug = id,
                             announced = c.optBoolean("announced", false),
-                            portraitUrl = c.optString("portraitUrl").ifBlank { imageUrl(id) },
+                            portraitUrl = c.optString("portraitUrl")
+                                .takeIf { isOwnDatabaseImageUrl(it) }
+                                ?: imageUrl(id),
                             rarity = c.optInt("rarity", 0),
                             id = id,
                             element = c.optString("element")
@@ -76,6 +78,9 @@ object CharacterDatabase {
 
     fun imageUrl(id: String): String =
         "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp"
+
+    private fun isOwnDatabaseImageUrl(url: String): Boolean =
+        url.startsWith("https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/")
 
     private fun isForbidden(name: String): Boolean {
         val n = normalize(name)
