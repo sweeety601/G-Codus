@@ -173,12 +173,14 @@ class AdminMainActivity : AppCompatActivity() {
             val elements = linkedSetOf<String>()
             list.map { it.element }.filter { it.isNotBlank() }.forEach { elements.add(it) }
             if (elements.isEmpty()) defaultElements(game).forEach { elements.add(it) }
-            val elementSpinner = spinner("Стихия", elements.toList(), existing?.element)
-            box.addView(elementSpinner)
+            box.addView(label("Стихия", muted, 12f))
+            val elementSpinner = spinner(elements.toList(), existing?.element)
+            box.addView(elementSpinner, lp())
 
             val rarities = (list.map { it.rarity.toString() } + listOf("4","5")).distinct().sorted()
-            val raritySpinner = spinner("Редкость", rarities, existing?.rarity?.toString())
-            box.addView(raritySpinner)
+            box.addView(label("Редкость", muted, 12f))
+            val raritySpinner = spinner(rarities, existing?.rarity?.toString())
+            box.addView(raritySpinner, lp())
 
             val portrait = button(if (existing == null) "Загрузить портрет" else "Заменить портрет")
             box.addView(portrait, lp())
@@ -408,7 +410,9 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun dateField(labelText: String, value: String): EditText {
-        val e = field(labelText, value, enabled = false)
+        val e = field(labelText, value)
+        e.isFocusable = false
+        e.isClickable = true
         e.setOnClickListener {
             val now = runCatching { LocalDate.parse(e.text.toString()) }.getOrElse { LocalDate.now() }
             DatePickerDialog(this, { _, y, m, d ->
@@ -506,7 +510,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun space(h: Int) = Space(this).apply { layoutParams = lp(0,h) }
 
     private fun lp(w: Int = -1, h: Int = -2) = LinearLayout.LayoutParams(
-        if (w == 0) 0 else if (w == -1) -1 else dp(w),
+        if (w <= 0) -1 else dp(w),
         if (h == -2) LinearLayout.LayoutParams.WRAP_CONTENT else dp(h)
     ).apply { setMargins(0,dp(5),0,dp(5)) }
 
