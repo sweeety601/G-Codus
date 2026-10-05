@@ -1,9 +1,6 @@
 package com.example.gcodus
 
 import android.content.Context
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 
 data class OnlineCharacter(
     val gameId: String,
@@ -17,82 +14,76 @@ data class OnlineCharacter(
 )
 
 object CharacterDatabase {
-    private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/library/generated/characters.json"
+    private val tables = listOf(
+        Triple("01_Wuthering_Waves.xlsx", "1", "wuwa"),
+        Triple("02_Genshin_Impact.xlsx", "2", "genshin"),
+        Triple("03_Honkai_Star_Rail.xlsx", "3", "starrail"),
+        Triple("04_Arknights_Endfield.xlsx", "4", "endfield"),
+        Triple("05_Zenless_Zone_Zero.xlsx", "5", "zzz")
+    )
 
-    /**
-     * The GitHub repository is the ONLY source of character data.
-     * No character JSON is stored in SharedPreferences and no stale local
-     * character database is used as a fallback.
-     */
     fun fetch(context: Context): List<OnlineCharacter> {
-        val json = get(DATA_URL + "?v=" + System.currentTimeMillis())
-        return parse(json)
+        val result = mutableListOf<OnlineCharacter>()
+        for ((filename, prefix, gameId) in tables) {
+            val rows = try {
+                RemoteXlsx.fetchRows(listOf("library/seed/" + filename))
+            } catch (_: Exception) {
+                continue
+            }
+            parseTable(rows, prefix, gameId, result)
+        }
+        return result.distinctBy { it.gameId + "|" + it.id }
     }
 
-    fun sync(context: Context): Boolean {
-        return try {
-            val fresh = get(DATA_URL + "?v=" + System.currentTimeMillis())
-            val games = JSONObject(fresh).optJSONArray("games") ?: return false
-            games.length() > 0 && parse(fresh).isNotEmpty()
-        } catch (_: Exception) {
-            false
+    fun sync(context: Context): Boolean = fetch(context).isNotEmpty()
+
+    private fun parseTable(
+        rows: List<List<String>>,
+        prefix: String,
+        gameId: String,
+        out: MutableList<OnlineCharacter>
+    ) {
+        if (rows.isEmpty()) return
+        val header = rows.first().map {
+            it.trim().removePrefix("﻿").replace("Ё", "Е").lowercase()
+        }
+
+        fun find(vararg names: String): Int {
+            val aliases = names.map { it.trim().replace("Ё", "Е").lowercase() }.toSet()
+            return header.indexOfFirst { it in aliases }
+        }
+
+        val idCol = find("id", "ид", "идентификатор")
+        val nameCol = find("имя", "имя персонажа", "название", "name", "character name")
+        val elementCol = find("стихия", "элемент", "element", "attribute")
+        val rarityCol = find("редкость", "rarity", "звезды", "звёзды", "stars")
+        if (idCol < 0 || nameCol < 0) return
+
+        for (row in rows.drop(1)) {
+            val id = row.getOrNull(idCol)?.trim().orEmpty()
+            val name = row.getOrNull(nameCol)?.trim().orEmpty()
+            if (id.isBlank() || name.isBlank()) continue
+            if (!Regex("^" + Regex.escape(prefix) + "\\.[0-9]+$").matches(id)) continue
+
+            val rarity = Regex("""\d+""")
+                .find(row.getOrNull(rarityCol).orEmpty())
+                ?.value
+                ?.toIntOrNull() ?: 0
+
+            out += OnlineCharacter(
+                gameId = gameId,
+                name = name,
+                slug = id,
+                announced = false,
+                portraitUrl = imageUrl(id),
+                rarity = rarity,
+                id = id,
+                element = row.getOrNull(elementCol).orEmpty()
+            )
         }
     }
 
-    private fun parse(json: String): List<OnlineCharacter> {
-        return try {
-            val root = JSONObject(json)
-            val games = root.optJSONArray("games") ?: return emptyList()
-            val version = root.optString("generatedAt").ifBlank { System.currentTimeMillis().toString() }
-                .replace(Regex("[^A-Za-z0-9]"), "")
-            buildList {
-                for (g in 0 until games.length()) {
-                    val game = games.getJSONObject(g)
-                    val gameId = game.optString("gameId").ifBlank { game.optString("id") }
-                    val chars = game.optJSONArray("characters") ?: continue
-                    for (i in 0 until chars.length()) {
-                        val c = chars.getJSONObject(i)
-                        val id = c.optString("id").trim()
-                        val name = c.optString("name").trim()
-                        if (id.isBlank() || name.isBlank()) continue
-                        add(OnlineCharacter(
-                            gameId = gameId,
-                            name = name,
-                            slug = id,
-                            announced = c.optBoolean("announced", false),
-                            portraitUrl = imageUrl(id, version),
-                            rarity = c.optInt("rarity", 0),
-                            id = id,
-                            element = c.optString("element")
-                        ))
-                    }
-                }
-            }.distinctBy { it.gameId + "|" + it.id }
-        } catch (_: Exception) {
-            emptyList()
-        }
-    }
-
-    fun imageUrl(id: String): String = imageUrl(id, "live")
-
-    private fun imageUrl(id: String, version: String): String =
-        "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp?v=$version"
-
-    private fun get(url: String): String {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.connectTimeout = 15_000
-        connection.readTimeout = 20_000
-        connection.requestMethod = "GET"
-        connection.instanceFollowRedirects = true
-        connection.useCaches = false
-        connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
-        connection.setRequestProperty("Pragma", "no-cache")
-        connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-        return try {
-            if (connection.responseCode !in 200..299) error("HTTP ${connection.responseCode}")
-            connection.inputStream.bufferedReader().use { it.readText() }
-        } finally {
-            connection.disconnect()
-        }
-    }
+    fun imageUrl(id: String): String =
+        "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/" +
+            id + ".webp?v=" + System.currentTimeMillis()
 }
