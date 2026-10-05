@@ -1,5 +1,34 @@
 {
-  "copied": [
+  "copied": [],
+  "missing": [
+    {
+      "id": "1.18",
+      "game": "Wuthering Waves",
+      "name": "Xiangli Yao"
+    },
+    {
+      "id": "1.30",
+      "game": "Wuthering Waves",
+      "name": "Hiyuki"
+    },
+    {
+      "id": "1.40",
+      "game": "Wuthering Waves",
+      "name": "Aemeath"
+    },
+    {
+      "id": "1.55",
+      "game": "Wuthering Waves",
+      "name": "Scar"
+    },
+    {
+      "id": "2.87",
+      "game": "Genshin Impact",
+      "name": "Sethos"
+    }
+  ],
+  "duplicates": [],
+  "skipped_existing": [
     {
       "id": "1.1",
       "game": "Wuthering Waves",
@@ -2064,33 +2093,5 @@
       "name": "Alice Thymefield",
       "source": "images_big/zenless_zone_zero/alice.webp"
     }
-  ],
-  "missing": [
-    {
-      "id": "1.18",
-      "game": "Wuthering Waves",
-      "name": "Xiangli Yao"
-    },
-    {
-      "id": "1.30",
-      "game": "Wuthering Waves",
-      "name": "Hiyuki"
-    },
-    {
-      "id": "1.40",
-      "game": "Wuthering Waves",
-      "name": "Aemeath"
-    },
-    {
-      "id": "1.55",
-      "game": "Wuthering Waves",
-      "name": "Huesos"
-    },
-    {
-      "id": "2.87",
-      "game": "Genshin Impact",
-      "name": "Sethos"
-    }
-  ],
-  "duplicates": []
+  ]
 }
