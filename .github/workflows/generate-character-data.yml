@@ -2,14 +2,8 @@ name: Generate character data and portraits
 
 on:
   push:
-    paths:
-      - 'library/seed/*.xlsx'
-      - 'library/seed/**'
-      - 'images_big/**'
-      - 'app/src/main/assets/**'
-      - 'scripts/generate_character_data.py'
-      - 'scripts/sync_library_portraits.py'
-      - '.github/workflows/generate-character-data.yml'
+  schedule:
+    - cron: '*/5 * * * *'
   workflow_dispatch:
 
 concurrency:
