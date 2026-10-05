@@ -4,7 +4,8 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "app/**"\n      - "admin/**"
+      - "app/**"
+      - "admin/**"
       - "build.gradle.kts"
       - "settings.gradle.kts"
       - "gradle.properties"
@@ -29,12 +30,19 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "9.8.0"
-      - name: Assemble debug APK
-        run: ./gradlew :app:assembleDebug --stacktrace
-      - name: Upload debug APK
+      - name: Assemble debug APKs
+        run: ./gradlew :app:assembleDebug :admin:assembleDebug --stacktrace
+      - name: Upload main app
         uses: actions/upload-artifact@v4
         with:
           name: G-Codus-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 7
+      - name: Upload admin app
+        uses: actions/upload-artifact@v4
+        with:
+          name: G-Codus-Admin-debug-apk
+          path: admin/build/outputs/apk/debug/admin-debug.apk
           if-no-files-found: error
           retention-days: 7
