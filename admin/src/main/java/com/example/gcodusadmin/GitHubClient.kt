@@ -6,26 +6,44 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.net.URLEncoder
 
-
-data class GitFile(val bytes: ByteArray, val sha: String)
+data class GitFile(val bytes: ByteArray, val sha: String?)
 
 class GitHubClient(private val token: String) {
     companion object {
         const val REPO = "sweeety601/G-Codus"
         private const val API = "https://api.github.com"
+        private const val RAW = "https://raw.githubusercontent.com/sweeety601/G-Codus/main"
         private const val TEST_FILE = "library/seed/01_Wuthering_Waves.xlsx"
     }
 
-    private fun connection(method: String, path: String): HttpURLConnection {
-        val conn = URL(API + "/repos/" + REPO + "/" + path).openConnection() as HttpURLConnection
+    private fun apiConnection(method: String, path: String): HttpURLConnection {
+        val safePath = path.split("/").joinToString("/") { part ->
+            URLEncoder.encode(part, "UTF-8").replace("+", "%20")
+        }
+        val conn = URL(API + "/repos/" + REPO + "/" + safePath).openConnection() as HttpURLConnection
         conn.requestMethod = method
+        conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
         conn.readTimeout = 30_000
         conn.setRequestProperty("Accept", "application/vnd.github+json")
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         conn.setRequestProperty("Authorization", "Bearer " + token)
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin")
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0")
+        return conn
+    }
+
+    private fun rawConnection(path: String): HttpURLConnection {
+        val encoded = path.split("/").joinToString("/") { part ->
+            URLEncoder.encode(part, "UTF-8").replace("+", "%20")
+        }
+        val conn = URL(RAW + "/" + encoded).openConnection() as HttpURLConnection
+        conn.requestMethod = "GET"
+        conn.instanceFollowRedirects = true
+        conn.connectTimeout = 20_000
+        conn.readTimeout = 30_000
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0")
         return conn
     }
 
@@ -36,33 +54,40 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        val repoConn = connection("GET", "")
-        val repoText = body(repoConn)
-        if (repoConn.responseCode !in 200..299) {
+        val raw = rawConnection(TEST_FILE)
+        val rawText = body(raw)
+        if (raw.responseCode !in 200..299) {
             throw IllegalStateException(
-                "Нет доступа к репозиторию " + REPO + ": HTTP " + repoConn.responseCode + " " + shortError(repoText) +
-                    ". Проверь Repository access и Contents = Read and write."
+                "Не удаётся прочитать публичный файл репозитория: HTTP " + raw.responseCode +
+                    " " + shortError(rawText)
             )
         }
 
-        val fileConn = connection("GET", "contents/" + TEST_FILE + "?ref=main")
-        val fileText = body(fileConn)
-        if (fileConn.responseCode !in 200..299) {
+        val api = apiConnection("GET", "contents/" + TEST_FILE + "?ref=main")
+        val apiText = body(api)
+        if (api.responseCode !in 200..299) {
             throw IllegalStateException(
-                "К репозиторию доступ есть, но нет доступа к файлам Contents. " +
-                    "Файл " + TEST_FILE + " вернул HTTP " + fileConn.responseCode + ": " + shortError(fileText) +
-                    ". Для Fine-grained token: Repository access → Only select repositories → G-Codus; " +
-                    "Repository permissions → Contents → Read and write."
+                "GitHub видит репозиторий, но токен не имеет доступа через Contents API: HTTP " +
+                    api.responseCode + " " + shortError(apiText) +
+                    ". Для Fine-grained token: G-Codus → Contents → Read and write."
             )
         }
     }
 
     fun getFile(path: String): GitFile {
-        val conn = connection("GET", "contents/" + path + "?ref=main")
+        val raw = rawConnection(path)
+        val rawBytes = if (raw.responseCode in 200..299) {
+            val stream = raw.inputStream
+            stream.use { it.readBytes() }
+        } else null
+
+        if (rawBytes != null) return GitFile(rawBytes, null)
+
+        val conn = apiConnection("GET", "contents/" + path + "?ref=main")
         val text = body(conn)
         if (conn.responseCode !in 200..299) {
             throw IllegalStateException(
-                "GET " + path + ": HTTP " + conn.responseCode + " " + shortError(text)
+                "Не удалось получить " + path + ": HTTP " + conn.responseCode + " " + shortError(text)
             )
         }
         val json = JSONObject(text)
@@ -70,8 +95,20 @@ class GitHubClient(private val token: String) {
         return GitFile(Base64.decode(content, Base64.DEFAULT), json.getString("sha"))
     }
 
+    fun getFileSha(path: String): String? {
+        val conn = apiConnection("GET", "contents/" + path + "?ref=main")
+        val text = body(conn)
+        if (conn.responseCode == 404) return null
+        if (conn.responseCode !in 200..299) {
+            throw IllegalStateException(
+                "Не удалось получить SHA файла " + path + ": HTTP " + conn.responseCode + " " + shortError(text)
+            )
+        }
+        return JSONObject(text).getString("sha")
+    }
+
     fun putFile(path: String, bytes: ByteArray, sha: String?, message: String): String {
-        val conn = connection("PUT", "contents/" + path)
+        val conn = apiConnection("PUT", "contents/" + path)
         conn.doOutput = true
         conn.setRequestProperty("Content-Type", "application/json")
         val payload = JSONObject()
@@ -83,7 +120,7 @@ class GitHubClient(private val token: String) {
         val text = body(conn)
         if (conn.responseCode !in 200..299) {
             throw IllegalStateException(
-                "PUT " + path + ": HTTP " + conn.responseCode + " " + shortError(text)
+                "Не удалось сохранить " + path + ": HTTP " + conn.responseCode + " " + shortError(text)
             )
         }
         return JSONObject(text).optJSONObject("commit")?.optString("sha").orEmpty()
@@ -94,10 +131,10 @@ class GitHubClient(private val token: String) {
             val json = JSONObject(text)
             val message = json.optString("message").trim()
             val documentation = json.optString("documentation_url").trim()
-            if (message.isNotBlank()) {
-                if (documentation.isNotBlank()) message + " (" + documentation + ")" else message
-            } else {
-                text.replace("\n", " ").replace("\r", " ").trim().take(300)
+            when {
+                message.isNotBlank() && documentation.isNotBlank() -> message + " (" + documentation + ")"
+                message.isNotBlank() -> message
+                else -> text.replace("\n", " ").replace("\r", " ").trim().take(300)
             }
         } catch (_: Exception) {
             text.replace("\n", " ").replace("\r", " ").trim().take(300)
