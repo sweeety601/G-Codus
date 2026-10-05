@@ -16,26 +16,16 @@ class GitHubClient(private val token: String) {
         private const val RAW = "https://raw.githubusercontent.com"
     }
 
-    private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
+    private fun apiConnection(method: String, path: String, authorized: Boolean = true, accept: String = "application/vnd.github+json"): HttpURLConnection {
         val conn = URL(API + "/repos/" + REPO + "/" + path).openConnection() as HttpURLConnection
         conn.requestMethod = method
         conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
         conn.readTimeout = 30_000
-        conn.setRequestProperty("Accept", "application/vnd.github+json")
+        conn.setRequestProperty("Accept", accept)
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         if (authorized && token.isNotBlank()) conn.setRequestProperty("Authorization", "Bearer " + token)
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.8")
-        return conn
-    }
-
-    private fun rawConnection(path: String): HttpURLConnection {
-        val conn = URL(RAW + "/" + REPO + "/main/" + path).openConnection() as HttpURLConnection
-        conn.requestMethod = "GET"
-        conn.instanceFollowRedirects = true
-        conn.connectTimeout = 20_000
-        conn.readTimeout = 30_000
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.8")
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.9")
         return conn
     }
 
@@ -50,18 +40,23 @@ class GitHubClient(private val token: String) {
     }
 
     fun getFile(path: String): GitFile {
-        // The repository is public. Read binary XLSX files directly from raw GitHub.
-        // This avoids the Contents API's JSON/base64 handling for binary files entirely.
-        val conn = rawConnection(path)
+        // Public repository: GitHub Contents API can return the raw file bytes
+        // directly. No PAT is sent for reads.
+        val conn = apiConnection(
+            "GET",
+            "contents/" + path + "?ref=main",
+            authorized = false,
+            accept = "application/vnd.github.raw+json"
+        )
         val code = conn.responseCode
         if (code !in 200..299) {
             val text = body(conn)
-            throw IllegalStateException("Не удалось прочитать " + path + ": GitHub RAW HTTP " + code + " — " + shortError(text))
+            throw IllegalStateException(
+                "Не удалось прочитать " + path + ": GitHub HTTP " + code + " — " + shortError(text)
+            )
         }
         val bytes = conn.inputStream.use { it.readBytes() }
         if (bytes.isEmpty()) throw IllegalStateException("GitHub вернул пустой файл " + path)
-        // Reading must never require Contents API authentication.
-        // SHA is fetched separately only by write operations.
         return GitFile(bytes, null)
     }
 
