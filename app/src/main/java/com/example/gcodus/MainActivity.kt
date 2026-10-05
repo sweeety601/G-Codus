@@ -295,6 +295,9 @@ class MainActivity : AppCompatActivity() {
         val content = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             setPadding(0, dp(14), 0, 0)
+            // This container is populated asynchronously by animatePageChange().
+            // Do not let the outer screen animation cancel that build animation.
+            tag = "dynamic_page_content"
         }
         column.addView(content)
 
@@ -2193,6 +2196,9 @@ class MainActivity : AppCompatActivity() {
     private fun animateScreenIn(container: android.view.ViewGroup) {
         for (index in 0 until container.childCount) {
             val child = container.getChildAt(index)
+            // Dynamic game-page content owns its own transition. Animating the
+            // same View here would cancel animatePageChange() before it builds.
+            if (child.tag == "dynamic_page_content") continue
             if (child.visibility != View.VISIBLE) continue
             child.animate().cancel()
             child.alpha = 0f
