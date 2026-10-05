@@ -1,12 +1,9 @@
 {
   "version": 3,
   "generated_at": "2026-10-05T13:15:47.102658+00:00",
-  "source": "Prydwen + secondary fallback",
+  "source": "G-Codus database",
   "games": {
     "Genshin Impact": {
-      "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-05T13:15:49.924155+00:00",
-      "status": "source_unavailable",
       "current": [
         {
           "phase": "7.1 Phase 1",
@@ -19,9 +16,6 @@
           "end_date": "2026-10-13",
           "status": "live",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 7.1 official notice",
-          "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/",
-          "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026",
           "four_star": [
             "Diona",
             "Faruzan",
@@ -41,8 +35,6 @@
           "end_date": "2026-11-03",
           "status": "upcoming",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 7.1 Special Program",
-          "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026",
           "four_star": [
             "Diona",
             "Faruzan",
@@ -50,13 +42,9 @@
           ]
         }
       ],
-      "upcoming": [],
-      "leak_sources": []
+      "upcoming": []
     },
     "Wuthering Waves": {
-      "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-05T13:15:52.139377+00:00",
-      "status": "source_unavailable",
       "current": [
         {
           "phase": "3.7 Phase 1",
@@ -70,9 +58,6 @@
           "end_date": "2026-10-22",
           "status": "live",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 3.7 official notice",
-          "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528",
-          "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
           "four_star": [
             "Buling",
             "Taoqi",
@@ -93,8 +78,6 @@
           "end_date": "2026-11-11",
           "status": "upcoming",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 3.7 official schedule / Special Report",
-          "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
           "four_star": [
             "Lumi",
             "Danjin",
@@ -102,13 +85,9 @@
           ]
         }
       ],
-      "upcoming": [],
-      "leak_sources": []
+      "upcoming": []
     },
     "Zenless Zone Zero": {
-      "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-05T13:15:55.130249+00:00",
-      "status": "source_unavailable",
       "current": [],
       "next": [
         {
@@ -121,17 +100,12 @@
           "end_date": "2026-11-11",
           "status": "upcoming",
           "unconfirmed": true,
-          "source_status": "unconfirmed",
-          "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
+          "source_status": "unconfirmed"
         }
       ],
-      "upcoming": [],
-      "leak_sources": []
+      "upcoming": []
     },
     "Honkai: Star Rail": {
-      "source_url": "https://www.prydwen.gg/star-rail/banners",
-      "fetched_at": "2026-10-05T13:15:57.254973+00:00",
-      "status": "source_unavailable",
       "current": [
         {
           "phase": "4.6 Phase 1",
@@ -144,9 +118,6 @@
           "end_date": "2026-10-21",
           "status": "live",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 4.6 official announcement",
-          "official_source": "https://hsr.hoyoverse.com/",
-          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
           "four_star": [
             "Qingque",
             "Xueyi",
@@ -166,9 +137,6 @@
           "end_date": "2026-11-10",
           "status": "upcoming",
           "source_status": "confirmed",
-          "confirmation_basis": "Version 4.6 official announcement",
-          "official_source": "https://hsr.hoyoverse.com/",
-          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
           "four_star": [
             "Qingque",
             "Xueyi",
@@ -176,16 +144,9 @@
           ]
         }
       ],
-      "upcoming": [],
-      "leak_sources": [
-        "https://hsr.hakush.in/",
-        "https://www.reddit.com/r/HonkaiStarRail_leaks/"
-      ]
+      "upcoming": []
     },
     "Arknights: Endfield": {
-      "source_url": "https://www.prydwen.gg/arknights-endfield/banners",
-      "fetched_at": "2026-10-05T13:15:59.420581+00:00",
-      "status": "source_unavailable",
       "current": [
         {
           "phase": "1.5 Phase 2",
@@ -197,18 +158,11 @@
           "end_date": "2026-10-21",
           "status": "live",
           "source_status": "confirmed",
-          "confirmation_basis": "Official RE-Factor Headhunting #1 announcement",
-          "official_source": "https://endfield.gryphline.com/en-us/news/3839",
-          "secondary_source": "https://endfield.gryphline.com/en-us/news/3839",
           "four_star": []
         }
       ],
       "next": [],
-      "upcoming": [],
-      "leak_sources": [
-        "https://www.reddit.com/r/ArknightsEndfieldLeak/",
-        "https://www.pocketgamer.com/arknights-endfield/upcoming-banners/"
-      ]
+      "upcoming": []
     }
   }
 }
