@@ -1285,6 +1285,16 @@ class MainActivity : AppCompatActivity() {
         val editor = prefs.edit()
         var changed = false
 
+        prefs.all.keys.filter { key ->
+            val normalized = key.lowercase().replace("’", "").replace("'", "").replace(Regex("[^a-z0-9]+"), "")
+            normalized.contains("trackedv2endfieldthestoryteller") ||
+                normalized.contains("trackedv2endfieldstoryteller") ||
+                normalized.contains("trackedv2endfieldsunbringer") ||
+                normalized.contains("trackedendfieldthestoryteller") ||
+                normalized.contains("trackedendfieldstoryteller") ||
+                normalized.contains("trackedendfieldsunbringer")
+        }.forEach { editor.remove(it); changed = true }
+
         // Storyteller and Sunbringer are permanently excluded from Tracking/Wishlist.
         // Remove all legacy/new saved keys for either name, regardless of game/prefix/version.
         prefs.all.keys.filter { key ->
@@ -1695,26 +1705,16 @@ class MainActivity : AppCompatActivity() {
         val b = normalizeCharacterForMatch(onlineName)
         val slug = normalizeCharacterForMatch(onlineSlug)
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
-
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
                 else -> value
             }
-            val localCanonical = hsrCanonical(a)
-            val onlineCanonical = hsrCanonical(b)
-            val localFileCanonical = hsrCanonical(file)
-            val onlineSlugCanonical = hsrCanonical(slug)
-            if (localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical) return true
+            if (hsrCanonical(a) == hsrCanonical(b) || hsrCanonical(file) == hsrCanonical(slug)) return true
         }
-
         return when (gameId) {
-            "zzz" -> {
-                val local = normalizeCharacterForMatch(localName)
-                val online = normalizeCharacterForMatch(onlineName)
-                val localSlug = normalizeCharacterForMatch(localFile)
-                local == online || localSlug == normalizeCharacterForMatch(onlineSlug)
-            }
+            "zzz" -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
+                normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
             else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
         }
