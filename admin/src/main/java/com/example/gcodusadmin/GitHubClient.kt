@@ -38,6 +38,24 @@ class GitHubClient(private val token: String) {
 
     fun testToken() {
         if (token.isBlank()) throw IllegalStateException("Пустой GitHub token")
+
+        // Реальная проверка токена: раньше здесь проверялась только непустая строка,
+        // поэтому любое значение считалось успешным входом.
+        val conn = apiConnection("GET", "", authorized = true)
+        val code = conn.responseCode
+        val response = body(conn)
+
+        if (code !in 200..299) {
+            val reason = shortError(response)
+            throw IllegalStateException(
+                when (code) {
+                    401 -> "GitHub отклонил токен (HTTP 401): токен недействителен или отозван"
+                    403 -> "GitHub запретил доступ (HTTP 403): проверь права Fine-grained token для репозитория G-Codus"
+                    404 -> "GitHub не видит репозиторий G-Codus этим токеном (HTTP 404): проверь Repository access"
+                    else -> "Проверка GitHub не пройдена (HTTP " + code + "): " + reason
+                }
+            )
+        }
     }
 
     fun getFile(path: String): GitFile {
