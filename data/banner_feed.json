@@ -1,214 +1,52 @@
 {
-  "version": 3,
-  "generated_at": "2026-10-05T10:34:49.394234+00:00",
-  "source": "Prydwen + secondary fallback",
+  "version": 5,
+  "generated_at": "2026-10-05T10:35:29.876808+00:00",
+  "source": "G-Codus banner Excel tables",
   "games": {
-    "Genshin Impact": {
-      "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-05T10:34:51.988636+00:00",
-      "status": "source_unavailable",
-      "current": [
-        {
-          "phase": "7.1 Phase 1",
-          "type": "character",
-          "characters": [
-            "Vesna",
-            "Vodyanitsa"
-          ],
-          "start_date": "2026-09-23",
-          "end_date": "2026-10-13",
-          "status": "live",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 7.1 official notice",
-          "official_source": "https://traveler.gg/version-7-1-event-wishes-notice-phase-i/",
-          "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026",
-          "four_star": [
-            "Diona",
-            "Faruzan",
-            "Chongyun"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "7.1 Phase 2",
-          "type": "character",
-          "characters": [
-            "Escoffier",
-            "Skirk"
-          ],
-          "start_date": "2026-10-13",
-          "end_date": "2026-11-03",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 7.1 Special Program",
-          "secondary_source": "https://timesaver.gg/blog/genshin-banner-schedule-october-2026",
-          "four_star": [
-            "Diona",
-            "Faruzan",
-            "Chongyun"
-          ]
-        }
-      ],
-      "upcoming": [],
-      "leak_sources": []
-    },
     "Wuthering Waves": {
-      "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-05T10:34:54.017681+00:00",
-      "status": "source_unavailable",
-      "current": [
-        {
-          "phase": "3.7 Phase 1",
-          "type": "character",
-          "characters": [
-            "Hsin",
-            "Chisa",
-            "Iuno"
-          ],
-          "start_date": "2026-09-30",
-          "end_date": "2026-10-22",
-          "status": "live",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 3.7 official notice",
-          "official_source": "https://wutheringwaves.kurogames.com/zh-tw/main/news/detail/5528",
-          "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
-          "four_star": [
-            "Buling",
-            "Taoqi",
-            "Youhu"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "3.7 Phase 2",
-          "type": "character",
-          "characters": [
-            "Suoming",
-            "Lucilla",
-            "Lynae"
-          ],
-          "start_date": "2026-10-22",
-          "end_date": "2026-11-11",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 3.7 official schedule / Special Report",
-          "secondary_source": "https://allthings.how/wuthering-waves-3-7-banners-hsin-and-suoming-pull-priority/",
-          "four_star": [
-            "Lumi",
-            "Danjin",
-            "Chixia"
-          ]
-        }
-      ],
-      "upcoming": [],
-      "leak_sources": []
-    },
-    "Zenless Zone Zero": {
-      "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-05T10:34:56.573365+00:00",
-      "status": "source_unavailable",
+      "id": "wuwa",
+      "name": "Wuthering Waves",
       "current": [],
-      "next": [
-        {
-          "phase": "3.3 Phase 1",
-          "type": "character",
-          "characters": [
-            "Phoenix"
-          ],
-          "start_date": "2026-10-21",
-          "end_date": "2026-11-11",
-          "status": "upcoming",
-          "unconfirmed": true,
-          "source_status": "unconfirmed",
-          "secondary_source": "https://keygold.gg/blog/detail/zenless-zone-zero-3-3-phoenix-severian-leaks"
-        }
-      ],
-      "upcoming": [],
-      "leak_sources": []
-    },
-    "Honkai: Star Rail": {
-      "source_url": "https://www.prydwen.gg/star-rail/banners",
-      "fetched_at": "2026-10-05T10:34:58.620751+00:00",
-      "status": "source_unavailable",
-      "current": [
-        {
-          "phase": "4.6 Phase 1",
-          "type": "character",
-          "characters": [
-            "Pearl",
-            "Evanescia"
-          ],
-          "start_date": "2026-09-28",
-          "end_date": "2026-10-21",
-          "status": "live",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 4.6 official announcement",
-          "official_source": "https://hsr.hoyoverse.com/",
-          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
-          "four_star": [
-            "Qingque",
-            "Xueyi",
-            "Misha"
-          ]
-        }
-      ],
-      "next": [
-        {
-          "phase": "4.6 Phase 2",
-          "type": "character",
-          "characters": [
-            "Pearl",
-            "Mortenax Blade"
-          ],
-          "start_date": "2026-10-21",
-          "end_date": "2026-11-10",
-          "status": "upcoming",
-          "source_status": "confirmed",
-          "confirmation_basis": "Version 4.6 official announcement",
-          "official_source": "https://hsr.hoyoverse.com/",
-          "secondary_source": "https://www.prydwen.gg/star-rail/banners",
-          "four_star": [
-            "Qingque",
-            "Xueyi",
-            "Misha"
-          ]
-        }
-      ],
-      "upcoming": [],
-      "leak_sources": [
-        "https://hsr.hakush.in/",
-        "https://www.reddit.com/r/HonkaiStarRail_leaks/"
-      ]
-    },
-    "Arknights: Endfield": {
-      "source_url": "https://www.prydwen.gg/arknights-endfield/banners",
-      "fetched_at": "2026-10-05T10:35:00.627247+00:00",
-      "status": "source_unavailable",
-      "current": [
-        {
-          "phase": "1.5 Phase 2",
-          "type": "character",
-          "characters": [
-            "Yvonne"
-          ],
-          "start_date": "2026-09-24",
-          "end_date": "2026-10-21",
-          "status": "live",
-          "source_status": "confirmed",
-          "confirmation_basis": "Official RE-Factor Headhunting #1 announcement",
-          "official_source": "https://endfield.gryphline.com/en-us/news/3839",
-          "secondary_source": "https://endfield.gryphline.com/en-us/news/3839",
-          "four_star": []
-        }
-      ],
       "next": [],
       "upcoming": [],
-      "leak_sources": [
-        "https://www.reddit.com/r/ArknightsEndfieldLeak/",
-        "https://www.pocketgamer.com/arknights-endfield/upcoming-banners/"
-      ]
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Genshin Impact": {
+      "id": "genshin",
+      "name": "Genshin Impact",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Honkai: Star Rail": {
+      "id": "starrail",
+      "name": "Honkai: Star Rail",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Arknights: Endfield": {
+      "id": "endfield",
+      "name": "Arknights: Endfield",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Zenless Zone Zero": {
+      "id": "zzz",
+      "name": "Zenless Zone Zero",
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
     }
   }
 }
