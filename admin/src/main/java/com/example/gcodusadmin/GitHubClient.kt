@@ -38,13 +38,12 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        // Do not reject a valid token at login because GitHub can return 404 for
-        // fine-grained tokens on endpoints that are not granted to them.
-        // The repository is public, so login only verifies public API connectivity.
-        val conn = apiConnection("GET", "", authorized = false)
-        val text = body(conn)
-        if (conn.responseCode !in 200..299) {
-            throw IllegalStateException("GitHub API недоступен: HTTP " + conn.responseCode + " " + shortError(text))
+        // Login must not make a repository metadata request.
+        // GitHub may return 404 for fine-grained tokens on endpoints that are
+        // not granted to them. Public file reads and authenticated writes are
+        // checked when the corresponding operation is actually performed.
+        if (token.isBlank()) {
+            throw IllegalStateException("Пустой GitHub token")
         }
     }
 
