@@ -14,9 +14,11 @@ android {
         versionName = "0.4.0"
     }
 
+    // Character portraits, banner JSON and other character assets are NOT packaged in the APK.
+    // All character data and portraits are fetched from the GitHub database at runtime.
     sourceSets {
         getByName("main") {
-            assets.srcDirs("src/main/assets", "../assets", "../images_big")
+            assets.setSrcDirs(emptyList<Any>())
         }
     }
 
