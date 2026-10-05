@@ -1,0 +1,2091 @@
+{
+  "copied": [
+    {
+      "id": "1.1",
+      "game": "Wuthering Waves",
+      "name": "Sigrika",
+      "source": "images_big/wuthering_waves/sigrika.webp"
+    },
+    {
+      "id": "1.2",
+      "game": "Wuthering Waves",
+      "name": "Luuk Herssen",
+      "source": "images_big/wuthering_waves/luuk-herssen.webp"
+    },
+    {
+      "id": "1.3",
+      "game": "Wuthering Waves",
+      "name": "Mornye",
+      "source": "images_big/wuthering_waves/mornye.webp"
+    },
+    {
+      "id": "1.4",
+      "game": "Wuthering Waves",
+      "name": "Roccia",
+      "source": "images_big/wuthering_waves/roccia.webp"
+    },
+    {
+      "id": "1.5",
+      "game": "Wuthering Waves",
+      "name": "Lynae",
+      "source": "images_big/wuthering_waves/lynae.webp"
+    },
+    {
+      "id": "1.6",
+      "game": "Wuthering Waves",
+      "name": "Aalto",
+      "source": "images_big/wuthering_waves/aalto.webp"
+    },
+    {
+      "id": "1.7",
+      "game": "Wuthering Waves",
+      "name": "Augusta",
+      "source": "images_big/wuthering_waves/aug.webp"
+    },
+    {
+      "id": "1.8",
+      "game": "Wuthering Waves",
+      "name": "Baizhi",
+      "source": "images_big/wuthering_waves/baizhi.webp"
+    },
+    {
+      "id": "1.9",
+      "game": "Wuthering Waves",
+      "name": "Buling",
+      "source": "images_big/wuthering_waves/buling.webp"
+    },
+    {
+      "id": "1.10",
+      "game": "Wuthering Waves",
+      "name": "Brant",
+      "source": "images_big/wuthering_waves/brant.webp"
+    },
+    {
+      "id": "1.11",
+      "game": "Wuthering Waves",
+      "name": "Camellya",
+      "source": "images_big/wuthering_waves/camellya.webp"
+    },
+    {
+      "id": "1.12",
+      "game": "Wuthering Waves",
+      "name": "Cantarella",
+      "source": "images_big/wuthering_waves/cantarella.webp"
+    },
+    {
+      "id": "1.13",
+      "game": "Wuthering Waves",
+      "name": "Carlotta",
+      "source": "images_big/wuthering_waves/carlotta.webp"
+    },
+    {
+      "id": "1.14",
+      "game": "Wuthering Waves",
+      "name": "Changli",
+      "source": "images_big/wuthering_waves/changli.webp"
+    },
+    {
+      "id": "1.15",
+      "game": "Wuthering Waves",
+      "name": "Shorekeeper",
+      "source": "images_big/wuthering_waves/shorekeeper.webp"
+    },
+    {
+      "id": "1.16",
+      "game": "Wuthering Waves",
+      "name": "Lumi",
+      "source": "images_big/wuthering_waves/lumi.webp"
+    },
+    {
+      "id": "1.17",
+      "game": "Wuthering Waves",
+      "name": "Phoebe",
+      "source": "images_big/wuthering_waves/phoebe.webp"
+    },
+    {
+      "id": "1.19",
+      "game": "Wuthering Waves",
+      "name": "Youhu",
+      "source": "images_big/wuthering_waves/youhu.webp"
+    },
+    {
+      "id": "1.20",
+      "game": "Wuthering Waves",
+      "name": "Zani",
+      "source": "images_big/wuthering_waves/zani.webp"
+    },
+    {
+      "id": "1.21",
+      "game": "Wuthering Waves",
+      "name": "Zhezhi",
+      "source": "images_big/wuthering_waves/zhezhi.webp"
+    },
+    {
+      "id": "1.22",
+      "game": "Wuthering Waves",
+      "name": "Cartethyia",
+      "source": "images_big/wuthering_waves/cartethyia.webp"
+    },
+    {
+      "id": "1.23",
+      "game": "Wuthering Waves",
+      "name": "Chisa",
+      "source": "images_big/wuthering_waves/chisa.webp"
+    },
+    {
+      "id": "1.24",
+      "game": "Wuthering Waves",
+      "name": "Chixia",
+      "source": "images_big/wuthering_waves/chixia.webp"
+    },
+    {
+      "id": "1.25",
+      "game": "Wuthering Waves",
+      "name": "Ciaccona",
+      "source": "images_big/wuthering_waves/ciaccona.webp"
+    },
+    {
+      "id": "1.26",
+      "game": "Wuthering Waves",
+      "name": "Danjin",
+      "source": "images_big/wuthering_waves/danjin.webp"
+    },
+    {
+      "id": "1.27",
+      "game": "Wuthering Waves",
+      "name": "Denia",
+      "source": "images_big/wuthering_waves/denia.webp"
+    },
+    {
+      "id": "1.28",
+      "game": "Wuthering Waves",
+      "name": "Encore",
+      "source": "images_big/wuthering_waves/encore.webp"
+    },
+    {
+      "id": "1.29",
+      "game": "Wuthering Waves",
+      "name": "Galbrena",
+      "source": "images_big/wuthering_waves/galbrena.webp"
+    },
+    {
+      "id": "1.31",
+      "game": "Wuthering Waves",
+      "name": "Hsin",
+      "source": "images_big/wuthering_waves/hsin.webp"
+    },
+    {
+      "id": "1.32",
+      "game": "Wuthering Waves",
+      "name": "Iuno",
+      "source": "images_big/wuthering_waves/iuno.webp"
+    },
+    {
+      "id": "1.33",
+      "game": "Wuthering Waves",
+      "name": "Jianxin",
+      "source": "images_big/wuthering_waves/jianxin.webp"
+    },
+    {
+      "id": "1.34",
+      "game": "Wuthering Waves",
+      "name": "Jinhsi",
+      "source": "images_big/wuthering_waves/jinhsi.webp"
+    },
+    {
+      "id": "1.35",
+      "game": "Wuthering Waves",
+      "name": "Jingran",
+      "source": "images_big/wuthering_waves/jingran.webp"
+    },
+    {
+      "id": "1.36",
+      "game": "Wuthering Waves",
+      "name": "Jiyan",
+      "source": "images_big/wuthering_waves/jiyan.webp"
+    },
+    {
+      "id": "1.37",
+      "game": "Wuthering Waves",
+      "name": "Lingyang",
+      "source": "images_big/wuthering_waves/ling.webp"
+    },
+    {
+      "id": "1.38",
+      "game": "Wuthering Waves",
+      "name": "Lupa",
+      "source": "images_big/wuthering_waves/lupa.webp"
+    },
+    {
+      "id": "1.39",
+      "game": "Wuthering Waves",
+      "name": "Lucy",
+      "source": "images_big/wuthering_waves/lucilla.webp"
+    },
+    {
+      "id": "1.41",
+      "game": "Wuthering Waves",
+      "name": "Mortefi",
+      "source": "images_big/wuthering_waves/mortefi.webp"
+    },
+    {
+      "id": "1.42",
+      "game": "Wuthering Waves",
+      "name": "Phrolova",
+      "source": "images_big/wuthering_waves/phrolova.webp"
+    },
+    {
+      "id": "1.43",
+      "game": "Wuthering Waves",
+      "name": "Qiuyuan",
+      "source": "images_big/wuthering_waves/qiuyuan.webp"
+    },
+    {
+      "id": "1.44",
+      "game": "Wuthering Waves",
+      "name": "Qingxiao",
+      "source": "images_big/wuthering_waves/qingxiao.webp"
+    },
+    {
+      "id": "1.45",
+      "game": "Wuthering Waves",
+      "name": "Rebecca",
+      "source": "images_big/wuthering_waves/rebecca.webp"
+    },
+    {
+      "id": "1.46",
+      "game": "Wuthering Waves",
+      "name": "Sanhua",
+      "source": "images_big/wuthering_waves/sanhua.webp"
+    },
+    {
+      "id": "1.47",
+      "game": "Wuthering Waves",
+      "name": "Suisui",
+      "source": "images_big/wuthering_waves/suisui.webp"
+    },
+    {
+      "id": "1.48",
+      "game": "Wuthering Waves",
+      "name": "Suoming",
+      "source": "images_big/wuthering_waves/suoming.webp"
+    },
+    {
+      "id": "1.49",
+      "game": "Wuthering Waves",
+      "name": "Taoqi",
+      "source": "images_big/wuthering_waves/taoqi.webp"
+    },
+    {
+      "id": "1.50",
+      "game": "Wuthering Waves",
+      "name": "Verina",
+      "source": "images_big/wuthering_waves/verina.webp"
+    },
+    {
+      "id": "1.51",
+      "game": "Wuthering Waves",
+      "name": "Yangyang",
+      "source": "images_big/wuthering_waves/yangyang.webp"
+    },
+    {
+      "id": "1.52",
+      "game": "Wuthering Waves",
+      "name": "Yangyang: Xuanling",
+      "source": "images_big/wuthering_waves/yangyang-xuanling.webp"
+    },
+    {
+      "id": "1.53",
+      "game": "Wuthering Waves",
+      "name": "Yinlin",
+      "source": "images_big/wuthering_waves/yinlin.webp"
+    },
+    {
+      "id": "1.54",
+      "game": "Wuthering Waves",
+      "name": "Yuanwu",
+      "source": "images_big/wuthering_waves/yuanwu.webp"
+    },
+    {
+      "id": "2.1",
+      "game": "Genshin Impact",
+      "name": "Aino",
+      "source": "images_big/genshin/aino.webp"
+    },
+    {
+      "id": "2.2",
+      "game": "Genshin Impact",
+      "name": "Albedo",
+      "source": "images_big/genshin/albedo.webp"
+    },
+    {
+      "id": "2.3",
+      "game": "Genshin Impact",
+      "name": "Alhaitham",
+      "source": "images_big/genshin/alhaitham.webp"
+    },
+    {
+      "id": "2.4",
+      "game": "Genshin Impact",
+      "name": "Aloy",
+      "source": "images_big/genshin/aloy.webp"
+    },
+    {
+      "id": "2.5",
+      "game": "Genshin Impact",
+      "name": "Amber",
+      "source": "images_big/genshin/amber.webp"
+    },
+    {
+      "id": "2.6",
+      "game": "Genshin Impact",
+      "name": "Arataki Itto",
+      "source": "images_big/genshin/arataki-itto.webp"
+    },
+    {
+      "id": "2.7",
+      "game": "Genshin Impact",
+      "name": "Arlecchino",
+      "source": "images_big/genshin/arlecchino.webp"
+    },
+    {
+      "id": "2.8",
+      "game": "Genshin Impact",
+      "name": "Baizhu",
+      "source": "images_big/genshin/baizhu.webp"
+    },
+    {
+      "id": "2.9",
+      "game": "Genshin Impact",
+      "name": "Barbara",
+      "source": "images_big/genshin/barbara.webp"
+    },
+    {
+      "id": "2.10",
+      "game": "Genshin Impact",
+      "name": "Beidou",
+      "source": "images_big/genshin/beidou.webp"
+    },
+    {
+      "id": "2.11",
+      "game": "Genshin Impact",
+      "name": "Bennett",
+      "source": "images_big/genshin/bennett.webp"
+    },
+    {
+      "id": "2.12",
+      "game": "Genshin Impact",
+      "name": "Candace",
+      "source": "images_big/genshin/candace.webp"
+    },
+    {
+      "id": "2.13",
+      "game": "Genshin Impact",
+      "name": "Charlotte",
+      "source": "images_big/genshin/charlotte.webp"
+    },
+    {
+      "id": "2.14",
+      "game": "Genshin Impact",
+      "name": "Chasca",
+      "source": "images_big/genshin/chasca.webp"
+    },
+    {
+      "id": "2.15",
+      "game": "Genshin Impact",
+      "name": "Chevreuse",
+      "source": "images_big/genshin/chevreuse.webp"
+    },
+    {
+      "id": "2.16",
+      "game": "Genshin Impact",
+      "name": "Chiori",
+      "source": "images_big/genshin/chiori.webp"
+    },
+    {
+      "id": "2.17",
+      "game": "Genshin Impact",
+      "name": "Chongyun",
+      "source": "images_big/genshin/chongyun.webp"
+    },
+    {
+      "id": "2.18",
+      "game": "Genshin Impact",
+      "name": "Citlali",
+      "source": "images_big/genshin/citlali.webp"
+    },
+    {
+      "id": "2.19",
+      "game": "Genshin Impact",
+      "name": "Clorinde",
+      "source": "images_big/genshin/clorinde.webp"
+    },
+    {
+      "id": "2.20",
+      "game": "Genshin Impact",
+      "name": "Collei",
+      "source": "images_big/genshin/collei.webp"
+    },
+    {
+      "id": "2.21",
+      "game": "Genshin Impact",
+      "name": "Columbina",
+      "source": "images_big/genshin/columbina.webp"
+    },
+    {
+      "id": "2.22",
+      "game": "Genshin Impact",
+      "name": "Cyno",
+      "source": "images_big/genshin/cyno.webp"
+    },
+    {
+      "id": "2.23",
+      "game": "Genshin Impact",
+      "name": "Dahlia",
+      "source": "images_big/genshin/dahlia.webp"
+    },
+    {
+      "id": "2.24",
+      "game": "Genshin Impact",
+      "name": "Dehya",
+      "source": "images_big/genshin/dehya.webp"
+    },
+    {
+      "id": "2.25",
+      "game": "Genshin Impact",
+      "name": "Diluc",
+      "source": "images_big/genshin/diluc.webp"
+    },
+    {
+      "id": "2.26",
+      "game": "Genshin Impact",
+      "name": "Diona",
+      "source": "images_big/genshin/diona.webp"
+    },
+    {
+      "id": "2.27",
+      "game": "Genshin Impact",
+      "name": "Dori",
+      "source": "images_big/genshin/dori.webp"
+    },
+    {
+      "id": "2.28",
+      "game": "Genshin Impact",
+      "name": "Durin",
+      "source": "images_big/genshin/durin.webp"
+    },
+    {
+      "id": "2.29",
+      "game": "Genshin Impact",
+      "name": "Emilie",
+      "source": "images_big/genshin/emilie.webp"
+    },
+    {
+      "id": "2.30",
+      "game": "Genshin Impact",
+      "name": "Escoffier",
+      "source": "images_big/genshin/escoffier.webp"
+    },
+    {
+      "id": "2.31",
+      "game": "Genshin Impact",
+      "name": "Eula",
+      "source": "images_big/genshin/eula.webp"
+    },
+    {
+      "id": "2.32",
+      "game": "Genshin Impact",
+      "name": "Faruzan",
+      "source": "images_big/genshin/faruzan.webp"
+    },
+    {
+      "id": "2.33",
+      "game": "Genshin Impact",
+      "name": "Fischl",
+      "source": "images_big/genshin/fischl.webp"
+    },
+    {
+      "id": "2.34",
+      "game": "Genshin Impact",
+      "name": "Flins",
+      "source": "images_big/genshin/flins.webp"
+    },
+    {
+      "id": "2.35",
+      "game": "Genshin Impact",
+      "name": "Freminet",
+      "source": "images_big/genshin/freminet.webp"
+    },
+    {
+      "id": "2.36",
+      "game": "Genshin Impact",
+      "name": "Furina",
+      "source": "images_big/genshin/furina.webp"
+    },
+    {
+      "id": "2.37",
+      "game": "Genshin Impact",
+      "name": "Gaming",
+      "source": "images_big/genshin/gaming.webp"
+    },
+    {
+      "id": "2.38",
+      "game": "Genshin Impact",
+      "name": "Ganyu",
+      "source": "images_big/genshin/ganyu.webp"
+    },
+    {
+      "id": "2.39",
+      "game": "Genshin Impact",
+      "name": "Gorou",
+      "source": "images_big/genshin/gorou.webp"
+    },
+    {
+      "id": "2.40",
+      "game": "Genshin Impact",
+      "name": "Hu Tao",
+      "source": "images_big/genshin/hu-tao.webp"
+    },
+    {
+      "id": "2.41",
+      "game": "Genshin Impact",
+      "name": "Iansan",
+      "source": "images_big/genshin/iansan.webp"
+    },
+    {
+      "id": "2.42",
+      "game": "Genshin Impact",
+      "name": "Ifa",
+      "source": "images_big/genshin/ifa.webp"
+    },
+    {
+      "id": "2.43",
+      "game": "Genshin Impact",
+      "name": "Illuga",
+      "source": "images_big/genshin/illuga.webp"
+    },
+    {
+      "id": "2.44",
+      "game": "Genshin Impact",
+      "name": "Ineffa",
+      "source": "images_big/genshin/ineffa.webp"
+    },
+    {
+      "id": "2.45",
+      "game": "Genshin Impact",
+      "name": "Jahoda",
+      "source": "images_big/genshin/jahoda.webp"
+    },
+    {
+      "id": "2.46",
+      "game": "Genshin Impact",
+      "name": "Jean",
+      "source": "images_big/genshin/jean.webp"
+    },
+    {
+      "id": "2.47",
+      "game": "Genshin Impact",
+      "name": "Kachina",
+      "source": "images_big/genshin/kachina.webp"
+    },
+    {
+      "id": "2.48",
+      "game": "Genshin Impact",
+      "name": "Kaedehara Kazuha",
+      "source": "images_big/genshin/kaedehara-kazuha.webp"
+    },
+    {
+      "id": "2.49",
+      "game": "Genshin Impact",
+      "name": "Kaeya",
+      "source": "images_big/genshin/kaeya.webp"
+    },
+    {
+      "id": "2.50",
+      "game": "Genshin Impact",
+      "name": "Kamisato Ayaka",
+      "source": "images_big/genshin/kamisato-ayaka.webp"
+    },
+    {
+      "id": "2.51",
+      "game": "Genshin Impact",
+      "name": "Kamisato Ayato",
+      "source": "images_big/genshin/kamisato-ayato.webp"
+    },
+    {
+      "id": "2.52",
+      "game": "Genshin Impact",
+      "name": "Kaveh",
+      "source": "images_big/genshin/kaveh.webp"
+    },
+    {
+      "id": "2.53",
+      "game": "Genshin Impact",
+      "name": "Keqing",
+      "source": "images_big/genshin/keqing.webp"
+    },
+    {
+      "id": "2.54",
+      "game": "Genshin Impact",
+      "name": "Kinich",
+      "source": "images_big/genshin/kinich.webp"
+    },
+    {
+      "id": "2.55",
+      "game": "Genshin Impact",
+      "name": "Kirara",
+      "source": "images_big/genshin/kirara.webp"
+    },
+    {
+      "id": "2.56",
+      "game": "Genshin Impact",
+      "name": "Klee",
+      "source": "images_big/genshin/klee.webp"
+    },
+    {
+      "id": "2.57",
+      "game": "Genshin Impact",
+      "name": "Kujou Sara",
+      "source": "images_big/genshin/kujou-sara.webp"
+    },
+    {
+      "id": "2.58",
+      "game": "Genshin Impact",
+      "name": "Kuki Shinobu",
+      "source": "images_big/genshin/kuki-shinobu.webp"
+    },
+    {
+      "id": "2.59",
+      "game": "Genshin Impact",
+      "name": "Lan Yan",
+      "source": "images_big/genshin/lan-yan.webp"
+    },
+    {
+      "id": "2.60",
+      "game": "Genshin Impact",
+      "name": "Lauma",
+      "source": "images_big/genshin/lauma.webp"
+    },
+    {
+      "id": "2.61",
+      "game": "Genshin Impact",
+      "name": "Layla",
+      "source": "images_big/genshin/layla.webp"
+    },
+    {
+      "id": "2.62",
+      "game": "Genshin Impact",
+      "name": "Linnea",
+      "source": "images_big/genshin/linnea.webp"
+    },
+    {
+      "id": "2.63",
+      "game": "Genshin Impact",
+      "name": "Lisa",
+      "source": "images_big/genshin/lisa.webp"
+    },
+    {
+      "id": "2.64",
+      "game": "Genshin Impact",
+      "name": "Lohen",
+      "source": "images_big/genshin/lohen.webp"
+    },
+    {
+      "id": "2.65",
+      "game": "Genshin Impact",
+      "name": "Lynette",
+      "source": "images_big/genshin/lynette.webp"
+    },
+    {
+      "id": "2.66",
+      "game": "Genshin Impact",
+      "name": "Lyney",
+      "source": "images_big/genshin/lyney.webp"
+    },
+    {
+      "id": "2.67",
+      "game": "Genshin Impact",
+      "name": "Mavuika",
+      "source": "images_big/genshin/mavuika.webp"
+    },
+    {
+      "id": "2.68",
+      "game": "Genshin Impact",
+      "name": "Mika",
+      "source": "images_big/genshin/mika.webp"
+    },
+    {
+      "id": "2.69",
+      "game": "Genshin Impact",
+      "name": "Mona",
+      "source": "images_big/genshin/mona.webp"
+    },
+    {
+      "id": "2.70",
+      "game": "Genshin Impact",
+      "name": "Mualani",
+      "source": "images_big/genshin/mualani.webp"
+    },
+    {
+      "id": "2.71",
+      "game": "Genshin Impact",
+      "name": "Nahida",
+      "source": "images_big/genshin/nahida.webp"
+    },
+    {
+      "id": "2.72",
+      "game": "Genshin Impact",
+      "name": "Navia",
+      "source": "images_big/genshin/navia.webp"
+    },
+    {
+      "id": "2.73",
+      "game": "Genshin Impact",
+      "name": "Nefer",
+      "source": "images_big/genshin/nefer.webp"
+    },
+    {
+      "id": "2.74",
+      "game": "Genshin Impact",
+      "name": "Neuvillette",
+      "source": "images_big/genshin/neuvillette.webp"
+    },
+    {
+      "id": "2.75",
+      "game": "Genshin Impact",
+      "name": "Nicole",
+      "source": "images_big/genshin/nicole.webp"
+    },
+    {
+      "id": "2.76",
+      "game": "Genshin Impact",
+      "name": "Nilou",
+      "source": "images_big/genshin/nilou.webp"
+    },
+    {
+      "id": "2.77",
+      "game": "Genshin Impact",
+      "name": "Ningguang",
+      "source": "images_big/genshin/ningguang.webp"
+    },
+    {
+      "id": "2.78",
+      "game": "Genshin Impact",
+      "name": "Noelle",
+      "source": "images_big/genshin/noelle.webp"
+    },
+    {
+      "id": "2.79",
+      "game": "Genshin Impact",
+      "name": "Ororon",
+      "source": "images_big/genshin/ororon.webp"
+    },
+    {
+      "id": "2.80",
+      "game": "Genshin Impact",
+      "name": "Prune",
+      "source": "images_big/genshin/prune.webp"
+    },
+    {
+      "id": "2.81",
+      "game": "Genshin Impact",
+      "name": "Qiqi",
+      "source": "images_big/genshin/qiqi.webp"
+    },
+    {
+      "id": "2.82",
+      "game": "Genshin Impact",
+      "name": "Raiden Shogun",
+      "source": "images_big/genshin/raiden-shogun.webp"
+    },
+    {
+      "id": "2.83",
+      "game": "Genshin Impact",
+      "name": "Razor",
+      "source": "images_big/genshin/razor.webp"
+    },
+    {
+      "id": "2.84",
+      "game": "Genshin Impact",
+      "name": "Rosaria",
+      "source": "images_big/genshin/rosaria.webp"
+    },
+    {
+      "id": "2.85",
+      "game": "Genshin Impact",
+      "name": "Sangonomiya Kokomi",
+      "source": "images_big/genshin/sangonomiya-kokomi.webp"
+    },
+    {
+      "id": "2.86",
+      "game": "Genshin Impact",
+      "name": "Sayu",
+      "source": "images_big/genshin/sayu.webp"
+    },
+    {
+      "id": "2.88",
+      "game": "Genshin Impact",
+      "name": "Shenhe",
+      "source": "images_big/genshin/shenhe.webp"
+    },
+    {
+      "id": "2.89",
+      "game": "Genshin Impact",
+      "name": "Shikanoin Heizou",
+      "source": "images_big/genshin/shikanoin-heizou.webp"
+    },
+    {
+      "id": "2.90",
+      "game": "Genshin Impact",
+      "name": "Sigewinne",
+      "source": "images_big/genshin/sigewinne.webp"
+    },
+    {
+      "id": "2.91",
+      "game": "Genshin Impact",
+      "name": "Skirk",
+      "source": "images_big/genshin/skirk.webp"
+    },
+    {
+      "id": "2.92",
+      "game": "Genshin Impact",
+      "name": "Sucrose",
+      "source": "images_big/genshin/sucrose.webp"
+    },
+    {
+      "id": "2.93",
+      "game": "Genshin Impact",
+      "name": "Tartaglia",
+      "source": "images_big/genshin/tartaglia.webp"
+    },
+    {
+      "id": "2.94",
+      "game": "Genshin Impact",
+      "name": "Thoma",
+      "source": "images_big/genshin/thoma.webp"
+    },
+    {
+      "id": "2.95",
+      "game": "Genshin Impact",
+      "name": "Tighnari",
+      "source": "images_big/genshin/tighnari.webp"
+    },
+    {
+      "id": "2.96",
+      "game": "Genshin Impact",
+      "name": "Varesa",
+      "source": "images_big/genshin/varesa.webp"
+    },
+    {
+      "id": "2.97",
+      "game": "Genshin Impact",
+      "name": "Varka",
+      "source": "images_big/genshin/varka.webp"
+    },
+    {
+      "id": "2.98",
+      "game": "Genshin Impact",
+      "name": "Venti",
+      "source": "images_big/genshin/venti.webp"
+    },
+    {
+      "id": "2.99",
+      "game": "Genshin Impact",
+      "name": "Wanderer",
+      "source": "images_big/genshin/wanderer.webp"
+    },
+    {
+      "id": "2.100",
+      "game": "Genshin Impact",
+      "name": "Wriothesley",
+      "source": "images_big/genshin/wriothesley.webp"
+    },
+    {
+      "id": "2.101",
+      "game": "Genshin Impact",
+      "name": "Xiangling",
+      "source": "images_big/genshin/xiangling.webp"
+    },
+    {
+      "id": "2.102",
+      "game": "Genshin Impact",
+      "name": "Xianyun",
+      "source": "images_big/genshin/xianyun.webp"
+    },
+    {
+      "id": "2.103",
+      "game": "Genshin Impact",
+      "name": "Xiao",
+      "source": "images_big/genshin/xiao.webp"
+    },
+    {
+      "id": "2.104",
+      "game": "Genshin Impact",
+      "name": "Xilonen",
+      "source": "images_big/genshin/xilonen.webp"
+    },
+    {
+      "id": "2.105",
+      "game": "Genshin Impact",
+      "name": "Xingqiu",
+      "source": "images_big/genshin/xingqiu.webp"
+    },
+    {
+      "id": "2.106",
+      "game": "Genshin Impact",
+      "name": "Xinyan",
+      "source": "images_big/genshin/xinyan.webp"
+    },
+    {
+      "id": "2.107",
+      "game": "Genshin Impact",
+      "name": "Yae Miko",
+      "source": "images_big/genshin/yae-miko.webp"
+    },
+    {
+      "id": "2.108",
+      "game": "Genshin Impact",
+      "name": "Yanfei",
+      "source": "images_big/genshin/yanfei.webp"
+    },
+    {
+      "id": "2.109",
+      "game": "Genshin Impact",
+      "name": "Yaoyao",
+      "source": "images_big/genshin/yaoyao.webp"
+    },
+    {
+      "id": "2.110",
+      "game": "Genshin Impact",
+      "name": "Yelan",
+      "source": "images_big/genshin/yelan.webp"
+    },
+    {
+      "id": "2.111",
+      "game": "Genshin Impact",
+      "name": "Yoimiya",
+      "source": "images_big/genshin/yoimiya.webp"
+    },
+    {
+      "id": "2.112",
+      "game": "Genshin Impact",
+      "name": "Yumemizuki Mizuki",
+      "source": "images_big/genshin/yumemizuki-mizuki.webp"
+    },
+    {
+      "id": "2.113",
+      "game": "Genshin Impact",
+      "name": "Yun Jin",
+      "source": "images_big/genshin/yun-jin.webp"
+    },
+    {
+      "id": "2.114",
+      "game": "Genshin Impact",
+      "name": "Zhongli",
+      "source": "images_big/genshin/zhongli.webp"
+    },
+    {
+      "id": "2.115",
+      "game": "Genshin Impact",
+      "name": "Zibai",
+      "source": "images_big/genshin/zibai.webp"
+    },
+    {
+      "id": "3.1",
+      "game": "Honkai: Star Rail",
+      "name": "Acheron",
+      "source": "app/src/main/assets/honkai_star_rail/acheron_card.webp"
+    },
+    {
+      "id": "3.2",
+      "game": "Honkai: Star Rail",
+      "name": "Aglaea",
+      "source": "app/src/main/assets/honkai_star_rail/aglaea_card.webp"
+    },
+    {
+      "id": "3.3",
+      "game": "Honkai: Star Rail",
+      "name": "Anaxa",
+      "source": "app/src/main/assets/honkai_star_rail/anaxa_card.webp"
+    },
+    {
+      "id": "3.4",
+      "game": "Honkai: Star Rail",
+      "name": "Archer",
+      "source": "app/src/main/assets/honkai_star_rail/archer_card.webp"
+    },
+    {
+      "id": "3.5",
+      "game": "Honkai: Star Rail",
+      "name": "Argenti",
+      "source": "app/src/main/assets/honkai_star_rail/argenti_card.webp"
+    },
+    {
+      "id": "3.6",
+      "game": "Honkai: Star Rail",
+      "name": "Arlan",
+      "source": "app/src/main/assets/honkai_star_rail/arlan_card.webp"
+    },
+    {
+      "id": "3.7",
+      "game": "Honkai: Star Rail",
+      "name": "Ashveil",
+      "source": "app/src/main/assets/honkai_star_rail/ashveil_card.webp"
+    },
+    {
+      "id": "3.8",
+      "game": "Honkai: Star Rail",
+      "name": "Asta",
+      "source": "app/src/main/assets/honkai_star_rail/asta_card.webp"
+    },
+    {
+      "id": "3.9",
+      "game": "Honkai: Star Rail",
+      "name": "Aventurine",
+      "source": "app/src/main/assets/honkai_star_rail/aventurine_card.webp"
+    },
+    {
+      "id": "3.10",
+      "game": "Honkai: Star Rail",
+      "name": "Waveflair",
+      "source": "app/src/main/assets/honkai_star_rail/aventurine-waveflair_card.webp"
+    },
+    {
+      "id": "3.11",
+      "game": "Honkai: Star Rail",
+      "name": "Bailu",
+      "source": "app/src/main/assets/honkai_star_rail/bailu_card.webp"
+    },
+    {
+      "id": "3.12",
+      "game": "Honkai: Star Rail",
+      "name": "Black",
+      "source": "app/src/main/assets/honkai_star_rail/black-swan_card.webp"
+    },
+    {
+      "id": "3.13",
+      "game": "Honkai: Star Rail",
+      "name": "Swan",
+      "source": "app/src/main/assets/honkai_star_rail/black-swan_card.webp"
+    },
+    {
+      "id": "3.14",
+      "game": "Honkai: Star Rail",
+      "name": "Blade",
+      "source": "app/src/main/assets/honkai_star_rail/blade_card.webp"
+    },
+    {
+      "id": "3.15",
+      "game": "Honkai: Star Rail",
+      "name": "Boothill",
+      "source": "app/src/main/assets/honkai_star_rail/boothill_card.webp"
+    },
+    {
+      "id": "3.16",
+      "game": "Honkai: Star Rail",
+      "name": "Bronya",
+      "source": "app/src/main/assets/honkai_star_rail/bronya_card.webp"
+    },
+    {
+      "id": "3.17",
+      "game": "Honkai: Star Rail",
+      "name": "Castorice",
+      "source": "app/src/main/assets/honkai_star_rail/castorice_card.webp"
+    },
+    {
+      "id": "3.18",
+      "game": "Honkai: Star Rail",
+      "name": "Cerydra",
+      "source": "app/src/main/assets/honkai_star_rail/cerydra_card.webp"
+    },
+    {
+      "id": "3.19",
+      "game": "Honkai: Star Rail",
+      "name": "Cipher",
+      "source": "app/src/main/assets/honkai_star_rail/cipher_card.webp"
+    },
+    {
+      "id": "3.20",
+      "game": "Honkai: Star Rail",
+      "name": "Clara",
+      "source": "app/src/main/assets/honkai_star_rail/clara_card.webp"
+    },
+    {
+      "id": "3.21",
+      "game": "Honkai: Star Rail",
+      "name": "Cyrene",
+      "source": "app/src/main/assets/honkai_star_rail/cyrene_card.webp"
+    },
+    {
+      "id": "3.22",
+      "game": "Honkai: Star Rail",
+      "name": "Dan Heng",
+      "source": "app/src/main/assets/honkai_star_rail/dan-heng_card.webp"
+    },
+    {
+      "id": "3.23",
+      "game": "Honkai: Star Rail",
+      "name": "Dan Heng • Imbibitor Lunae",
+      "source": "app/src/main/assets/honkai_star_rail/imbibitor-lunae_card.webp"
+    },
+    {
+      "id": "3.24",
+      "game": "Honkai: Star Rail",
+      "name": "Dan Heng • Permansor Terrae",
+      "source": "app/src/main/assets/honkai_star_rail/dan-heng-permansor-terrae_card.webp"
+    },
+    {
+      "id": "3.25",
+      "game": "Honkai: Star Rail",
+      "name": "Dr Ratio",
+      "source": "app/src/main/assets/honkai_star_rail/dr-ratio_card.webp"
+    },
+    {
+      "id": "3.26",
+      "game": "Honkai: Star Rail",
+      "name": "Evanescia",
+      "source": "app/src/main/assets/honkai_star_rail/evanescia_card.webp"
+    },
+    {
+      "id": "3.27",
+      "game": "Honkai: Star Rail",
+      "name": "Feixiao",
+      "source": "app/src/main/assets/honkai_star_rail/feixiao_card.webp"
+    },
+    {
+      "id": "3.28",
+      "game": "Honkai: Star Rail",
+      "name": "Firefly",
+      "source": "app/src/main/assets/honkai_star_rail/firefly_card.webp"
+    },
+    {
+      "id": "3.29",
+      "game": "Honkai: Star Rail",
+      "name": "Fu Xuan",
+      "source": "app/src/main/assets/honkai_star_rail/fu-xuan_card.webp"
+    },
+    {
+      "id": "3.30",
+      "game": "Honkai: Star Rail",
+      "name": "Gallagher",
+      "source": "app/src/main/assets/honkai_star_rail/gallagher_card.webp"
+    },
+    {
+      "id": "3.31",
+      "game": "Honkai: Star Rail",
+      "name": "Gepard",
+      "source": "app/src/main/assets/honkai_star_rail/gepard_card.webp"
+    },
+    {
+      "id": "3.32",
+      "game": "Honkai: Star Rail",
+      "name": "Gilgamesh",
+      "source": "app/src/main/assets/honkai_star_rail/gilgamesh_card.webp"
+    },
+    {
+      "id": "3.33",
+      "game": "Honkai: Star Rail",
+      "name": "Guinaifen",
+      "source": "app/src/main/assets/honkai_star_rail/guinaifen_card.webp"
+    },
+    {
+      "id": "3.34",
+      "game": "Honkai: Star Rail",
+      "name": "Hanya",
+      "source": "app/src/main/assets/honkai_star_rail/hanya_card.webp"
+    },
+    {
+      "id": "3.35",
+      "game": "Honkai: Star Rail",
+      "name": "Herta",
+      "source": "app/src/main/assets/honkai_star_rail/herta_card.webp"
+    },
+    {
+      "id": "3.36",
+      "game": "Honkai: Star Rail",
+      "name": "Himeko",
+      "source": "app/src/main/assets/honkai_star_rail/himeko_card.webp"
+    },
+    {
+      "id": "3.37",
+      "game": "Honkai: Star Rail",
+      "name": "Himeko Nova",
+      "source": "app/src/main/assets/honkai_star_rail/himeko-nova_card.webp"
+    },
+    {
+      "id": "3.38",
+      "game": "Honkai: Star Rail",
+      "name": "Hook",
+      "source": "app/src/main/assets/honkai_star_rail/hook_card.webp"
+    },
+    {
+      "id": "3.39",
+      "game": "Honkai: Star Rail",
+      "name": "Huohuo",
+      "source": "app/src/main/assets/honkai_star_rail/huohuo_card.webp"
+    },
+    {
+      "id": "3.40",
+      "game": "Honkai: Star Rail",
+      "name": "Hyacine",
+      "source": "app/src/main/assets/honkai_star_rail/hyacine_card.webp"
+    },
+    {
+      "id": "3.41",
+      "game": "Honkai: Star Rail",
+      "name": "Hysilens",
+      "source": "app/src/main/assets/honkai_star_rail/hysilens_card.webp"
+    },
+    {
+      "id": "3.42",
+      "game": "Honkai: Star Rail",
+      "name": "Jade",
+      "source": "app/src/main/assets/honkai_star_rail/jade_card.webp"
+    },
+    {
+      "id": "3.43",
+      "game": "Honkai: Star Rail",
+      "name": "Jiaoqiu",
+      "source": "app/src/main/assets/honkai_star_rail/jiaoqiu_card.webp"
+    },
+    {
+      "id": "3.44",
+      "game": "Honkai: Star Rail",
+      "name": "Jing Yuan",
+      "source": "app/src/main/assets/honkai_star_rail/jing-yuan_card.webp"
+    },
+    {
+      "id": "3.45",
+      "game": "Honkai: Star Rail",
+      "name": "Jingliu",
+      "source": "app/src/main/assets/honkai_star_rail/jingliu_card.webp"
+    },
+    {
+      "id": "3.46",
+      "game": "Honkai: Star Rail",
+      "name": "Kafka",
+      "source": "app/src/main/assets/honkai_star_rail/kafka_card.webp"
+    },
+    {
+      "id": "3.47",
+      "game": "Honkai: Star Rail",
+      "name": "Lingsha",
+      "source": "app/src/main/assets/honkai_star_rail/lingsha_card.webp"
+    },
+    {
+      "id": "3.48",
+      "game": "Honkai: Star Rail",
+      "name": "Luka",
+      "source": "app/src/main/assets/honkai_star_rail/luka_card.webp"
+    },
+    {
+      "id": "3.49",
+      "game": "Honkai: Star Rail",
+      "name": "Luocha",
+      "source": "app/src/main/assets/honkai_star_rail/luocha_card.webp"
+    },
+    {
+      "id": "3.50",
+      "game": "Honkai: Star Rail",
+      "name": "Lynx",
+      "source": "app/src/main/assets/honkai_star_rail/lynx_card.webp"
+    },
+    {
+      "id": "3.51",
+      "game": "Honkai: Star Rail",
+      "name": "March 7th",
+      "source": "app/src/main/assets/honkai_star_rail/march-7th_card.webp"
+    },
+    {
+      "id": "3.52",
+      "game": "Honkai: Star Rail",
+      "name": "March 7th • Evernight",
+      "source": "app/src/main/assets/honkai_star_rail/march-7th-evernight_card.webp"
+    },
+    {
+      "id": "3.53",
+      "game": "Honkai: Star Rail",
+      "name": "March 7th • The Hunt",
+      "source": "app/src/main/assets/honkai_star_rail/march-7th-swordmaster_card.webp"
+    },
+    {
+      "id": "3.54",
+      "game": "Honkai: Star Rail",
+      "name": "Misha",
+      "source": "app/src/main/assets/honkai_star_rail/misha_card.webp"
+    },
+    {
+      "id": "3.55",
+      "game": "Honkai: Star Rail",
+      "name": "Mortenax Blade",
+      "source": "app/src/main/assets/honkai_star_rail/blade-mortenax_card.webp"
+    },
+    {
+      "id": "3.56",
+      "game": "Honkai: Star Rail",
+      "name": "Moze",
+      "source": "app/src/main/assets/honkai_star_rail/moze_card.webp"
+    },
+    {
+      "id": "3.57",
+      "game": "Honkai: Star Rail",
+      "name": "Mydei",
+      "source": "app/src/main/assets/honkai_star_rail/mydei_card.webp"
+    },
+    {
+      "id": "3.58",
+      "game": "Honkai: Star Rail",
+      "name": "Natasha",
+      "source": "app/src/main/assets/honkai_star_rail/natasha_card.webp"
+    },
+    {
+      "id": "3.59",
+      "game": "Honkai: Star Rail",
+      "name": "Pela",
+      "source": "app/src/main/assets/honkai_star_rail/pela_card.webp"
+    },
+    {
+      "id": "3.60",
+      "game": "Honkai: Star Rail",
+      "name": "Phainon",
+      "source": "app/src/main/assets/honkai_star_rail/phainon_card.webp"
+    },
+    {
+      "id": "3.61",
+      "game": "Honkai: Star Rail",
+      "name": "Qingque",
+      "source": "app/src/main/assets/honkai_star_rail/qingque_card.webp"
+    },
+    {
+      "id": "3.62",
+      "game": "Honkai: Star Rail",
+      "name": "Rappa",
+      "source": "app/src/main/assets/honkai_star_rail/rappa_card.webp"
+    },
+    {
+      "id": "3.63",
+      "game": "Honkai: Star Rail",
+      "name": "Rin Tohsaka",
+      "source": "app/src/main/assets/honkai_star_rail/rin-tohsaka_card.webp"
+    },
+    {
+      "id": "3.64",
+      "game": "Honkai: Star Rail",
+      "name": "Robin",
+      "source": "app/src/main/assets/honkai_star_rail/robin_card.webp"
+    },
+    {
+      "id": "3.65",
+      "game": "Honkai: Star Rail",
+      "name": "Robin • Summeretto",
+      "source": "app/src/main/assets/honkai_star_rail/robin-summeretto_card.webp"
+    },
+    {
+      "id": "3.66",
+      "game": "Honkai: Star Rail",
+      "name": "Ruan Mei",
+      "source": "app/src/main/assets/honkai_star_rail/ruan-mei_card.webp"
+    },
+    {
+      "id": "3.67",
+      "game": "Honkai: Star Rail",
+      "name": "Saber",
+      "source": "app/src/main/assets/honkai_star_rail/saber_card.webp"
+    },
+    {
+      "id": "3.68",
+      "game": "Honkai: Star Rail",
+      "name": "Sampo",
+      "source": "app/src/main/assets/honkai_star_rail/sampo_card.webp"
+    },
+    {
+      "id": "3.69",
+      "game": "Honkai: Star Rail",
+      "name": "Seele",
+      "source": "app/src/main/assets/honkai_star_rail/seele_card.webp"
+    },
+    {
+      "id": "3.70",
+      "game": "Honkai: Star Rail",
+      "name": "Serval",
+      "source": "app/src/main/assets/honkai_star_rail/serval_card.webp"
+    },
+    {
+      "id": "3.71",
+      "game": "Honkai: Star Rail",
+      "name": "Silver Wolf",
+      "source": "app/src/main/assets/honkai_star_rail/silver-wolf_card.webp"
+    },
+    {
+      "id": "3.72",
+      "game": "Honkai: Star Rail",
+      "name": "Silver Wolf • Lv. 999",
+      "source": "app/src/main/assets/honkai_star_rail/silver-wolf-lv-999_card.webp"
+    },
+    {
+      "id": "3.73",
+      "game": "Honkai: Star Rail",
+      "name": "Sparkle",
+      "source": "app/src/main/assets/honkai_star_rail/sparkle_card.webp"
+    },
+    {
+      "id": "3.74",
+      "game": "Honkai: Star Rail",
+      "name": "Sparxie",
+      "source": "app/src/main/assets/honkai_star_rail/sparxie_card.webp"
+    },
+    {
+      "id": "3.75",
+      "game": "Honkai: Star Rail",
+      "name": "Sunday",
+      "source": "app/src/main/assets/honkai_star_rail/sunday_card.webp"
+    },
+    {
+      "id": "3.76",
+      "game": "Honkai: Star Rail",
+      "name": "Sushang",
+      "source": "app/src/main/assets/honkai_star_rail/sushang_card.webp"
+    },
+    {
+      "id": "3.77",
+      "game": "Honkai: Star Rail",
+      "name": "The Dahlia",
+      "source": "app/src/main/assets/honkai_star_rail/the-dahlia_card.webp"
+    },
+    {
+      "id": "3.78",
+      "game": "Honkai: Star Rail",
+      "name": "The Herta",
+      "source": "app/src/main/assets/honkai_star_rail/the-herta_card.webp"
+    },
+    {
+      "id": "3.79",
+      "game": "Honkai: Star Rail",
+      "name": "Tingyun",
+      "source": "app/src/main/assets/honkai_star_rail/tingyun_card.webp"
+    },
+    {
+      "id": "3.80",
+      "game": "Honkai: Star Rail",
+      "name": "Tingyun • Fugue",
+      "source": "app/src/main/assets/honkai_star_rail/tingyun-fugue_card.webp"
+    },
+    {
+      "id": "3.81",
+      "game": "Honkai: Star Rail",
+      "name": "Topaz & Numby",
+      "source": "app/src/main/assets/honkai_star_rail/topaz_card.webp"
+    },
+    {
+      "id": "3.82",
+      "game": "Honkai: Star Rail",
+      "name": "Tribbie",
+      "source": "app/src/main/assets/honkai_star_rail/tribbie_card.webp"
+    },
+    {
+      "id": "3.83",
+      "game": "Honkai: Star Rail",
+      "name": "Welt",
+      "source": "app/src/main/assets/honkai_star_rail/welt_card.webp"
+    },
+    {
+      "id": "3.84",
+      "game": "Honkai: Star Rail",
+      "name": "Xueyi",
+      "source": "app/src/main/assets/honkai_star_rail/xueyi_card.webp"
+    },
+    {
+      "id": "3.85",
+      "game": "Honkai: Star Rail",
+      "name": "Yanqing",
+      "source": "app/src/main/assets/honkai_star_rail/yanqing_card.webp"
+    },
+    {
+      "id": "3.86",
+      "game": "Honkai: Star Rail",
+      "name": "Yao Guang",
+      "source": "app/src/main/assets/honkai_star_rail/yao-guang_card.webp"
+    },
+    {
+      "id": "3.87",
+      "game": "Honkai: Star Rail",
+      "name": "Yukong",
+      "source": "app/src/main/assets/honkai_star_rail/yukong_card.webp"
+    },
+    {
+      "id": "3.88",
+      "game": "Honkai: Star Rail",
+      "name": "Yunli",
+      "source": "app/src/main/assets/honkai_star_rail/yunli_card.webp"
+    },
+    {
+      "id": "4.1",
+      "game": "Arknights: Endfield",
+      "name": "Arcane",
+      "source": "app/src/main/assets/arknights_endfield/arcane_card.webp"
+    },
+    {
+      "id": "4.2",
+      "game": "Arknights: Endfield",
+      "name": "Ardelia",
+      "source": "app/src/main/assets/arknights_endfield/ardelia_card.webp"
+    },
+    {
+      "id": "4.3",
+      "game": "Arknights: Endfield",
+      "name": "Camille",
+      "source": "app/src/main/assets/arknights_endfield/camille_card.webp"
+    },
+    {
+      "id": "4.4",
+      "game": "Arknights: Endfield",
+      "name": "Ember",
+      "source": "app/src/main/assets/arknights_endfield/ember_card.webp"
+    },
+    {
+      "id": "4.5",
+      "game": "Arknights: Endfield",
+      "name": "Gilberta",
+      "source": "app/src/main/assets/arknights_endfield/gilberta_card.webp"
+    },
+    {
+      "id": "4.6",
+      "game": "Arknights: Endfield",
+      "name": "Laevatain",
+      "source": "app/src/main/assets/arknights_endfield/laevatain_card.webp"
+    },
+    {
+      "id": "4.7",
+      "game": "Arknights: Endfield",
+      "name": "Last Rite",
+      "source": "app/src/main/assets/arknights_endfield/last-rite_card.webp"
+    },
+    {
+      "id": "4.8",
+      "game": "Arknights: Endfield",
+      "name": "Lifeng",
+      "source": "app/src/main/assets/arknights_endfield/lifeng_card.webp"
+    },
+    {
+      "id": "4.9",
+      "game": "Arknights: Endfield",
+      "name": "Liino",
+      "source": "app/src/main/assets/arknights_endfield/liino_card.webp"
+    },
+    {
+      "id": "4.10",
+      "game": "Arknights: Endfield",
+      "name": "Mi Fu",
+      "source": "app/src/main/assets/arknights_endfield/mi-fu_card.webp"
+    },
+    {
+      "id": "4.11",
+      "game": "Arknights: Endfield",
+      "name": "Pogranichnik",
+      "source": "app/src/main/assets/arknights_endfield/pogranichnik_card.webp"
+    },
+    {
+      "id": "4.12",
+      "game": "Arknights: Endfield",
+      "name": "Rossi",
+      "source": "app/src/main/assets/arknights_endfield/rossi_card.webp"
+    },
+    {
+      "id": "4.13",
+      "game": "Arknights: Endfield",
+      "name": "Tangtang",
+      "source": "app/src/main/assets/arknights_endfield/tangtang_card.webp"
+    },
+    {
+      "id": "4.14",
+      "game": "Arknights: Endfield",
+      "name": "Typhoeus",
+      "source": "app/src/main/assets/arknights_endfield/typhoeus_card.webp"
+    },
+    {
+      "id": "4.15",
+      "game": "Arknights: Endfield",
+      "name": "Yvonne",
+      "source": "app/src/main/assets/arknights_endfield/yvonne_card.webp"
+    },
+    {
+      "id": "4.16",
+      "game": "Arknights: Endfield",
+      "name": "Zhuang Fangyi",
+      "source": "app/src/main/assets/arknights_endfield/zhuang-fangyi_card.webp"
+    },
+    {
+      "id": "4.17",
+      "game": "Arknights: Endfield",
+      "name": "Alesh",
+      "source": "app/src/main/assets/arknights_endfield/alesh_card.webp"
+    },
+    {
+      "id": "4.18",
+      "game": "Arknights: Endfield",
+      "name": "Arclight",
+      "source": "app/src/main/assets/arknights_endfield/arclight_card.webp"
+    },
+    {
+      "id": "4.19",
+      "game": "Arknights: Endfield",
+      "name": "Avywenna",
+      "source": "app/src/main/assets/arknights_endfield/avywenna_card.webp"
+    },
+    {
+      "id": "4.20",
+      "game": "Arknights: Endfield",
+      "name": "Chen Qianyu",
+      "source": "app/src/main/assets/arknights_endfield/chen-qianyu_card.webp"
+    },
+    {
+      "id": "4.21",
+      "game": "Arknights: Endfield",
+      "name": "Da Pan",
+      "source": "app/src/main/assets/arknights_endfield/da-pan_card.webp"
+    },
+    {
+      "id": "4.22",
+      "game": "Arknights: Endfield",
+      "name": "Perlica",
+      "source": "app/src/main/assets/arknights_endfield/perlica_card.webp"
+    },
+    {
+      "id": "4.23",
+      "game": "Arknights: Endfield",
+      "name": "Purrchena",
+      "source": "app/src/main/assets/arknights_endfield/purrchena_card.webp"
+    },
+    {
+      "id": "4.24",
+      "game": "Arknights: Endfield",
+      "name": "Snowshine",
+      "source": "app/src/main/assets/arknights_endfield/snowshine_card.webp"
+    },
+    {
+      "id": "4.25",
+      "game": "Arknights: Endfield",
+      "name": "Wulfgard",
+      "source": "app/src/main/assets/arknights_endfield/wulfgard_card.webp"
+    },
+    {
+      "id": "4.26",
+      "game": "Arknights: Endfield",
+      "name": "Xaihi",
+      "source": "app/src/main/assets/arknights_endfield/xaihi_card.webp"
+    },
+    {
+      "id": "4.27",
+      "game": "Arknights: Endfield",
+      "name": "Akekuri",
+      "source": "app/src/main/assets/arknights_endfield/akekuri_card.webp"
+    },
+    {
+      "id": "4.28",
+      "game": "Arknights: Endfield",
+      "name": "Antal",
+      "source": "app/src/main/assets/arknights_endfield/antal_card.webp"
+    },
+    {
+      "id": "4.29",
+      "game": "Arknights: Endfield",
+      "name": "Catcher",
+      "source": "app/src/main/assets/arknights_endfield/catcher_card.webp"
+    },
+    {
+      "id": "4.30",
+      "game": "Arknights: Endfield",
+      "name": "Estella",
+      "source": "app/src/main/assets/arknights_endfield/estella_card.webp"
+    },
+    {
+      "id": "4.31",
+      "game": "Arknights: Endfield",
+      "name": "Fluorite",
+      "source": "app/src/main/assets/arknights_endfield/fluorite_card.webp"
+    },
+    {
+      "id": "5.1",
+      "game": "Zenless Zone Zero",
+      "name": "Zhu Yuan",
+      "source": "images_big/zenless_zone_zero/zhu-yuan.webp"
+    },
+    {
+      "id": "5.2",
+      "game": "Zenless Zone Zero",
+      "name": "Zhao",
+      "source": "images_big/zenless_zone_zero/zhao.webp"
+    },
+    {
+      "id": "5.3",
+      "game": "Zenless Zone Zero",
+      "name": "Ukinami Yuzuha",
+      "source": "images_big/zenless_zone_zero/ukinami-yuzuha.webp"
+    },
+    {
+      "id": "5.4",
+      "game": "Zenless Zone Zero",
+      "name": "Yixuan",
+      "source": "images_big/zenless_zone_zero/yixuan.webp"
+    },
+    {
+      "id": "5.5",
+      "game": "Zenless Zone Zero",
+      "name": "Yidhari",
+      "source": "images_big/zenless_zone_zero/yidhari.webp"
+    },
+    {
+      "id": "5.6",
+      "game": "Zenless Zone Zero",
+      "name": "Ye Shunguang",
+      "source": "images_big/zenless_zone_zero/ye-shunguang.webp"
+    },
+    {
+      "id": "5.7",
+      "game": "Zenless Zone Zero",
+      "name": "Tsukishiro Yanagi",
+      "source": "images_big/zenless_zone_zero/yanagi.webp"
+    },
+    {
+      "id": "5.8",
+      "game": "Zenless Zone Zero",
+      "name": "Vivian",
+      "source": "images_big/zenless_zone_zero/vivian.webp"
+    },
+    {
+      "id": "5.9",
+      "game": "Zenless Zone Zero",
+      "name": "Velina Airgid",
+      "source": "images_big/zenless_zone_zero/velina.webp"
+    },
+    {
+      "id": "5.10",
+      "game": "Zenless Zone Zero",
+      "name": "Trigger",
+      "source": "images_big/zenless_zone_zero/trigger.webp"
+    },
+    {
+      "id": "5.11",
+      "game": "Zenless Zone Zero",
+      "name": "Sunna",
+      "source": "images_big/zenless_zone_zero/sunna.webp"
+    },
+    {
+      "id": "5.12",
+      "game": "Zenless Zone Zero",
+      "name": "Soukaku",
+      "source": "images_big/zenless_zone_zero/soukaku.webp"
+    },
+    {
+      "id": "5.13",
+      "game": "Zenless Zone Zero",
+      "name": "Soldier 11",
+      "source": "images_big/zenless_zone_zero/soldier-11.webp"
+    },
+    {
+      "id": "5.14",
+      "game": "Zenless Zone Zero",
+      "name": "Sigrid de L’Azur",
+      "source": "images_big/zenless_zone_zero/sigrid.webp"
+    },
+    {
+      "id": "5.15",
+      "game": "Zenless Zone Zero",
+      "name": "Seth Lowell",
+      "source": "images_big/zenless_zone_zero/seth.webp"
+    },
+    {
+      "id": "5.16",
+      "game": "Zenless Zone Zero",
+      "name": "Seed",
+      "source": "images_big/zenless_zone_zero/seed.webp"
+    },
+    {
+      "id": "5.17",
+      "game": "Zenless Zone Zero",
+      "name": "Roxy Ifrita Pryce",
+      "source": "images_big/zenless_zone_zero/roxy.webp"
+    },
+    {
+      "id": "5.18",
+      "game": "Zenless Zone Zero",
+      "name": "Alexandrina Sebastiane",
+      "source": "images_big/zenless_zone_zero/rina.webp"
+    },
+    {
+      "id": "5.19",
+      "game": "Zenless Zone Zero",
+      "name": "Remielle Dan",
+      "source": "images_big/zenless_zone_zero/remielle.webp"
+    },
+    {
+      "id": "5.20",
+      "game": "Zenless Zone Zero",
+      "name": "Qingyi",
+      "source": "images_big/zenless_zone_zero/qingyi.webp"
+    },
+    {
+      "id": "5.21",
+      "game": "Zenless Zone Zero",
+      "name": "Pyrois",
+      "source": "images_big/zenless_zone_zero/pyrois.webp"
+    },
+    {
+      "id": "5.22",
+      "game": "Zenless Zone Zero",
+      "name": "Pulchra Fellini",
+      "source": "images_big/zenless_zone_zero/pulchra.webp"
+    },
+    {
+      "id": "5.23",
+      "game": "Zenless Zone Zero",
+      "name": "Promeia",
+      "source": "images_big/zenless_zone_zero/promeia.webp"
+    },
+    {
+      "id": "5.24",
+      "game": "Zenless Zone Zero",
+      "name": "Piper Wheel",
+      "source": "images_big/zenless_zone_zero/piper.webp"
+    },
+    {
+      "id": "5.25",
+      "game": "Zenless Zone Zero",
+      "name": "Pan Yinhu",
+      "source": "images_big/zenless_zone_zero/pan-yinhu.webp"
+    },
+    {
+      "id": "5.26",
+      "game": "Zenless Zone Zero",
+      "name": "Orphie & Magus",
+      "source": "images_big/zenless_zone_zero/orphie-and-magus.webp"
+    },
+    {
+      "id": "5.27",
+      "game": "Zenless Zone Zero",
+      "name": "Norma Hollowell",
+      "source": "images_big/zenless_zone_zero/norma.webp"
+    },
+    {
+      "id": "5.28",
+      "game": "Zenless Zone Zero",
+      "name": "Nicole Demara",
+      "source": "images_big/zenless_zone_zero/nicole-demara.webp"
+    },
+    {
+      "id": "5.29",
+      "game": "Zenless Zone Zero",
+      "name": "Nekomiya Mana",
+      "source": "images_big/zenless_zone_zero/nekomata.webp"
+    },
+    {
+      "id": "5.30",
+      "game": "Zenless Zone Zero",
+      "name": "Nangong Yu",
+      "source": "images_big/zenless_zone_zero/nangong-yu.webp"
+    },
+    {
+      "id": "5.31",
+      "game": "Zenless Zone Zero",
+      "name": "Tsukishiro Miyabi",
+      "source": "images_big/zenless_zone_zero/miyabi.webp"
+    },
+    {
+      "id": "5.32",
+      "game": "Zenless Zone Zero",
+      "name": "Komano Manato",
+      "source": "images_big/zenless_zone_zero/manato.webp"
+    },
+    {
+      "id": "5.33",
+      "game": "Zenless Zone Zero",
+      "name": "Von Lycaon",
+      "source": "images_big/zenless_zone_zero/lycaon.webp"
+    },
+    {
+      "id": "5.34",
+      "game": "Zenless Zone Zero",
+      "name": "Lucy",
+      "source": "images_big/zenless_zone_zero/lucy.webp"
+    },
+    {
+      "id": "5.35",
+      "game": "Zenless Zone Zero",
+      "name": "Lucia",
+      "source": "images_big/zenless_zone_zero/lucia.webp"
+    },
+    {
+      "id": "5.36",
+      "game": "Zenless Zone Zero",
+      "name": "Lighter",
+      "source": "images_big/zenless_zone_zero/lighter.webp"
+    },
+    {
+      "id": "5.37",
+      "game": "Zenless Zone Zero",
+      "name": "Koleda Belobog",
+      "source": "images_big/zenless_zone_zero/koleda.webp"
+    },
+    {
+      "id": "5.38",
+      "game": "Zenless Zone Zero",
+      "name": "Ju Fufu",
+      "source": "images_big/zenless_zone_zero/ju-fufu.webp"
+    },
+    {
+      "id": "5.39",
+      "game": "Zenless Zone Zero",
+      "name": "Jane Doe",
+      "source": "images_big/zenless_zone_zero/jane-doe.webp"
+    },
+    {
+      "id": "5.40",
+      "game": "Zenless Zone Zero",
+      "name": "Hugo Vlad",
+      "source": "images_big/zenless_zone_zero/hugo.webp"
+    },
+    {
+      "id": "5.41",
+      "game": "Zenless Zone Zero",
+      "name": "Asaba Harumasa",
+      "source": "images_big/zenless_zone_zero/harumasa.webp"
+    },
+    {
+      "id": "5.42",
+      "game": "Zenless Zone Zero",
+      "name": "Grace Howard",
+      "source": "images_big/zenless_zone_zero/grace-howard.webp"
+    },
+    {
+      "id": "5.43",
+      "game": "Zenless Zone Zero",
+      "name": "Evelyn Chevalier",
+      "source": "images_big/zenless_zone_zero/evelyn.webp"
+    },
+    {
+      "id": "5.44",
+      "game": "Zenless Zone Zero",
+      "name": "Ellen Joe",
+      "source": "images_big/zenless_zone_zero/ellen.webp"
+    },
+    {
+      "id": "5.45",
+      "game": "Zenless Zone Zero",
+      "name": "Dialyn",
+      "source": "images_big/zenless_zone_zero/dialyn.webp"
+    },
+    {
+      "id": "5.46",
+      "game": "Zenless Zone Zero",
+      "name": "Corin Wickes",
+      "source": "images_big/zenless_zone_zero/corin.webp"
+    },
+    {
+      "id": "5.47",
+      "game": "Zenless Zone Zero",
+      "name": "Claret Flint",
+      "source": "images_big/zenless_zone_zero/claret.webp"
+    },
+    {
+      "id": "5.48",
+      "game": "Zenless Zone Zero",
+      "name": "Cissia",
+      "source": "images_big/zenless_zone_zero/cissia.webp"
+    },
+    {
+      "id": "5.49",
+      "game": "Zenless Zone Zero",
+      "name": "Caesar King",
+      "source": "images_big/zenless_zone_zero/caesar.webp"
+    },
+    {
+      "id": "5.50",
+      "game": "Zenless Zone Zero",
+      "name": "Burnice White",
+      "source": "images_big/zenless_zone_zero/burnice.webp"
+    },
+    {
+      "id": "5.51",
+      "game": "Zenless Zone Zero",
+      "name": "Starlight - Billy",
+      "source": "images_big/zenless_zone_zero/billy-starlight.webp"
+    },
+    {
+      "id": "5.52",
+      "game": "Zenless Zone Zero",
+      "name": "Billy Kid",
+      "source": "images_big/zenless_zone_zero/billy-kid.webp"
+    },
+    {
+      "id": "5.53",
+      "game": "Zenless Zone Zero",
+      "name": "Ben Bigger",
+      "source": "images_big/zenless_zone_zero/ben.webp"
+    },
+    {
+      "id": "5.54",
+      "game": "Zenless Zone Zero",
+      "name": "Banyue",
+      "source": "images_big/zenless_zone_zero/banyue.webp"
+    },
+    {
+      "id": "5.55",
+      "game": "Zenless Zone Zero",
+      "name": "Astra Yao",
+      "source": "images_big/zenless_zone_zero/astra-yao.webp"
+    },
+    {
+      "id": "5.56",
+      "game": "Zenless Zone Zero",
+      "name": "Aria",
+      "source": "images_big/zenless_zone_zero/aria.webp"
+    },
+    {
+      "id": "5.57",
+      "game": "Zenless Zone Zero",
+      "name": "Anton Ivanov",
+      "source": "images_big/zenless_zone_zero/anton.webp"
+    },
+    {
+      "id": "5.58",
+      "game": "Zenless Zone Zero",
+      "name": "Soldier 0 - Anby",
+      "source": "images_big/zenless_zone_zero/anby-demara-soldier-0.webp"
+    },
+    {
+      "id": "5.59",
+      "game": "Zenless Zone Zero",
+      "name": "Anby Demara",
+      "source": "images_big/zenless_zone_zero/anby-demara.webp"
+    },
+    {
+      "id": "5.60",
+      "game": "Zenless Zone Zero",
+      "name": "Alice Thymefield",
+      "source": "images_big/zenless_zone_zero/alice.webp"
+    }
+  ],
+  "missing": [
+    {
+      "id": "1.18",
+      "game": "Wuthering Waves",
+      "name": "Xiangli Yao"
+    },
+    {
+      "id": "1.30",
+      "game": "Wuthering Waves",
+      "name": "Hiyuki"
+    },
+    {
+      "id": "1.40",
+      "game": "Wuthering Waves",
+      "name": "Aemeath"
+    },
+    {
+      "id": "2.87",
+      "game": "Genshin Impact",
+      "name": "Sethos"
+    }
+  ],
+  "duplicates": []
+}
