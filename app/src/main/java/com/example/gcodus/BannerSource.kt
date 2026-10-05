@@ -28,7 +28,8 @@ object BannerSource {
 
         for ((gameId, gameName, base) in games) {
             val confirmed = readRows(base, true)
-            val leaks = readRows(base, false)
+                ?: throw IllegalStateException("Не удалось скачать подтверждённую таблицу: $base")
+            val leaks = readRows(base, false) ?: emptyList()
             val merged = linkedMapOf<String, BannerRowData>()
             leaks.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = false) }
             confirmed.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = true) }
@@ -65,7 +66,7 @@ object BannerSource {
         return out.put("games", resultGames).toString()
     }
 
-    private fun readRows(base: String, confirmed: Boolean): List<BannerRowData> {
+    private fun readRows(base: String, confirmed: Boolean): List<BannerRowData>? {
         val suffix = if (confirmed) "confirmed" else "leaks"
         val rows = try {
             RemoteXlsx.fetchRows(
@@ -75,7 +76,7 @@ object BannerSource {
                 )
             )
         } catch (_: Exception) {
-            emptyList()
+            return null
         }
         if (rows.isEmpty()) return emptyList()
 
