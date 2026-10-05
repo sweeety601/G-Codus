@@ -69,7 +69,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showTokenScreen() {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
-        box.addView(label("G-Codus Admin напрямую изменяет репозиторий sweeety601/G-Codus.", muted, 14f))
+        box.addView(label("G-Codus Admin v1.0.1 — проверка доступа к sweeety601/G-Codus.", muted, 14f))
         box.addView(space(10))
         box.addView(label("Создай GitHub Fine-grained token с правом Contents: Read and write и вставь его ниже.", muted, 14f))
         val input = EditText(this).apply {
@@ -112,7 +112,7 @@ class AdminMainActivity : AppCompatActivity() {
         header.addView(settings, LinearLayout.LayoutParams(dp(100), dp(48)))
         settings.setOnClickListener { showTokenSettings() }
         box.addView(header)
-        box.addView(label("Редактор онлайн-базы G-Codus", muted, 14f))
+        box.addView(label("Редактор онлайн-базы G-Codus • v1.0.1", muted, 14f))
         box.addView(space(18))
 
         val add = bigButton("Добавить персонажа в базу")
