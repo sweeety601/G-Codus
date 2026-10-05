@@ -26,7 +26,7 @@ class AdminMainActivity : AppCompatActivity() {
 
     private val bg = 0xFF0D0E13.toInt()
     private val surface = 0xFF171923.toInt()
-    private val text = 0xFFF5F5F7.toInt()
+    private val ink = 0xFFF5F5F7.toInt()
     private val muted = 0xFFA5A7B1.toInt()
     private val accent = 0xFF8A63E8.toInt()
     private var root: LinearLayout? = null
@@ -75,7 +75,7 @@ class AdminMainActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             hint = "github_pat_..."
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(text)
+            setTextColor(ink)
             setHintTextColor(muted)
             setSingleLine(true)
             setPadding(dp(14), dp(12), dp(14), dp(12))
@@ -284,7 +284,7 @@ class AdminMainActivity : AppCompatActivity() {
             rows.forEachIndexed { index, b ->
                 val card = horizontal()
                 val info = vertical()
-                info.addView(label(b.phase, text, 16f, true))
+                info.addView(label(b.phase, ink, 16f, true))
                 info.addView(label(b.startDate + " → " + b.endDate, muted, 13f))
                 info.addView(label("Персонажи: " + b.characters.joinToString(", "), muted, 12f))
                 card.addView(info, LinearLayout.LayoutParams(0,-2,1f))
@@ -513,17 +513,6 @@ class AdminMainActivity : AppCompatActivity() {
         if (w <= 0) -1 else dp(w),
         if (h == -2) LinearLayout.LayoutParams.WRAP_CONTENT else dp(h)
     ).apply { setMargins(0,dp(5),0,dp(5)) }
-
-    private fun runBackground(work: () -> Unit, done: () -> Unit, fail: ((Exception) -> Unit)? = null) {
-        executor.execute {
-            try {
-                work()
-                runOnUiThread { done() }
-            } catch (e: Exception) {
-                runOnUiThread { fail?.invoke(e) ?: toast(e.message ?: "Ошибка") }
-            }
-        }
-    }
 
     private fun <T> runBackground(work: () -> T, done: (T) -> Unit, fail: ((Exception) -> Unit)? = null) {
         executor.execute {
