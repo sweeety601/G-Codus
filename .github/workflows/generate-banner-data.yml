@@ -52,7 +52,8 @@ jobs:
                   if not legacy.exists():
                       continue
 
-                  legacy_wb = load_workbook(legacy, read_only=True, data_only=True)
+                  with legacy.open("rb") as stream:
+                    legacy_wb = load_workbook(stream, read_only=True, data_only=True)
                   legacy_ws = legacy_wb.active
                   legacy_rows = [list(r) for r in legacy_ws.iter_rows(values_only=True)]
                   legacy_wb.close()
