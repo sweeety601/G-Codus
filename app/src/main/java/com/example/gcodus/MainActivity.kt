@@ -1158,30 +1158,7 @@ class MainActivity : AppCompatActivity() {
         loadDatabasePortrait(image, online)
     }
 
-    private fun refreshCharacterDatabaseInBackground() {
-        executor.execute {
-            try {
-                val fresh = CharacterDatabase.fetch(this@MainActivity)
-                if (fresh.isNotEmpty()) {
-                    onlineCharacters = fresh
-                    runOnUiThread {
-                        if (!isFinishing) refreshCurrentScreen()
-                    }
-                }
-            } catch (_: Exception) { }
-        }
-        executor.scheduleAtFixedRate({
-            try {
-                val fresh = CharacterDatabase.fetch(this@MainActivity)
-                if (fresh.isNotEmpty()) {
-                    onlineCharacters = fresh
-                    runOnUiThread {
-                        if (!isFinishing) refreshCurrentScreen()
-                        /**
-     * Live G-Codus database: characters and banners are always loaded directly
-     * from the Excel tables in GitHub. Character data is loaded first so banner
-     * rarity/name resolution is complete before the feed is rendered.
-     */
+    /** Load characters first, then banners from the live Excel tables. */
     private fun refreshLiveDatabaseOnce() {
         executor.execute {
             var changed = false
@@ -1216,7 +1193,28 @@ class MainActivity : AppCompatActivity() {
         }, 15, 15, TimeUnit.MINUTES)
     }
 
-ader = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL; setPadding(0, 0, 0, dp(12)) }
+    private fun refreshCurrentScreen() {
+        when (currentScreen) {
+            Screen.TRACKING -> currentGameId?.let { showTracking(it) } ?: showWishlist()
+            Screen.WISHLIST -> showWishlist()
+            Screen.GAME -> currentGameId?.let { showGame(it) }
+            Screen.HOME -> showHome()
+        }
+    }
+
+    private fun showTracking(gameId: String) {
+        if (currentScreen != Screen.TRACKING) {
+            previousScreen = currentScreen
+            previousGameId = currentGameId
+        }
+        currentScreen = Screen.TRACKING
+        currentGameId = gameId
+        countdownViews.clear()
+        val root = findViewById<FrameLayout>(R.id.root)
+        root.removeAllViews()
+        val scroll = makeScroll()
+        val column = makeColumn()
+        val header = LinearLayout(this).apply { gravity = Gravity.CENTER_VERTICAL; setPadding(0, 0, 0, dp(12)) }
         val back = TextView(this).apply {
             text = "‹"
             textSize = 38f
