@@ -6,18 +6,12 @@ import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 
-/**
- * Reads the G-Codus banner feed generated from the repository Excel tables.
- * Confirmed rows have priority over leak rows with the same version/phase.
- */
 object BannerSource {
     private const val FEED_URL =
         "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/banner_feed.json"
 
     fun fetchNormalized(context: Context): String {
-        // The GitHub G-Codus database is the only banner source.
-        // context is kept for API compatibility with existing callers.
-        return normalize(fetch(FEED_URL + "?t=" + (System.currentTimeMillis() / 600000L)))
+        return normalize(fetch(FEED_URL + "?v=" + System.currentTimeMillis()))
     }
 
     private fun normalize(source: String): String {
@@ -39,10 +33,8 @@ object BannerSource {
 
         for ((id, name) in definitions) {
             val sourceGame = when {
-                sourceGamesObject != null -> {
-                    sourceGamesObject.optJSONObject(name)
-                        ?: sourceGamesObject.optJSONObject(id)
-                }
+                sourceGamesObject != null -> sourceGamesObject.optJSONObject(name)
+                    ?: sourceGamesObject.optJSONObject(id)
                 else -> {
                     var found: JSONObject? = null
                     for (i in 0 until sourceGamesArray!!.length()) {
@@ -57,24 +49,16 @@ object BannerSource {
                 }
             } ?: continue
 
-            val current = normalizeArray(sourceGame.opt("current"), id, name)
-            val next = normalizeArray(sourceGame.opt("next"), id, name)
-            val upcoming = normalizeArray(sourceGame.opt("upcoming"), id, name)
-            val history = normalizeArray(sourceGame.opt("history"), id, name)
-
-            games.put(
-                JSONObject()
-                    .put("id", id)
-                    .put("name", name)
-                    .put("current", current)
-                    .put("next", next)
-                    .put("upcoming", upcoming)
-                    .put("history", history)
-            )
+            games.put(JSONObject()
+                .put("id", id)
+                .put("name", name)
+                .put("current", normalizeArray(sourceGame.opt("current")))
+                .put("next", normalizeArray(sourceGame.opt("next")))
+                .put("upcoming", normalizeArray(sourceGame.opt("upcoming")))
+                .put("history", normalizeArray(sourceGame.opt("history"))))
         }
 
         if (games.length() == 0) throw IllegalStateException("Banner feed has no supported games")
-
         return JSONObject()
             .put("version", root.optInt("version", 1))
             .put("generated_at", root.optString("generated_at"))
@@ -83,7 +67,7 @@ object BannerSource {
             .toString()
     }
 
-    private fun normalizeArray(raw: Any?, gameId: String, gameName: String): JSONArray {
+    private fun normalizeArray(raw: Any?): JSONArray {
         val source = when (raw) {
             is JSONObject -> JSONArray().put(raw)
             is JSONArray -> raw
@@ -100,18 +84,9 @@ object BannerSource {
     }
 
     private fun normalizePhase(source: JSONObject): JSONObject {
-        val characters = copyArray(
-            source.optJSONArray("characters") ?: source.optJSONArray("five_star")
-        )
-        val fourStars = copyArray(
-            source.optJSONArray("four_star") ?: source.optJSONArray("fourStars")
-        )
-        val status = if (source.optString("source_status").equals("confirmed", true)) {
-            "confirmed"
-        } else {
-            "unconfirmed"
-        }
-
+        val characters = copyArray(source.optJSONArray("characters") ?: source.optJSONArray("five_star"))
+        val fourStars = copyArray(source.optJSONArray("four_star") ?: source.optJSONArray("fourStars"))
+        val status = if (source.optString("source_status").equals("confirmed", true)) "confirmed" else "unconfirmed"
         return JSONObject()
             .put("version", source.optString("phase", source.optString("version")))
             .put("start", source.optString("start").ifBlank { JSONObject.NULL.toString() })
@@ -140,11 +115,10 @@ object BannerSource {
             connection.requestMethod = "GET"
             connection.instanceFollowRedirects = true
             connection.useCaches = false
-            connection.setRequestProperty("Cache-Control", "no-cache")
+            connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
+            connection.setRequestProperty("Pragma", "no-cache")
             connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-            if (connection.responseCode !in 200..299) {
-                throw IllegalStateException("HTTP " + connection.responseCode)
-            }
+            if (connection.responseCode !in 200..299) throw IllegalStateException("HTTP " + connection.responseCode)
             return connection.inputStream.use { it.bufferedReader().readText() }
         } finally {
             connection.disconnect()
