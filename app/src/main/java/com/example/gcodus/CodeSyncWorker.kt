@@ -14,7 +14,7 @@ class CodeSyncWorker(
     override fun doWork(): Result {
         return try {
             // Promo codes are fetched directly from live public sources.
-            val json = PromoCodeSource.fetchJson()
+            val json = PromoCodeSource.fetchJson(applicationContext)
             applicationContext.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
                 .edit().putString("codes_feed", json).apply()
             Result.success()
