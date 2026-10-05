@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-05T17:08:24.228643+00:00",
+  "generatedAt": "2026-10-05T17:16:50.610152+00:00",
   "games": [
     {
       "id": "1",
@@ -496,7 +496,7 @@
         {
           "id": "1.55",
           "gameId": "wuwa",
-          "name": "Scargandon2",
+          "name": "Scargandon3",
           "element": "Fusion",
           "rarity": 5,
           "announced": false,
