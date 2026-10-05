@@ -1,5 +1,5 @@
 <resources>
-    <style name="Theme.GCodusAdmin" parent="Theme.MaterialComponents.Dark.NoActionBar">
+    <style name="Theme.GCodusAdmin" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowBackground">#0D0E13</item>
         <item name="android:textColorPrimary">#FFFFFF</item>
