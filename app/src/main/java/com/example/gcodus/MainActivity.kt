@@ -1467,8 +1467,14 @@ class MainActivity : AppCompatActivity() {
                 Triple(value, resolved, record?.rarity ?: 0)
             }
 
+            val explicitFourStarKeys = fourStarArr
+                .let { array -> (0 until array.length()).map { characterNameForFeedValue(game.optString("id"), array.optString(it)) } }
+                .filter { it.isNotBlank() }
+                .map(::normalizeCharacterForMatch)
+                .toSet()
+
             val fiveStars = resolvedCharacters
-                .filter { it.third == 5 }
+                .filter { it.third == 5 || (it.third == 0 && normalizeCharacterForMatch(it.second.ifBlank { it.first }) !in explicitFourStarKeys) }
                 .map { it.second.ifBlank { it.first } }
                 .filter { it.isNotBlank() }
                 .distinctBy { normalizeCharacterForMatch(it) }
