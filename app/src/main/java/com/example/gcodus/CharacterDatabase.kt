@@ -19,25 +19,21 @@ data class OnlineCharacter(
 object CharacterDatabase {
     private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/library/generated/characters.json"
 
+    /**
+     * The GitHub repository is the ONLY source of character data.
+     * No character JSON is stored in SharedPreferences and no stale local
+     * character database is used as a fallback.
+     */
     fun fetch(context: Context): List<OnlineCharacter> {
-        val prefs = context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-        val json = try {
-            get(DATA_URL + "?v=" + System.currentTimeMillis()).also {
-                prefs.edit().putString("character_feed_json", it).apply()
-            }
-        } catch (_: Exception) {
-            prefs.getString("character_feed_json", null) ?: return emptyList()
-        }
+        val json = get(DATA_URL + "?v=" + System.currentTimeMillis())
         return parse(json)
     }
 
     fun sync(context: Context): Boolean {
         return try {
             val fresh = get(DATA_URL + "?v=" + System.currentTimeMillis())
-            JSONObject(fresh).optJSONArray("games") ?: return false
-            context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-                .edit().putString("character_feed_json", fresh).apply()
-            true
+            val games = JSONObject(fresh).optJSONArray("games") ?: return false
+            games.length() > 0 && parse(fresh).isNotEmpty()
         } catch (_: Exception) {
             false
         }
@@ -59,7 +55,6 @@ object CharacterDatabase {
                         val id = c.optString("id").trim()
                         val name = c.optString("name").trim()
                         if (id.isBlank() || name.isBlank()) continue
-                        if (isForbidden(name)) continue
                         add(OnlineCharacter(
                             gameId = gameId,
                             name = name,
@@ -72,7 +67,7 @@ object CharacterDatabase {
                         ))
                     }
                 }
-            }.distinctBy { it.id }
+            }.distinctBy { it.gameId + "|" + it.id }
         } catch (_: Exception) {
             emptyList()
         }
@@ -83,20 +78,12 @@ object CharacterDatabase {
     private fun imageUrl(id: String, version: String): String =
         "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp?v=$version"
 
-    private fun isForbidden(name: String): Boolean {
-        val n = normalize(name)
-        return n == "storyteller" || n.startsWith("thestoryteller") ||
-            n == "sunbringer" || n.startsWith("sunbringer")
-    }
-
-    private fun normalize(value: String): String =
-        value.lowercase().replace(Regex("[^a-z0-9]+"), "")
-
     private fun get(url: String): String {
         val connection = URL(url).openConnection() as HttpURLConnection
         connection.connectTimeout = 15_000
         connection.readTimeout = 20_000
         connection.requestMethod = "GET"
+        connection.instanceFollowRedirects = true
         connection.useCaches = false
         connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
         connection.setRequestProperty("Pragma", "no-cache")
