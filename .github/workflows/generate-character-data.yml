@@ -7,7 +7,6 @@ on:
       - 'library/seed/**'
       - 'images_big/**'
       - 'app/src/main/assets/**'
-      - 'scripts/ensure_library_xlsx.py'
       - 'scripts/generate_character_data.py'
       - 'scripts/sync_library_portraits.py'
       - '.github/workflows/generate-character-data.yml'
@@ -56,7 +55,15 @@ jobs:
           if errors:
               print('\n'.join(errors))
               raise SystemExit(1)
+          missing = []
+          for game in data['games']:
+              for c in game['characters']:
+                  if not Path('images', f'{c["id"]}.webp').exists():
+                      missing.append(f'{c["id"]} | {c["name"]}')
           print(f'Validated {len(seen)} character IDs.')
+          if missing:
+              print('WARNING: missing portraits (data update is still allowed):')
+              print('\n'.join(missing))
           PY
 
       - name: Commit generated library and portraits
