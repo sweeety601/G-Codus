@@ -4,10 +4,18 @@ import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
 object RemoteXlsx {
+    private data class CachedFile(
+        val bytes: ByteArray,
+        val etag: String?
+    )
+
+    private val cache = ConcurrentHashMap<String, CachedFile>()
+
     fun fetchRows(pathCandidates: List<String>): MutableList<MutableList<String>> {
         var lastError: Exception? = null
         for (path in pathCandidates) {
@@ -25,8 +33,7 @@ object RemoteXlsx {
             java.net.URLEncoder.encode(it, "UTF-8").replace("+", "%20")
         }
         val url = URL(
-            "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" +
-                encodedPath + "?v=" + System.currentTimeMillis()
+            "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" + encodedPath
         )
         val connection = url.openConnection() as HttpURLConnection
         return try {
@@ -35,13 +42,29 @@ object RemoteXlsx {
             connection.requestMethod = "GET"
             connection.instanceFollowRedirects = true
             connection.useCaches = false
-            connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
+            connection.setRequestProperty("Cache-Control", "no-cache, max-age=0")
             connection.setRequestProperty("Pragma", "no-cache")
             connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-            if (connection.responseCode !in 200..299) {
-                error("HTTP " + connection.responseCode + " for " + path)
+
+            cache[path]?.etag?.let {
+                connection.setRequestProperty("If-None-Match", it)
             }
-            connection.inputStream.use { it.readBytes() }
+
+            when (connection.responseCode) {
+                HttpURLConnection.HTTP_NOT_MODIFIED -> {
+                    cache[path]?.bytes
+                        ?: error("GitHub вернул 304 без локальной копии для $path")
+                }
+                in 200..299 -> {
+                    val bytes = connection.inputStream.use { it.readBytes() }
+                    cache[path] = CachedFile(
+                        bytes = bytes,
+                        etag = connection.getHeaderField("ETag")
+                    )
+                    bytes
+                }
+                else -> error("HTTP " + connection.responseCode + " for " + path)
+            }
         } finally {
             connection.disconnect()
         }
