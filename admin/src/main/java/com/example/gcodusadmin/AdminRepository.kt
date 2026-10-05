@@ -86,8 +86,12 @@ class AdminRepository(private val github: GitHubClient) {
                 }.toMutableList()
                 Pair(list, file.sha)
             }
-        } catch (_: Exception) {
-            Pair(mutableListOf(), null)
+        } catch (e: Exception) {
+            if (e.message?.contains("HTTP 404") == true) {
+                Pair(mutableListOf(), null)
+            } else {
+                throw e
+            }
         }
     }
 
