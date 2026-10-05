@@ -60,7 +60,9 @@ class GitHubClient(private val token: String) {
         }
         val bytes = conn.inputStream.use { it.readBytes() }
         if (bytes.isEmpty()) throw IllegalStateException("GitHub вернул пустой файл " + path)
-        return GitFile(bytes, getFileSha(path))
+        // Reading must never require Contents API authentication.
+        // SHA is fetched separately only by write operations.
+        return GitFile(bytes, null)
     }
 
     fun getFileSha(path: String): String? {
