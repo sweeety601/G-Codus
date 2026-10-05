@@ -3,125 +3,159 @@ package com.example.gcodus
 import android.content.Context
 import org.json.JSONArray
 import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
+import java.time.Instant
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 object BannerSource {
-    private const val FEED_URL =
-        "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/banner_feed.json"
+    private val games = listOf(
+        Triple("wuwa", "Wuthering Waves", "01_Wuthering_Waves"),
+        Triple("genshin", "Genshin Impact", "02_Genshin_Impact"),
+        Triple("starrail", "Honkai: Star Rail", "03_Honkai_Star_Rail"),
+        Triple("endfield", "Arknights: Endfield", "04_Arknights_Endfield"),
+        Triple("zzz", "Zenless Zone Zero", "05_Zenless_Zone_Zero")
+    )
 
     fun fetchNormalized(context: Context): String {
-        return normalize(fetch(FEED_URL + "?v=" + System.currentTimeMillis()))
-    }
+        val now = Instant.now()
+        val out = JSONObject()
+            .put("version", 7)
+            .put("generated_at", now.toString())
+            .put("source", "G-Codus banner Excel tables (direct)")
+        val resultGames = JSONArray()
 
-    private fun normalize(source: String): String {
-        val root = JSONObject(source)
-        val sourceGamesObject = root.optJSONObject("games")
-        val sourceGamesArray = root.optJSONArray("games")
-        if (sourceGamesObject == null && sourceGamesArray == null) {
-            throw IllegalStateException("Banner feed has no games")
+        for ((gameId, gameName, base) in games) {
+            val confirmed = readRows(base, true)
+            val leaks = readRows(base, false)
+            val merged = linkedMapOf<String, BannerRowData>()
+            leaks.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = false) }
+            confirmed.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = true) }
+
+            val rows = merged.values.sortedBy { it.startInstant }
+            val current = rows.filter { !it.startInstant.isAfter(now) && now.isBefore(it.endInstant) }
+            val future = rows.filter { it.startInstant.isAfter(now) }
+            val history = rows.filter { !it.endInstant.isAfter(now) }
+                .sortedByDescending { it.startInstant }
+
+            fun phaseJson(row: BannerRowData): JSONObject =
+                JSONObject()
+                    .put("phase", row.phase)
+                    .put("version", row.phase)
+                    .put("start", row.start)
+                    .put("end", row.end)
+                    .put("characters", JSONArray(row.characters))
+                    .put("five_star", JSONArray(row.characters))
+                    .put("four_star", JSONArray(row.fourStars))
+                    .put("source_status", if (row.confirmed) "confirmed" else "unconfirmed")
+                    .put("unconfirmed", !row.confirmed)
+
+            resultGames.put(
+                JSONObject()
+                    .put("id", gameId)
+                    .put("name", gameName)
+                    .put("current", JSONArray().apply { current.forEach { put(phaseJson(it)) } })
+                    .put("next", JSONArray().apply { future.take(1).forEach { put(phaseJson(it)) } })
+                    .put("upcoming", JSONArray().apply { future.drop(1).forEach { put(phaseJson(it)) } })
+                    .put("history", JSONArray().apply { history.forEach { put(phaseJson(it)) } })
+            )
         }
 
-        val games = JSONArray()
-        val definitions = listOf(
-            "genshin" to "Genshin Impact",
-            "wuwa" to "Wuthering Waves",
-            "zzz" to "Zenless Zone Zero",
-            "starrail" to "Honkai: Star Rail",
-            "endfield" to "Arknights: Endfield"
+        return out.put("games", resultGames).toString()
+    }
+
+    private fun readRows(base: String, confirmed: Boolean): List<BannerRowData> {
+        val suffix = if (confirmed) "confirmed" else "leaks"
+        val rows = RemoteXlsx.fetchRows(
+            listOf(
+                "banners/" + base + "_" + suffix + ".xlsx",
+                "banners/" + base + "_" + suffix
+            )
         )
+        if (rows.isEmpty()) return emptyList()
 
-        for ((id, name) in definitions) {
-            val sourceGame = when {
-                sourceGamesObject != null -> sourceGamesObject.optJSONObject(name)
-                    ?: sourceGamesObject.optJSONObject(id)
-                else -> {
-                    var found: JSONObject? = null
-                    for (i in 0 until sourceGamesArray!!.length()) {
-                        val candidate = sourceGamesArray.optJSONObject(i) ?: continue
-                        if (candidate.optString("name").equals(name, true) ||
-                            candidate.optString("id").equals(id, true)) {
-                            found = candidate
-                            break
-                        }
-                    }
-                    found
+        val header = rows.first().map { it.trim().lowercase().replace("ё", "е") }
+
+        fun col(vararg names: String): Int {
+            val aliases = names.map { it.trim().lowercase().replace("ё", "е") }.toSet()
+            return header.indexOfFirst { it in aliases }
+        }
+
+        val phaseCol = col("версия и фаза", "phase", "version and phase")
+        val startCol = col("дата начала", "start date", "start_date")
+        val endCol = col("дата окончания", "end date", "end_date")
+        val charsCol = col("персонажи в составе баннера", "персонажи", "characters")
+        val fourCol = col("4* в баннере", "4★ в баннере", "4*", "four star", "four_star")
+        if (phaseCol < 0 || startCol < 0 || endCol < 0) return emptyList()
+
+        return rows.drop(1).mapNotNull { row ->
+            val phase = row.getOrNull(phaseCol).orEmpty().trim()
+            val start = normalizeDate(row.getOrNull(startCol).orEmpty())
+            val end = normalizeDate(row.getOrNull(endCol).orEmpty())
+            if (phase.isBlank() || start.isBlank() || end.isBlank()) return@mapNotNull null
+
+            BannerRowData(
+                phase = phase,
+                start = start,
+                end = end,
+                characters = splitIds(row.getOrNull(charsCol).orEmpty()),
+                fourStars = splitIds(row.getOrNull(fourCol).orEmpty()).take(3),
+                confirmed = confirmed
+            )
+        }
+    }
+
+    private fun splitIds(value: String): List<String> =
+        value.split(',', ';', '\n').map { it.trim() }.filter { it.isNotBlank() }.distinct()
+
+    private fun normalizeDate(value: String): String {
+        val v = value.trim()
+        if (v.isBlank()) return ""
+        val patterns = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss'Z'",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd HH:mm",
+            "yyyy-MM-dd",
+            "dd.MM.yyyy HH:mm:ss",
+            "dd.MM.yyyy HH:mm",
+            "dd.MM.yyyy",
+            "dd/MM/yyyy HH:mm",
+            "dd/MM/yyyy"
+        )
+        for (pattern in patterns) {
+            try {
+                val formatter = DateTimeFormatter.ofPattern(pattern)
+                return when {
+                    pattern.contains("'T'") ->
+                        LocalDateTime.parse(v, formatter).toInstant(ZoneOffset.UTC).toString()
+                    pattern.contains("HH") ->
+                        LocalDateTime.parse(v, formatter).toInstant(ZoneOffset.UTC).toString()
+                    else ->
+                        LocalDate.parse(v, formatter).atStartOfDay().toInstant(ZoneOffset.UTC).toString()
                 }
-            } ?: continue
-
-            games.put(JSONObject()
-                .put("id", id)
-                .put("name", name)
-                .put("current", normalizeArray(sourceGame.opt("current")))
-                .put("next", normalizeArray(sourceGame.opt("next")))
-                .put("upcoming", normalizeArray(sourceGame.opt("upcoming")))
-                .put("history", normalizeArray(sourceGame.opt("history"))))
+            } catch (_: Exception) { }
         }
-
-        if (games.length() == 0) throw IllegalStateException("Banner feed has no supported games")
-        return JSONObject()
-            .put("version", root.optInt("version", 1))
-            .put("generated_at", root.optString("generated_at"))
-            .put("source", root.optString("source", "G-Codus banner Excel tables"))
-            .put("games", games)
-            .toString()
+        return try {
+            val numeric = v.toDouble()
+            LocalDateTime.of(1899, 12, 30, 0, 0)
+                .plusSeconds((numeric * 86_400.0).toLong())
+                .toInstant(ZoneOffset.UTC)
+                .toString()
+        } catch (_: Exception) {
+            ""
+        }
     }
 
-    private fun normalizeArray(raw: Any?): JSONArray {
-        val source = when (raw) {
-            is JSONObject -> JSONArray().put(raw)
-            is JSONArray -> raw
-            else -> JSONArray()
-        }
-        val result = JSONArray()
-        for (i in 0 until source.length()) {
-            val item = source.optJSONObject(i) ?: continue
-            val phase = normalizePhase(item)
-            if (phase.optString("version").isBlank()) continue
-            result.put(phase)
-        }
-        return result
-    }
-
-    private fun normalizePhase(source: JSONObject): JSONObject {
-        val characters = copyArray(source.optJSONArray("characters") ?: source.optJSONArray("five_star"))
-        val fourStars = copyArray(source.optJSONArray("four_star") ?: source.optJSONArray("fourStars"))
-        val status = if (source.optString("source_status").equals("confirmed", true)) "confirmed" else "unconfirmed"
-        return JSONObject()
-            .put("version", source.optString("phase", source.optString("version")))
-            .put("start", source.optString("start").ifBlank { JSONObject.NULL.toString() })
-            .put("end", source.optString("end").ifBlank { JSONObject.NULL.toString() })
-            .put("five_star", characters)
-            .put("four_star", fourStars)
-            .put("source_status", status)
-            .put("unconfirmed", status == "unconfirmed")
-    }
-
-    private fun copyArray(source: JSONArray?): JSONArray {
-        if (source == null) return JSONArray()
-        val result = JSONArray()
-        for (i in 0 until source.length()) {
-            val value = source.optString(i).trim()
-            if (value.isNotBlank()) result.put(value)
-        }
-        return result
-    }
-
-    private fun fetch(url: String): String {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        try {
-            connection.connectTimeout = 5000
-            connection.readTimeout = 8000
-            connection.requestMethod = "GET"
-            connection.instanceFollowRedirects = true
-            connection.useCaches = false
-            connection.setRequestProperty("Cache-Control", "no-cache, no-store, max-age=0")
-            connection.setRequestProperty("Pragma", "no-cache")
-            connection.setRequestProperty("User-Agent", "G-Codus/1.0")
-            if (connection.responseCode !in 200..299) throw IllegalStateException("HTTP " + connection.responseCode)
-            return connection.inputStream.use { it.bufferedReader().readText() }
-        } finally {
-            connection.disconnect()
-        }
+    private data class BannerRowData(
+        val phase: String,
+        val start: String,
+        val end: String,
+        val characters: List<String>,
+        val fourStars: List<String>,
+        val confirmed: Boolean
+    ) {
+        val startInstant: Instant get() = Instant.parse(start)
+        val endInstant: Instant get() = Instant.parse(end)
     }
 }
