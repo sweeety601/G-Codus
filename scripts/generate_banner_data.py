@@ -53,8 +53,8 @@ def read_table(path, game_prefix):
             continue
         if not PHASE_RE.fullmatch(phase):
             raise SystemExit(f"{path}: invalid version/phase '{phase}'")
-        start = str(row[indexes[HEADERS[1].lower()]] or "").strip()
-        end = str(row[indexes[HEADERS[2].lower()]] or "").strip()
+        start = normalize_date(row[indexes[HEADERS[1].lower()]])
+        end = normalize_date(row[indexes[HEADERS[2].lower()]])
         characters = split_ids(row[indexes[HEADERS[3].lower()]])
         four = split_ids(row[indexes[HEADERS[4].lower()]])
         for cid in characters + four:
@@ -72,23 +72,42 @@ def read_table(path, game_prefix):
     return rows
 
 
+def normalize_date(value):
+    if value is None or str(value).strip() == "":
+        return ""
+    if isinstance(value, datetime):
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    text = str(value).strip()
+    formats = (
+        "%Y-%m-%d", "%Y-%m-%d %H:%M", "%Y-%m-%d %H:%M:%S",
+        "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ",
+        "%d.%m.%Y", "%d.%m.%Y %H:%M", "%d.%m.%Y %H:%M:%S",
+        "%d/%m/%Y", "%d/%m/%Y %H:%M"
+    )
+    for fmt in formats:
+        try:
+            dt = datetime.strptime(text, fmt).replace(tzinfo=timezone.utc)
+            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            pass
+    raise SystemExit(f"Invalid date: {text}")
+
+
 def parse_date(value):
     value = value.strip()
-    for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ"):
+    for fmt in ("%Y-%m-%d", "%Y-%m-%d %H:%M", "%Y-%m-%dT%H:%M", "%Y-%m-%dT%H:%M:%S", "%Y-%m-%dT%H:%M:%SZ"):
         try:
             dt = datetime.strptime(value, fmt)
-            return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+            return dt.replace(tzinfo=timezone.utc)
         except ValueError:
             pass
     raise SystemExit(f"Invalid date: {value}")
 
 
 def normalize(row, confirmed):
-    return {
-        **row,
-        "source_status": "confirmed" if confirmed else "unconfirmed",
-        "unconfirmed": not confirmed,
-    }
+    return {**row, "source_status": "confirmed" if confirmed else "unconfirmed", "unconfirmed": not confirmed}
 
 
 def build_game(game_id, game_name, prefix):
@@ -100,15 +119,8 @@ def build_game(game_id, game_name, prefix):
     if not leaks_path.exists():
         make_initial_workbook(leaks_path)
 
-    confirmed = {
-        r["phase"].lower(): normalize(r, True)
-        for r in read_table(confirmed_path, prefix)
-    }
-    leaks = {
-        r["phase"].lower(): normalize(r, False)
-        for r in read_table(leaks_path, prefix)
-    }
-
+    confirmed = {r["phase"].lower(): normalize(r, True) for r in read_table(confirmed_path, prefix)}
+    leaks = {r["phase"].lower(): normalize(r, False) for r in read_table(leaks_path, prefix)}
     merged = dict(leaks)
     merged.update(confirmed)
     rows = sorted(merged.values(), key=lambda x: parse_date(x["start"]))
@@ -117,24 +129,16 @@ def build_game(game_id, game_name, prefix):
     current = [x for x in rows if parse_date(x["start"]) <= now < parse_date(x["end"])]
     future = [x for x in rows if parse_date(x["start"]) > now]
     history = [x for x in rows if parse_date(x["end"]) <= now]
-
     return {
-        "id": game_id,
-        "name": game_name,
-        "current": current,
-        "next": future[:1],
-        "upcoming": future[1:],
-        "history": list(reversed(history)),
-        "source": "G-Codus banner Excel tables",
+        "id": game_id, "name": game_name,
+        "current": current, "next": future[:1], "upcoming": future[1:],
+        "history": list(reversed(history)), "source": "G-Codus banner Excel tables",
     }
 
 
 def main():
     BANNERS.mkdir(parents=True, exist_ok=True)
-    games = [
-        build_game(gid, name, str(i))
-        for i, (gid, (name, _)) in enumerate(GAMES.items(), 1)
-    ]
+    games = [build_game(gid, name, str(i)) for i, (gid, (name, _)) in enumerate(GAMES.items(), 1)]
     payload = {
         "version": 6,
         "generated_at": datetime.now(timezone.utc).isoformat(),
