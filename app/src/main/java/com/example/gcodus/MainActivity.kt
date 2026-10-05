@@ -1073,8 +1073,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
     private fun normalizeCharacterForMatch(value: String): String =
         value.lowercase().replace("’", "").replace("'", "").replace("&", "and")
             .replace(Regex("[^a-z0-9]+"), "")
@@ -1088,16 +1086,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-]?\\s*)"),
-                " "
-            )
-            .replace(Regex("\\s+"), " ")
-            .trim()
-
-
-
-
-
 
 
 
@@ -1109,7 +1097,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun trackedIdentityKey(gameId: String, file: String): String =
         "tracked_v2_" + gameId + "_" + normalizeCharacterForMatch(trackedCharacterName(gameId, file))
-
 
 
     private fun trackingKey(gameId: String, file: String) = trackedIdentityKey(gameId, file)
@@ -1297,11 +1284,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
-
-
-
     private fun startCountdownTicker() {
         countdownExecutor.scheduleAtFixedRate({
             runOnUiThread {
@@ -1422,6 +1404,16 @@ class MainActivity : AppCompatActivity() {
         }
         executor.execute { refreshOnce() }
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
+    }
+
+    private fun characterNameForFeedValue(gameId: String, value: String): String {
+        val clean = value.trim()
+        return onlineCharacters.firstOrNull {
+            it.gameId == gameId && (
+                it.id == clean ||
+                normalizeCharacterForMatch(it.name) == normalizeCharacterForMatch(clean)
+            )
+        }?.name ?: clean
     }
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
