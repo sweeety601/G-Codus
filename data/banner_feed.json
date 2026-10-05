@@ -1,11 +1,11 @@
 {
   "version": 3,
-  "generated_at": "2026-10-05T12:50:34.825555+00:00",
+  "generated_at": "2026-10-05T13:15:47.102658+00:00",
   "source": "Prydwen + secondary fallback",
   "games": {
     "Genshin Impact": {
       "source_url": "https://www.prydwen.gg/genshin-impact/banners",
-      "fetched_at": "2026-10-05T12:50:37.125996+00:00",
+      "fetched_at": "2026-10-05T13:15:49.924155+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -55,7 +55,7 @@
     },
     "Wuthering Waves": {
       "source_url": "https://www.prydwen.gg/wuthering-waves/banners",
-      "fetched_at": "2026-10-05T12:50:39.094157+00:00",
+      "fetched_at": "2026-10-05T13:15:52.139377+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -107,7 +107,7 @@
     },
     "Zenless Zone Zero": {
       "source_url": "https://www.prydwen.gg/zenless/banners",
-      "fetched_at": "2026-10-05T12:50:41.534903+00:00",
+      "fetched_at": "2026-10-05T13:15:55.130249+00:00",
       "status": "source_unavailable",
       "current": [],
       "next": [
@@ -130,7 +130,7 @@
     },
     "Honkai: Star Rail": {
       "source_url": "https://www.prydwen.gg/star-rail/banners",
-      "fetched_at": "2026-10-05T12:50:43.516968+00:00",
+      "fetched_at": "2026-10-05T13:15:57.254973+00:00",
       "status": "source_unavailable",
       "current": [
         {
@@ -184,7 +184,7 @@
     },
     "Arknights: Endfield": {
       "source_url": "https://www.prydwen.gg/arknights-endfield/banners",
-      "fetched_at": "2026-10-05T12:50:45.499194+00:00",
+      "fetched_at": "2026-10-05T13:15:59.420581+00:00",
       "status": "source_unavailable",
       "current": [
         {
