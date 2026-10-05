@@ -66,7 +66,7 @@ class AdminMainActivity : AppCompatActivity() {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
         if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
-        box.addView(label("G-Codus Admin v2.0.5", muted, 14f))
+        box.addView(label("G-Codus Admin v2.0.6", muted, 14f))
         box.addView(space(10))
         box.addView(label("Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
         val input = EditText(this).apply {
@@ -92,7 +92,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showHome() {
         val box = vertical()
         box.addView(title("G-Codus Admin"))
-        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.5", muted, 14f))
+        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.6", muted, 14f))
         box.addView(bigButton("Добавить персонажа в базу").also { it.setOnClickListener { chooseGame { game -> showCharacterEditor(game, null) } } }, lp(0, 70))
         box.addView(bigButton("Редактировать базу данных персонажей").also { it.setOnClickListener { showCharacterDatabase() } }, lp(0, 70))
         box.addView(bigButton("График баннеров").also { it.setOnClickListener { chooseGame { game -> showBannerTypes(game) } } }, lp(0, 70))
