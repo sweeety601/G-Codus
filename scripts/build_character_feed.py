@@ -7,6 +7,7 @@ from openpyxl import load_workbook
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "characters"
 OUT = ROOT / "data" / "characters.json"
+IMAGES = ROOT / "images"
 
 FILES = {
     1: "01_Wuthering_Waves.xlsx",
@@ -76,6 +77,10 @@ def read_table(game_id, path):
         except Exception:
             raise SystemExit(f"{path}: row {row_index}: rarity must be numeric")
 
+        portrait = IMAGES / f"{char_id}.webp"
+        if not portrait.is_file():
+            raise SystemExit(f"{path}: row {row_index}: missing portrait images/{char_id}.webp")
+
         records.append({
             "id": char_id,
             "game": GAME_NAMES[game_id],
@@ -94,6 +99,7 @@ def read_table(game_id, path):
 
 def main():
     SOURCE.mkdir(parents=True, exist_ok=True)
+    IMAGES.mkdir(parents=True, exist_ok=True)
     all_records, changed_files, missing = [], [], []
 
     for game_id, filename in FILES.items():
@@ -106,16 +112,17 @@ def main():
         if changed:
             changed_files.append(filename)
 
+    if missing:
+        raise SystemExit("Missing Excel tables: " + ", ".join(missing))
     if not all_records:
-        print("No Excel character tables found; nothing to generate.")
-        return
+        raise SystemExit("No character rows found in the five Excel tables")
 
     ids = [x["id"] for x in all_records]
     if len(ids) != len(set(ids)):
         raise SystemExit("Duplicate character IDs across tables")
 
     payload = {
-        "version": 1,
+        "version": 2,
         "games": [
             {"id": GAME_IDS[gid], "name": GAME_NAMES[gid],
              "characters": [x for x in all_records if x["gameId"] == GAME_IDS[gid]]}
@@ -124,8 +131,6 @@ def main():
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Generated {OUT} with {len(all_records)} characters")
-    if missing:
-        print("Missing tables:", ", ".join(missing))
     if changed_files:
         print("Assigned IDs in:", ", ".join(changed_files))
 
