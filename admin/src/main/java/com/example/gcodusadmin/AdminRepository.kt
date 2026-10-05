@@ -1,55 +1,78 @@
 package com.example.gcodusadmin
 
-import org.json.JSONArray
-import org.json.JSONObject
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import java.io.ByteArrayOutputStream
-import java.time.LocalDate
 
 class AdminRepository(private val github: GitHubClient) {
 
     fun loadCharacters(game: GameMeta): MutableList<AdminCharacter> {
         val rows = XlsxCodec.read(github.getFile(game.seedPath).bytes)
         if (rows.isEmpty()) return mutableListOf()
-        val header = rows.first().map { it.trim().lowercase() }
-        val idCol = find(header, listOf("id", "ид", "идентификатор"))
-        val nameCol = find(header, listOf("имя", "name"))
-        val elementCol = find(header, listOf("стихия", "элемент", "element"))
-        val rarityCol = find(header, listOf("редкость", "rarity"))
-        if (idCol < 0 || nameCol < 0) throw IllegalStateException("В " + game.seedPath + " не найдены колонки ID/Имя")
+
+        val header = rows.first()
+        val normalized = header.map(::normalizeHeader)
+
+        val idCol = find(normalized, listOf("id", "ид", "идентификатор"))
+        val nameCol = find(normalized, listOf("имя", "имя персонажа", "название", "name", "character name"))
+        val elementCol = find(normalized, listOf("стихия", "элемент", "element", "attribute"))
+        val rarityCol = find(normalized, listOf("редкость", "rarity", "звезды", "звёзды", "stars"))
+
+        if (idCol < 0 || nameCol < 0) {
+            throw IllegalStateException(
+                "Файл " + game.seedPath + " прочитан, но в нём не найдены колонки ID и «Имя персонажа». Заголовки: " +
+                    header.joinToString(" | ")
+            )
+        }
+
         return rows.drop(1).mapNotNull { row ->
             val id = row.getOrNull(idCol)?.trim().orEmpty()
             val name = row.getOrNull(nameCol)?.trim().orEmpty()
-            if (id.isBlank() || name.isBlank()) null
-            else AdminCharacter(id, name, row.getOrNull(elementCol)?.trim().orEmpty(),
-                row.getOrNull(rarityCol)?.trim()?.toIntOrNull() ?: 5)
+            if (id.isBlank() || name.isBlank()) {
+                null
+            } else {
+                AdminCharacter(
+                    id = id,
+                    name = name,
+                    element = row.getOrNull(elementCol)?.trim().orEmpty(),
+                    rarity = parseRarity(row.getOrNull(rarityCol).orEmpty())
+                )
+            }
         }.toMutableList()
     }
 
     fun saveCharacters(game: GameMeta, chars: List<AdminCharacter>) {
         val currentBytes = github.getFile(game.seedPath).bytes
         val rows = XlsxCodec.read(currentBytes)
-        val header = if (rows.isNotEmpty()) rows.first() else mutableListOf("ID","Имя","Стихия","Редкость")
-        val normalized = header.map { it.trim().lowercase() }
-        val idCol = ensureColumn(header, normalized, "ID")
-        val nameCol = ensureColumn(header, normalized, "Имя")
-        val elementCol = ensureColumn(header, normalized, "Стихия")
-        val rarityCol = ensureColumn(header, normalized, "Редкость")
+        val header = if (rows.isNotEmpty()) rows.first() else mutableListOf("ID", "Имя персонажа", "Портрет", "Стихия", "Редкость")
+
+        val idCol = ensureColumn(header, listOf("id", "ид", "идентификатор"), "ID")
+        val nameCol = ensureColumn(header, listOf("имя", "имя персонажа", "название", "name", "character name"), "Имя персонажа")
+        val elementCol = ensureColumn(header, listOf("стихия", "элемент", "element", "attribute"), "Стихия")
+        val rarityCol = ensureColumn(header, listOf("редкость", "rarity", "звезды", "звёзды", "stars"), "Редкость")
+
         val out = mutableListOf<MutableList<String>>()
         out += header.toMutableList()
-        chars.sortedBy { it.id.substringAfter('.', "").toIntOrNull() ?: Int.MAX_VALUE }
-            .forEach { c ->
-                val row = MutableList(header.size) { "" }
-                row[idCol] = c.id
-                row[nameCol] = c.name
-                row[elementCol] = c.element
-                row[rarityCol] = c.rarity.toString()
-                out += row
-            }
+
+        chars.sortedWith(compareBy<AdminCharacter>({ game.idPrefix }, {
+            it.id.substringAfter('.', "").toIntOrNull() ?: Int.MAX_VALUE
+        })).forEach { c ->
+            val row = MutableList(header.size) { "" }
+            row[idCol] = c.id
+            row[nameCol] = c.name
+            row[elementCol] = c.element
+            row[rarityCol] = c.rarity.toString() + "★"
+            out += row
+        }
+
         val currentSha = github.getFileSha(game.seedPath)
-        github.putFile(game.seedPath, XlsxCodec.write(out), currentSha, "Admin: update " + game.name + " character database")
+        github.putFile(
+            game.seedPath,
+            XlsxCodec.write(out),
+            currentSha,
+            "Admin: update " + game.name + " character database"
+        )
     }
 
     fun nextId(game: GameMeta, chars: List<AdminCharacter>): String {
@@ -68,27 +91,44 @@ class AdminRepository(private val github: GitHubClient) {
         return try {
             val file = github.getFile(path)
             val rows = XlsxCodec.read(file.bytes)
-            if (rows.isEmpty()) Pair(mutableListOf(), null)
-            else {
-                val header = rows.first().map { it.trim().lowercase() }
+            if (rows.isEmpty()) {
+                Pair(mutableListOf(), file.sha)
+            } else {
+                val header = rows.first().map(::normalizeHeader)
                 fun col(names: List<String>) = find(header, names)
+
                 val phase = col(listOf("версия и фаза", "version and phase", "phase"))
                 val start = col(listOf("дата начала", "start date", "start_date"))
                 val end = col(listOf("дата окончания", "end date", "end_date"))
                 val chars = col(listOf("персонажи в составе баннера", "персонажи", "characters"))
-                val four = col(listOf("4* в баннере", "4★ в баннере", "4*","four star", "four_star"))
+                val four = col(listOf("4* в баннере", "4★ в баннере", "4*", "four star", "four_star"))
+
+                if (phase < 0 || start < 0 || end < 0) {
+                    throw IllegalStateException(
+                        "Файл " + path + " прочитан, но не найдены обязательные колонки графика. Заголовки: " +
+                            rows.first().joinToString(" | ")
+                    )
+                }
+
                 val list = rows.drop(1).mapNotNull { row ->
                     val p = row.getOrNull(phase).orEmpty().trim()
-                    if (p.isBlank()) null else BannerRow(
-                        p, row.getOrNull(start).orEmpty().trim(), row.getOrNull(end).orEmpty().trim(),
-                        splitIds(row.getOrNull(chars).orEmpty()),
-                        splitIds(row.getOrNull(four).orEmpty())
-                    )
+                    if (p.isBlank()) {
+                        null
+                    } else {
+                        BannerRow(
+                            p,
+                            row.getOrNull(start).orEmpty().trim(),
+                            row.getOrNull(end).orEmpty().trim(),
+                            splitIds(row.getOrNull(chars).orEmpty()),
+                            splitIds(row.getOrNull(four).orEmpty())
+                        )
+                    }
                 }.toMutableList()
-                Pair(list, null)
+
+                Pair(list, file.sha)
             }
         } catch (e: Exception) {
-            if (e.message?.contains("HTTP 404") == true) {
+            if (e.message?.contains("GitHub API HTTP 404") == true || e.message?.contains("RAW HTTP 404") == true) {
                 Pair(mutableListOf(), null)
             } else {
                 throw e
@@ -100,27 +140,48 @@ class AdminRepository(private val github: GitHubClient) {
         val path = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks" + ".xlsx"
         val currentSha = github.getFileSha(path)
         val table = mutableListOf<MutableList<String>>()
-        table += mutableListOf("Версия и фаза","Дата начала","Дата окончания","Персонажи в составе баннера","4* в баннере")
+        table += mutableListOf("Версия и фаза", "Дата начала", "Дата окончания", "Персонажи в составе баннера", "4* в баннере")
         rows.forEach { b ->
-            table += mutableListOf(b.phase, b.startDate, b.endDate, b.characters.joinToString(", "), b.fourStars.joinToString(", "))
+            table += mutableListOf(
+                b.phase,
+                b.startDate,
+                b.endDate,
+                b.characters.joinToString(", "),
+                b.fourStars.joinToString(", ")
+            )
         }
-        github.putFile(path, XlsxCodec.write(table), currentSha, "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks")
+        github.putFile(
+            path,
+            XlsxCodec.write(table),
+            currentSha,
+            "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks"
+        )
     }
 
     private fun find(header: List<String>, names: List<String>): Int {
-        names.forEach { n ->
-            val idx = header.indexOf(n.lowercase())
-            if (idx >= 0) return idx
+        val aliases = names.map(::normalizeHeader).toSet()
+        header.forEachIndexed { index, value ->
+            if (value in aliases) return index
         }
         return -1
     }
 
-    private fun ensureColumn(header: MutableList<String>, normalized: List<String>, name: String): Int {
-        val idx = normalized.indexOf(name.lowercase())
-        if (idx >= 0) return idx
-        header += name
+    private fun ensureColumn(header: MutableList<String>, aliases: List<String>, canonical: String): Int {
+        val normalized = header.map(::normalizeHeader)
+        val index = find(normalized, aliases)
+        if (index >= 0) return index
+        header += canonical
         return header.lastIndex
     }
+
+    private fun normalizeHeader(value: String): String =
+        value.trim()
+            .removePrefix("\uFEFF")
+            .replace("Ё", "Е")
+            .lowercase()
+
+    private fun parseRarity(value: String): Int =
+        Regex("""\d+""").find(value)?.value?.toIntOrNull() ?: 5
 
     private fun splitIds(value: String): MutableList<String> =
         value.split(',').map { it.trim() }.filter { it.isNotBlank() }.distinct().toMutableList()
@@ -140,7 +201,9 @@ class AdminRepository(private val github: GitHubClient) {
         val out = ByteArrayOutputStream()
         val format = if (android.os.Build.VERSION.SDK_INT >= 30)
             Bitmap.CompressFormat.WEBP_LOSSY else Bitmap.CompressFormat.WEBP
-        if (!bitmap.compress(format, 95, out)) throw IllegalStateException("Не удалось преобразовать изображение в WebP")
+        if (!bitmap.compress(format, 95, out)) {
+            throw IllegalStateException("Не удалось преобразовать изображение в WebP")
+        }
         bitmap.recycle()
         return out.toByteArray()
     }
