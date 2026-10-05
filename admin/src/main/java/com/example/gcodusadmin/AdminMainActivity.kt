@@ -2,6 +2,8 @@ package com.example.gcodusadmin
 
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -18,7 +20,6 @@ import java.time.LocalDate
 import java.util.concurrent.Executors
 
 class AdminMainActivity : AppCompatActivity() {
-
     private val tokenStore by lazy { TokenStore(this) }
     private var github: GitHubClient? = null
     private var repo: AdminRepository? = null
@@ -29,7 +30,6 @@ class AdminMainActivity : AppCompatActivity() {
     private val ink = 0xFFF5F5F7.toInt()
     private val muted = 0xFFA5A7B1.toInt()
     private val accent = 0xFF8A63E8.toInt()
-    private var root: LinearLayout? = null
 
     private var pendingPortrait: ByteArray? = null
     private var pendingPortraitTarget: TextView? = null
@@ -37,34 +37,28 @@ class AdminMainActivity : AppCompatActivity() {
     private val portraitPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri == null) return@registerForActivityResult
         val target = pendingPortraitTarget
-        runBackground({
-            repo!!.readPortrait(uri, contentResolver)
-        }, { bytes ->
+        runBackground({ repo!!.readPortrait(uri, contentResolver) }, { bytes ->
             pendingPortrait = bytes
             target?.text = "Портрет выбран • WebP • " + (bytes.size / 1024) + " KB"
-        })
+        }, { e -> toast("Ошибка изображения: " + (e.message ?: "неизвестная ошибка")) })
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val loading = vertical()
         loading.addView(title("G-Codus Admin"))
         loading.addView(label("Проверка GitHub…", muted, 14f))
         setContentView(wrap(loading))
-
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) { v, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(v.paddingLeft, bars.top, v.paddingRight, bars.bottom)
             insets
         }
-
         val savedToken = tokenStore.get()
         if (savedToken.isNullOrBlank()) {
             showTokenScreen()
             return
         }
-
         runBackground({
             val c = GitHubClient(savedToken)
             c.testToken()
@@ -84,20 +78,15 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showTokenScreen(errorMessage: String? = null) {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
-        if (!errorMessage.isNullOrBlank()) {
-            box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
-        }
-        box.addView(label("G-Codus Admin v1.1.0 — проверка доступа к G-Codus.", muted, 14f))
+        if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
+        box.addView(label("G-Codus Admin v1.1.1 — проверка доступа к G-Codus.", muted, 14f))
         box.addView(space(10))
-        box.addView(label("Создай GitHub Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
+        box.addView(label("Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
         val input = EditText(this).apply {
             hint = "github_pat_..."
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(ink)
-            setHintTextColor(muted)
-            setSingleLine(true)
-            setPadding(dp(14), dp(12), dp(14), dp(12))
-            setBackgroundColor(surface)
+            setTextColor(ink); setHintTextColor(muted); setSingleLine(true)
+            setPadding(dp(14), dp(12), dp(14), dp(12)); setBackgroundColor(surface)
         }
         box.addView(input, lp())
         val save = button("Подключить GitHub")
@@ -118,8 +107,7 @@ class AdminMainActivity : AppCompatActivity() {
                 showHome()
             }, { error ->
                 save.isEnabled = true
-                val message = error.message ?: "неизвестная ошибка"
-                toast(message)
+                toast(error.message ?: "Ошибка подключения")
             })
         }
         setContentView(wrap(box))
@@ -128,10 +116,10 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showHome() {
         val box = vertical()
         box.addView(title("G-Codus Admin"))
-        box.addView(label("Редактор онлайн-базы G-Codus • v1.1.0", muted, 14f))
-        box.addView(bigButton("Добавить персонажа в базу").also { it.setOnClickListener { chooseGame { showCharacterEditor(it, null) } } }, lp(0, 70))
+        box.addView(label("Редактор онлайн-базы G-Codus • v1.1.1", muted, 14f))
+        box.addView(bigButton("Добавить персонажа в базу").also { it.setOnClickListener { chooseGame { game -> showCharacterEditor(game, null) } } }, lp(0, 70))
         box.addView(bigButton("Редактировать базу данных персонажей").also { it.setOnClickListener { showCharacterDatabase() } }, lp(0, 70))
-        box.addView(bigButton("График баннеров").also { it.setOnClickListener { chooseGame { showBannerTypes(it) } } }, lp(0, 70))
+        box.addView(bigButton("График баннеров").also { it.setOnClickListener { chooseGame { game -> showBannerTypes(game) } } }, lp(0, 70))
         box.addView(space(14))
         box.addView(button("Переподключить GitHub").also { it.setOnClickListener { tokenStore.clear(); showTokenScreen() } }, lp())
         setContentView(wrap(box))
@@ -139,10 +127,7 @@ class AdminMainActivity : AppCompatActivity() {
 
     private fun chooseGame(onSelected: (GameMeta) -> Unit) {
         val names = GameCatalog.games.map { it.name }.toTypedArray()
-        AlertDialog.Builder(this)
-            .setTitle("Выбери игру")
-            .setItems(names) { _, which -> onSelected(GameCatalog.games[which]) }
-            .show()
+        AlertDialog.Builder(this).setTitle("Выбери игру").setItems(names) { _, which -> onSelected(GameCatalog.games[which]) }.show()
     }
 
     private fun showCharacterEditor(game: GameMeta, existing: AdminCharacter?) {
@@ -153,9 +138,9 @@ class AdminMainActivity : AppCompatActivity() {
             val box = vertical()
             box.addView(title(if (existing == null) "Новый персонаж" else "Редактирование персонажа"))
             box.addView(label("ID закреплён автоматически", muted, 13f))
-            val idView = field("ID", id, enabled = false)
+            box.addView(field("ID", id, enabled = false))
             val name = field("Имя", existing?.name.orEmpty())
-            box.addView(idView); box.addView(name)
+            box.addView(name)
 
             val elements = linkedSetOf<String>()
             list.map { it.element }.filter { it.isNotBlank() }.forEach { elements.add(it) }
@@ -164,7 +149,7 @@ class AdminMainActivity : AppCompatActivity() {
             val elementSpinner = spinner(elements.toList(), existing?.element)
             box.addView(elementSpinner, lp())
 
-            val rarities = (list.map { it.rarity.toString() } + listOf("4","5")).distinct().sorted()
+            val rarities = (list.map { it.rarity.toString() } + listOf("4", "5")).distinct().sorted()
             box.addView(label("Редкость", muted, 12f))
             val raritySpinner = spinner(rarities, existing?.rarity?.toString())
             box.addView(raritySpinner, lp())
@@ -176,7 +161,6 @@ class AdminMainActivity : AppCompatActivity() {
                 portraitPicker.launch("image/*")
             }
 
-            box.addView(space(10))
             val save = bigButton("Сохранить в GitHub")
             box.addView(save, lp(0, 58))
             save.setOnClickListener {
@@ -185,9 +169,8 @@ class AdminMainActivity : AppCompatActivity() {
                 val el = elementSpinner.selectedItem?.toString().orEmpty()
                 val rar = raritySpinner.selectedItem?.toString()?.toIntOrNull() ?: 5
                 save.isEnabled = false
-                val updated = existing?.let { old ->
-                    list.map { if (it.id == old.id) AdminCharacter(old.id, nm, el, rar) else it }
-                } ?: (list + AdminCharacter(id, nm, el, rar))
+                val updated = existing?.let { old -> list.map { if (it.id == old.id) AdminCharacter(old.id, nm, el, rar) else it } }
+                    ?: (list + AdminCharacter(id, nm, el, rar))
                 val portraitBytes = pendingPortrait
                 runBackground({
                     r.saveCharacters(game, updated)
@@ -202,12 +185,12 @@ class AdminMainActivity : AppCompatActivity() {
                     showCharacterDatabase()
                 }, { e ->
                     save.isEnabled = true
-                    toast("Ошибка сохранения: " + e.message)
+                    toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка"))
                 })
             }
             addBack(box)
             setContentView(wrap(box))
-        }, { e -> toast("Ошибка чтения базы: " + e.message) })
+        }, { e -> toast("Ошибка чтения базы: " + (e.message ?: "неизвестная ошибка")) })
     }
 
     private fun showCharacterDatabase() {
@@ -215,16 +198,15 @@ class AdminMainActivity : AppCompatActivity() {
         runBackground({ r.loadAllCharacters() }, { all ->
             val box = vertical()
             val header = horizontal()
-            header.addView(title("База персонажей"), LinearLayout.LayoutParams(0,-2,1f))
+            header.addView(title("База персонажей"), LinearLayout.LayoutParams(0, -2, 1f))
             val refresh = button("Обновить")
             header.addView(refresh, LinearLayout.LayoutParams(dp(120), dp(48)))
             refresh.setOnClickListener { showCharacterDatabase() }
             box.addView(header)
-
             val search = EditText(this).apply {
                 hint = "Поиск по имени или ID"
-                setTextColor(ink); setHintTextColor(muted); setSingleLine()
-                setPadding(dp(14),dp(10),dp(14,)); setBackgroundColor(surface)
+                setTextColor(ink); setHintTextColor(muted); setSingleLine(true)
+                setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface)
             }
             box.addView(search, lp())
             val listBox = vertical()
@@ -246,20 +228,17 @@ class AdminMainActivity : AppCompatActivity() {
             render("")
             addBack(box)
             setContentView(wrap(box))
-        }, { e -> toast("Ошибка базы: " + e.message) })
+        }, { e -> toast("Ошибка базы: " + (e.message ?: "неизвестная ошибка")) })
     }
 
     private fun showBannerTypes(game: GameMeta) {
         val box = vertical()
         box.addView(title(game.name + " — график баннеров"))
         val confirmed = bigButton("Редактировать график подтверждённых баннеров")
-        box.addView(confirmed, lp(0, 64))
-        confirmed.setOnClickListener { showBannerList(game, true) }
+        box.addView(confirmed, lp(0, 64)); confirmed.setOnClickListener { showBannerList(game, true) }
         val leaks = bigButton("Редактировать график неподтверждённых баннеров")
-        box.addView(leaks, lp(0, 64))
-        leaks.setOnClickListener { showBannerList(game, false) }
-        addBack(box)
-        setContentView(wrap(box))
+        box.addView(leaks, lp(0, 64)); leaks.setOnClickListener { showBannerList(game, false) }
+        addBack(box); setContentView(wrap(box))
     }
 
     private fun showBannerList(game: GameMeta, confirmed: Boolean) {
@@ -269,15 +248,12 @@ class AdminMainActivity : AppCompatActivity() {
             box.addView(title(if (confirmed) "Подтверждённые баннеры" else "Неподтверждённые баннеры"))
             rows.forEach { row ->
                 val b = bigButton(row.phase + "\n" + row.startDate + " → " + row.endDate)
-                box.addView(b, lp(0, 72))
-                b.setOnClickListener { showBannerEditor(game, confirmed, row) }
+                box.addView(b, lp(0, 72)); b.setOnClickListener { showBannerEditor(game, confirmed, row) }
             }
             val add = bigButton("Добавить новый")
-            box.addView(add, lp(0, 64))
-            add.setOnClickListener { showBannerEditor(game, confirmed, null) }
-            addBack(box)
-            setContentView(wrap(box))
-        }, { e -> toast("Ошибка графика: " + e.message) })
+            box.addView(add, lp(0, 64)); add.setOnClickListener { showBannerEditor(game, confirmed, null) }
+            addBack(box); setContentView(wrap(box))
+        }, { e -> toast("Ошибка графика: " + (e.message ?: "неизвестная ошибка")) })
     }
 
     private fun showBannerEditor(game: GameMeta, confirmed: Boolean, existing: BannerRow?) {
@@ -289,8 +265,7 @@ class AdminMainActivity : AppCompatActivity() {
             val start = field("Дата начала", existing?.startDate.orEmpty(), enabled = false)
             val end = field("Дата окончания", existing?.endDate.orEmpty(), enabled = false)
             box.addView(phase); box.addView(start); box.addView(end)
-            start.setOnClickListener { pickDate(start) }
-            end.setOnClickListener { pickDate(end) }
+            start.setOnClickListener { pickDate(start) }; end.setOnClickListener { pickDate(end) }
 
             box.addView(label("Персонажи", muted, 12f))
             val selected = existing?.characters?.toMutableSet() ?: mutableSetOf()
@@ -300,10 +275,11 @@ class AdminMainActivity : AppCompatActivity() {
                 val labels = chars.map { it.id + " • " + it.name + " • ★" + it.rarity }.toTypedArray()
                 val checked = BooleanArray(chars.size) { selected.contains(chars[it].id) }
                 AlertDialog.Builder(this).setTitle("Персонажи")
-                    .setMultiChoiceItems(labels, checked) { _, which, isChecked ->
+                    .setMultiChoiceItems(labels, checked, DialogInterface.OnMultiChoiceClickListener { _, which, isChecked ->
                         if (isChecked) selected.add(chars[which].id) else selected.remove(chars[which].id)
                         selectedView.text = "Выбрано: " + selected.size
-                    }.setPositiveButton("Готово", null).show()
+                    })
+                    .setPositiveButton("Готово", null).show()
             }
 
             val save = bigButton("Сохранить в GitHub")
@@ -316,11 +292,10 @@ class AdminMainActivity : AppCompatActivity() {
                     val idx = existing?.let { old -> all.indexOfFirst { it.phase == old.phase && it.startDate == old.startDate && it.endDate == old.endDate } } ?: -1
                     if (idx >= 0) all[idx] = row else all.add(row)
                     r.saveBanners(game, confirmed, all)
-                }, { toast("Баннер сохранён"); showBannerList(game, confirmed) }, { e -> toast("Ошибка сохранения: " + e.message) })
+                }, { toast("Баннер сохранён"); showBannerList(game, confirmed) }, { e -> toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка")) })
             }
-            addBack(box)
-            setContentView(wrap(box))
-        }, { e -> toast("Ошибка чтения персонажей: " + e.message) })
+            addBack(box); setContentView(wrap(box))
+        }, { e -> toast("Ошибка чтения персонажей: " + (e.message ?: "неизвестная ошибка")) })
     }
 
     private fun pickDate(target: EditText) {
@@ -344,21 +319,24 @@ class AdminMainActivity : AppCompatActivity() {
         executor.execute { try { val value = work(); runOnUiThread { ok(value) } } catch (e: Exception) { runOnUiThread { fail(e) } } }
     }
 
-    private fun addBack(box: LinearLayout) {
-        box.addView(button("← Назад").also { it.setOnClickListener { showHome() } }, lp())
-    }
-
+    private fun addBack(box: LinearLayout) { box.addView(button("← Назад").also { it.setOnClickListener { showHome() } }, lp()) }
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(24), dp(24), dp(24)); setBackgroundColor(bg) }
     private fun horizontal() = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(bg) }
     private fun wrap(view: View) = ScrollView(this).apply { setBackgroundColor(bg); addView(view) }
-    private fun title(text: String) = TextView(this).apply { this.text = text; setTextColor(ink); textSize = 28f; typeface = Typeface.DEFAULT_BOLD; setPadding(0,0,0,dp(18)) }
-    private fun label(text: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { this.text=text; setTextColor(color); textSize=size; if(bold) typeface=Typeface.DEFAULT_BOLD; setPadding(0,dp(6),0,dp(6)) }
-    private fun field(hintText: String, value: String, enabled: Boolean = true) = EditText(this).apply { hint=hintText; setText(value); isEnabled=enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(); setPadding(dp(14),dp(12),dp(14),dp(12)); setBackgroundColor(surface) }
-    private fun spinner(items: List<String>, selected: String?): Spinner = Spinner(this).apply { adapter=ArrayAdapter(this@AdminMainActivity, android.R.layout.simple_spinner_dropdown_item, items); selected?.let { val i=items.indexOf(it); if(i>=0) setSelection(i) } }
-    private fun button(text: String) = Button(this).apply { this.text=text; textSize=16f; isAllCaps=false }
-    private fun bigButton(text: String) = Button(this).apply { this.text=text; textSize=17f; isAllCaps=false; setTextColor(Color.WHITE); setBackgroundColor(accent) }
-    private fun space(h: Int) = Space(this).apply { layoutParams=LinearLayout.LayoutParams(1,dp(h)) }
-    private fun lp(w: Int = -1, h: Int = -2) = LinearLayout.LayoutParams(if(w==-1) -1 else dp(w), if(h==-2) -2 else dp(h)).apply { setMargins(0,dp(5),0,dp(5)) }
+    private fun title(text: String) = TextView(this).apply { this.text = text; setTextColor(ink); textSize = 28f; typeface = Typeface.DEFAULT_BOLD; setPadding(0, 0, 0, dp(18)) }
+    private fun label(text: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { this.text = text; setTextColor(color); textSize = size; if (bold) typeface = Typeface.DEFAULT_BOLD; setPadding(0, dp(6), 0, dp(6)) }
+    private fun field(hintText: String, value: String, enabled: Boolean = true) = EditText(this).apply { hint = hintText; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(); setPadding(dp(14), dp(12), dp(14), dp(12)); setBackgroundColor(surface) }
+    private fun spinner(items: List<String>, selected: String?): Spinner = Spinner(this).apply { adapter = ArrayAdapter(this@AdminMainActivity, android.R.layout.simple_spinner_dropdown_item, items); selected?.let { val i = items.indexOf(it); if (i >= 0) setSelection(i) } }
+    private fun button(text: String) = Button(this).apply { this.text = text; textSize = 16f; isAllCaps = false }
+    private fun bigButton(text: String) = Button(this).apply { this.text = text; textSize = 17f; isAllCaps = false; setTextColor(Color.WHITE); setBackgroundColor(accent) }
+    private fun space(h: Int) = Space(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(h)) }
+    private fun lp(w: Int = -1, h: Int = -2) = LinearLayout.LayoutParams(if (w == -1) -1 else dp(w), if (h == -2) -2 else dp(h)).apply { setMargins(0, dp(5), 0, dp(5)) }
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_LONG).show()
+
+    private class SimpleTextWatcher(private val onChange: (String) -> Unit) : android.text.TextWatcher {
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) { onChange(s?.toString().orEmpty()) }
+        override fun afterTextChanged(s: android.text.Editable?) = Unit
+    }
 }
