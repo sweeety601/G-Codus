@@ -73,7 +73,7 @@ class AdminRepository(private val github: GitHubClient) {
             currentSha,
             "Admin: update " + game.name + " character database"
         )
-        github.triggerDataSync("characters:" + game.gameId)
+        github.triggerDataSync("characters:" + game.key)
     }
 
     fun nextId(game: GameMeta, chars: List<AdminCharacter>): String {
@@ -157,7 +157,7 @@ class AdminRepository(private val github: GitHubClient) {
             currentSha,
             "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks"
         )
-        github.triggerDataSync("banners:" + game.gameId)
+        github.triggerDataSync("banners:" + game.key)
     }
 
     private fun find(header: List<String>, names: List<String>): Int {
