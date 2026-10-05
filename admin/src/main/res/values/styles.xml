@@ -1,7 +1,13 @@
 <resources>
-    <style name="Theme.GCodusAdmin" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.GCodusAdmin" parent="Theme.MaterialComponents.Dark.NoActionBar">
         <item name="android:fontFamily">sans</item>
+        <item name="android:windowBackground">#0D0E13</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#FFFFFF</item>
+        <item name="android:colorAccent">#8A63E8</item>
+        <item name="colorAccent">#8A63E8</item>
         <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:navigationBarColor">#0D0E13</item>
         <item name="android:statusBarColor">#0D0E13</item>
     </style>
