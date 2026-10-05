@@ -17,7 +17,7 @@ data class OnlineCharacter(
 )
 
 object CharacterDatabase {
-    private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/generated/characters.json"
+    private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/library/generated/characters.json"
 
     fun fetch(context: Context): List<OnlineCharacter> {
         val json = try { get(DATA_URL) } catch (_: Exception) { return emptyList() }
