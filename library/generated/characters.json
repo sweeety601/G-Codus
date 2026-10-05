@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-05T10:15:10.444562+00:00",
+  "generatedAt": "2026-10-05T14:02:39.110242+00:00",
   "games": [
     {
       "id": "1",
@@ -492,6 +492,15 @@
           "rarity": 4,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.54.webp"
+        },
+        {
+          "id": "1.55",
+          "gameId": "wuwa",
+          "name": "Huesos",
+          "element": "Fusion",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.55.webp"
         }
       ]
     },
