@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'data/characters/*.xlsx'
+      - 'images/*.webp'
       - 'scripts/generate_character_data.py'
       - '.github/workflows/generate-character-data.yml'
   workflow_dispatch:
@@ -26,14 +27,33 @@ jobs:
       - name: Install Excel parser
         run: pip install openpyxl
 
-      - name: Generate JSON and assign IDs
-        run: python scripts/generate_character_data.py
+      - name: Generate JSON, assign IDs and validate portraits
+        run: |
+          python scripts/generate_character_data.py
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          data = json.loads(Path('data/generated/characters.json').read_text(encoding='utf-8'))
+          missing = []
+          seen = set()
+          for game in data['games']:
+              for c in game['characters']:
+                  cid = c['id']
+                  if cid in seen:
+                      missing.append(f'duplicate ID: {cid}')
+                  seen.add(cid)
+                  if not Path('images', f'{cid}.webp').exists():
+                      missing.append(f'missing portrait: images/{cid}.webp')
+          if missing:
+              print('\n'.join(missing))
+              raise SystemExit(1)
+          PY
 
       - name: Commit generated data and assigned IDs
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add data/characters.json data/characters/*.xlsx
+          git add data/generated/characters.json data/characters/*.xlsx
           if git diff --cached --quiet; then
             echo 'No generated changes.'
           else
