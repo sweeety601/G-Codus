@@ -1268,6 +1268,16 @@ class MainActivity : AppCompatActivity() {
                 normalized.contains("trackedendfieldsunbringer")
         }.forEach { editor.remove(it); changed = true }
 
+        prefs.all.keys.filter { key ->
+            val normalized = key.lowercase().replace("’", "").replace("'", "").replace(Regex("[^a-z0-9]+"), "")
+            normalized.contains("trackedv2endfieldthestoryteller") ||
+                normalized.contains("trackedv2endfieldstoryteller") ||
+                normalized.contains("trackedv2endfieldsunbringer") ||
+                normalized.contains("trackedendfieldthestoryteller") ||
+                normalized.contains("trackedendfieldstoryteller") ||
+                normalized.contains("trackedendfieldsunbringer")
+        }.forEach { editor.remove(it); changed = true }
+
         // Storyteller and Sunbringer are permanently excluded from Tracking/Wishlist.
         // Remove all legacy/new saved keys for either name, regardless of game/prefix/version.
         prefs.all.keys.filter { key ->
