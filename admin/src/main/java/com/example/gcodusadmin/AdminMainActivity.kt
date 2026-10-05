@@ -110,10 +110,11 @@ class AdminMainActivity : AppCompatActivity() {
                 val c = GitHubClient(token)
                 c.testToken()
                 tokenStore.save(token)
+                c
             }, {
                 save.isEnabled = true
-                github = c
-                repo = AdminRepository(c)
+                github = it
+                repo = AdminRepository(it)
                 showHome()
             }, { error ->
                 save.isEnabled = true
