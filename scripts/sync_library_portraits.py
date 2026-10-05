@@ -18,6 +18,7 @@ TABLES = {
 
 ALIASES = {
     ("wuwa", "Augusta"): "aug",
+    ("wuwa", "Lucy"): "lucilla",
     ("wuwa", "Hiyuki"): "hiyuki",
     ("wuwa", "Jianxin"): "jianxin",
     ("wuwa", "Jinhsi"): "jinhsi",
@@ -27,6 +28,9 @@ ALIASES = {
     ("wuwa", "Yangyang"): "yangyang",
     ("zzz", "Billy"): "billy-kid",
     ("zzz", "Billy Kid"): "billy-kid",
+    ("zzz", "Orphie & Magus"): "orphie-and-magus",
+    ("zzz", "Starlight - Billy"): "billy-starlight",
+    ("zzz", "Soldier 0 - Anby"): "anby-demara-soldier-0",
     ("zzz", "Nicole"): "nicole-demara",
     ("zzz", "Nicole Demara"): "nicole-demara",
     ("zzz", "Anby"): "anby-demara",
