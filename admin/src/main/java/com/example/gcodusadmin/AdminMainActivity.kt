@@ -194,7 +194,7 @@ class AdminMainActivity : AppCompatActivity() {
                 setPadding(0, dp(6), 0, dp(24))
                 setBackgroundColor(bg)
             }
-            scroll.addView(grid, ScrollView.LayoutParams(-1, -2))
+            scroll.addView(grid)
             box.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
 
             fun openCharacter(c: AdminCharacter) {
@@ -352,6 +352,18 @@ class AdminMainActivity : AppCompatActivity() {
         val back = button("← Назад").also { it.setOnClickListener { showHome() } }
         box.addView(back, 0, lp(120, 48))
     }
+    private fun makeScroll() = ScrollView(this).apply {
+        isFillViewport = true
+        overScrollMode = View.OVER_SCROLL_NEVER
+        setBackgroundColor(bg)
+    }
+
+    private fun roundedDrawable(color: Int, radius: Float) =
+        android.graphics.drawable.GradientDrawable().apply {
+            setColor(color)
+            cornerRadius = dp(radius).toFloat()
+        }
+
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(24), dp(24), dp(24)); setBackgroundColor(bg) }
     private fun horizontal() = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(bg) }
     private fun wrap(v: View): FrameLayout = FrameLayout(this).apply { addView(v, FrameLayout.LayoutParams(-1, -1)); setBackgroundColor(bg) }
