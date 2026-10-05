@@ -12,13 +12,15 @@ TABLES = {
     "04_Arknights_Endfield.xlsx": ("4", "endfield", "Arknights: Endfield"),
     "05_Zenless_Zone_Zero.xlsx": ("5", "zzz", "Zenless Zone Zero"),
 }
-OUT = ROOT / "data" / "generated" / "characters.json"
+OUT = ROOT / "library" / "generated" / "characters.json"
 IMAGE_BASE = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images"
 ALIASES = {"Имя персонажа":"name", "Имя":"name", "Стихия":"element", "Элемент":"element", "Редкость":"rarity", "Rarity":"rarity", "ID":"id"}
+
 
 def parse_rarity(v):
     m = re.search(r"\d+", str(v or ""))
     return int(m.group()) if m else 0
+
 
 def process(path, prefix, game_id, game_name):
     wb = load_workbook(path)
@@ -60,8 +62,9 @@ def process(path, prefix, game_id, game_name):
     wb.save(path)
     return {"id":prefix, "gameId":game_id, "name":game_name, "characters":result}
 
+
 def main():
-    base = ROOT / "data" / "characters"
+    base = ROOT / "library"
     games = []
     for filename, meta in TABLES.items():
         path = base / filename
@@ -71,6 +74,7 @@ def main():
     payload = {"version":1, "generatedAt":datetime.now(timezone.utc).isoformat(), "games":games}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
 
 if __name__ == "__main__":
     main()
