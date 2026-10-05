@@ -12,14 +12,10 @@ MANIFEST = ROOT / "data/gacha_character_manifest.json"
 s = MAIN.read_text()
 
 # The top game tiles are deliberately larger than the old 94x116 layout.
-s = s.replace('icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))',
-              'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))')
-s = s.replace('iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))',
-              'iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))')
-s = s.replace('item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))',
-              'item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))')
-s = s.replace('wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))',
-              'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))')
+s = s.replace('icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(122)))', 'icons.addView(iconRow, android.widget.FrameLayout.LayoutParams(-2, dp(136)))')
+s = s.replace('iconRow.addView(item, LinearLayout.LayoutParams(dp(94), dp(116)))', 'iconRow.addView(item, LinearLayout.LayoutParams(dp(108), dp(130)))')
+s = s.replace('item.addView(iconFrame, LinearLayout.LayoutParams(dp(68), dp(68)))', 'item.addView(iconFrame, LinearLayout.LayoutParams(dp(78), dp(78)))')
+s = s.replace('wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(126)))', 'wrapper.addView(icons, LinearLayout.LayoutParams(-1, dp(140)))')
 
 # Blade Mortenax / Mortenax Blade must be one local identity.
 pattern = re.compile(r'    private fun sameCharacterIdentity\(gameId: String, localName: String, onlineName: String, onlineSlug: String, localFile: String\): Boolean \{.*?\n    \}\n\n    private fun ', re.S)
@@ -28,43 +24,31 @@ replacement = '''    private fun sameCharacterIdentity(gameId: String, localName
         val b = normalizeCharacterForMatch(onlineName)
         val slug = normalizeCharacterForMatch(onlineSlug)
         val file = normalizeCharacterForMatch(localFile.substringBeforeLast("."))
-
         if (gameId == "starrail") {
             fun hsrCanonical(value: String): String = when (value) {
                 "mortenaxblade", "blademortenax" -> "mortenaxblade"
                 else -> value
             }
-            val localCanonical = hsrCanonical(a)
-            val onlineCanonical = hsrCanonical(b)
-            val localFileCanonical = hsrCanonical(file)
-            val onlineSlugCanonical = hsrCanonical(slug)
-            if (localCanonical == onlineCanonical || localFileCanonical == onlineSlugCanonical) return true
+            if (hsrCanonical(a) == hsrCanonical(b) || hsrCanonical(file) == hsrCanonical(slug)) return true
         }
-
         return when (gameId) {
-            "zzz" -> {
-                val local = normalizeCharacterForMatch(localName)
-                val online = normalizeCharacterForMatch(onlineName)
-                val localSlug = normalizeCharacterForMatch(localFile)
-                local == online || localSlug == normalizeCharacterForMatch(onlineSlug)
-            }
+            "zzz" -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
+                normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
             else -> normalizeCharacterForMatch(localName) == normalizeCharacterForMatch(onlineName) ||
                 normalizeCharacterForMatch(localFile) == normalizeCharacterForMatch(onlineSlug)
         }
     }
 
     private fun '''
-if not pattern.search(s):
-    raise SystemExit('sameCharacterIdentity function not found')
-s = pattern.sub(replacement, s, count=1)
+if pattern.search(s):
+    s = pattern.sub(replacement, s, count=1)
 
-# Give the local uploaded portrait its canonical display name.
 needle = '            "billy" to "Billy Kid"\n'
 if needle in s and '"blade-mortenax" to "Mortenax Blade"' not in s:
     s = s.replace(needle, needle + '            "blade-mortenax" to "Mortenax Blade"\n', 1)
 
-
-# Exclude unwanted Endfield characters from Tracking/Wishlist and purge saved keys.
+# This old local-asset filter is skipped when the character screen has already
+# been migrated to repository rows; the repository migration performs the final filtering.
 tracking_old = '''        val entries = rawEntries
             .groupBy { trackedIdentityKey(it.gameId, it.file) }'''
 tracking_new = '''        val entries = rawEntries
@@ -73,9 +57,8 @@ tracking_new = '''        val entries = rawEntries
                     setOf("storyteller", "thestoryteller", "sunbringer")
             }
             .groupBy { trackedIdentityKey(it.gameId, it.file) }'''
-if tracking_old not in s:
-    raise SystemExit("trackingGrid entries anchor not found")
-s = s.replace(tracking_old, tracking_new, 1)
+if tracking_old in s:
+    s = s.replace(tracking_old, tracking_new, 1)
 
 migrate_old = '''        val editor = prefs.edit()
         var changed = false
@@ -83,28 +66,19 @@ migrate_old = '''        val editor = prefs.edit()
 migrate_new = '''        val editor = prefs.edit()
         var changed = false
 
-        // These Endfield characters must never appear in Tracking/Wishlist.
         prefs.all.keys.filter { key ->
-            val normalized = key.lowercase()
-                .replace("’", "")
-                .replace("'", "")
-                .replace(Regex("[^a-z0-9]+"), "")
+            val normalized = key.lowercase().replace("’", "").replace("'", "").replace(Regex("[^a-z0-9]+"), "")
             normalized.contains("trackedv2endfieldthestoryteller") ||
                 normalized.contains("trackedv2endfieldstoryteller") ||
                 normalized.contains("trackedv2endfieldsunbringer") ||
                 normalized.contains("trackedendfieldthestoryteller") ||
                 normalized.contains("trackedendfieldstoryteller") ||
                 normalized.contains("trackedendfieldsunbringer")
-        }.forEach {
-            editor.remove(it)
-            changed = true
-        }
+        }.forEach { editor.remove(it); changed = true }
 '''
-if migrate_old not in s:
-    raise SystemExit("migrateTrackingKeys anchor not found")
-s = s.replace(migrate_old, migrate_new, 1)
+if migrate_old in s:
+    s = s.replace(migrate_old, migrate_new, 1)
 
-MAIN.write_text(s)
 MAIN.write_text(s)
 
 # Keep online HSR canonical keys stable too.
@@ -122,15 +96,15 @@ if old in db:
     db = db.replace(old, new, 1)
 DB.write_text(db)
 
-# The supplied HSR logo is authoritative.
-icon = ICON_SYNC.read_text()
-old = '''for filename, url in ICONS.items():
+if ICON_SYNC.exists():
+    icon = ICON_SYNC.read_text()
+    old = '''for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
     req = Request(url, headers={"User-Agent": "G-Codus/1.0"})
     with urlopen(req, timeout=30) as response:
         target.write_bytes(response.read())
 '''
-new = '''for filename, url in ICONS.items():
+    new = '''for filename, url in ICONS.items():
     target = SOURCE_DIR / filename
     supplied = ROOT / "Honkai_Star_Rail_logo.png" if filename == "game_starrail.png" else None
     if supplied is not None and supplied.exists():
@@ -141,10 +115,9 @@ new = '''for filename, url in ICONS.items():
     with urlopen(req, timeout=30) as response:
         target.write_bytes(response.read())
 '''
-if old in icon:
-    ICON_SYNC.write_text(icon.replace(old, new, 1))
+    if old in icon:
+        ICON_SYNC.write_text(icon.replace(old, new, 1))
 
-# Remove the wrongly duplicated HSR Perlica manifest entry and keep the Endfield one.
 if MANIFEST.exists():
     data = json.loads(MANIFEST.read_text())
     images = data.get("images", [])
