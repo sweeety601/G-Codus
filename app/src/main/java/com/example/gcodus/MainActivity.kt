@@ -1458,15 +1458,42 @@ class MainActivity : AppCompatActivity() {
                 ?: b.optJSONArray("fourStars")
                 ?: JSONArray()
 
-            val fiveStars = (0 until arr.length())
+            val rawCharacters = (0 until arr.length())
                 .map { arr.optString(it).trim() }
                 .filter { it.isNotBlank() }
                 .distinctBy { normalizeCharacterForMatch(it) }
 
-            val fourStars = (0 until fourStarArr.length())
+            // The Excel "characters" column can contain both 5★ and 4★.
+            // Resolve every character against the local character database
+            // so 4★ characters never become featured 5★ cards.
+            val resolvedCharacters = rawCharacters.map { value ->
+                val resolved = characterNameForFeedValue(game.optString("id"), value)
+                val record = onlineCharacters.firstOrNull {
+                    it.gameId == game.optString("id") &&
+                        (it.id == value ||
+                            normalizeCharacterForMatch(it.name) ==
+                            normalizeCharacterForMatch(resolved))
+                }
+                Triple(value, resolved, record?.rarity ?: 0)
+            }
+
+            val fiveStars = resolvedCharacters
+                .filter { it.third == 5 }
+                .map { it.second.ifBlank { it.first } }
+                .filter { it.isNotBlank() }
+                .distinctBy { normalizeCharacterForMatch(it) }
+
+            val explicitFourStars = (0 until fourStarArr.length())
                 .map { characterNameForFeedValue(game.optString("id"), fourStarArr.optString(it)) }
                 .filter { it.isNotBlank() }
-                .distinct()
+
+            val fourStarsFromCharacters = resolvedCharacters
+                .filter { it.third == 4 }
+                .map { it.second.ifBlank { it.first } }
+                .filter { it.isNotBlank() }
+
+            val fourStars = (explicitFourStars + fourStarsFromCharacters)
+                .distinctBy { normalizeCharacterForMatch(it) }
                 .take(3)
 
             if (fiveStars.isEmpty()) continue
