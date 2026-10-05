@@ -25,7 +25,7 @@ class GitHubClient(private val token: String) {
         conn.setRequestProperty("Accept", "application/vnd.github+json")
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         if (authorized && token.isNotBlank()) conn.setRequestProperty("Authorization", "Bearer " + token)
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.7")
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.8")
         return conn
     }
 
@@ -35,7 +35,7 @@ class GitHubClient(private val token: String) {
         conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
         conn.readTimeout = 30_000
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.7")
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.8")
         return conn
     }
 
