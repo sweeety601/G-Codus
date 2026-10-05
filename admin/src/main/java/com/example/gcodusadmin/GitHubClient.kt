@@ -18,7 +18,8 @@ class GitHubClient(private val token: String) {
     }
 
     private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
-        val conn = URL(API + "/repos/" + REPO + "/" + path).openConnection() as HttpURLConnection
+        val suffix = if (path.isBlank()) "" else "/" + path
+        val conn = URL(API + "/repos/" + REPO + suffix).openConnection() as HttpURLConnection
         conn.requestMethod = method
         conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
