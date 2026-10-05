@@ -1,7 +1,6 @@
 from pathlib import Path
 import json
 import re
-import sys
 
 from openpyxl import load_workbook
 
@@ -16,18 +15,21 @@ FILES = {
     4: "04_Arknights_Endfield.xlsx",
     5: "05_Zenless_Zone_Zero.xlsx",
 }
-
 GAME_NAMES = {
-    1: "Wuthering Waves",
-    2: "Genshin Impact",
-    3: "Honkai: Star Rail",
-    4: "Arknights: Endfield",
-    5: "Zenless Zone Zero",
+    1: "Wuthering Waves", 2: "Genshin Impact", 3: "Honkai: Star Rail",
+    4: "Arknights: Endfield", 5: "Zenless Zone Zero",
 }
+GAME_IDS = {1: "wuwa", 2: "genshin", 3: "starrail", 4: "endfield", 5: "zzz"}
 
 
 def norm(value):
     return re.sub(r"\s+", " ", str(value or "").strip())
+
+
+def slugify(value):
+    s = norm(value).lower().replace("’", "").replace("'", "")
+    s = s.replace("•", "-").replace("&", "and")
+    return re.sub(r"[^a-z0-9]+", "-", s).strip("-")
 
 
 def read_table(game_id, path):
@@ -40,21 +42,15 @@ def read_table(game_id, path):
     header = [norm(x).lower() for x in rows[0]]
     required = ["id", "имя персонажа", "стихия", "редкость"]
     if header[:4] != required:
-        raise SystemExit(
-            f"{path}: expected columns exactly {required}, got {header[:4]}"
-        )
+        raise SystemExit(f"{path}: expected columns exactly {required}, got {header[:4]}")
 
-    records = []
-    changed = False
-    used = set()
+    records, changed, used = [], False, set()
     next_number = 1
 
     for row_index, row in enumerate(rows[1:], start=2):
         if not any(x not in (None, "") for x in row[:4]):
             continue
-        name = norm(row[1])
-        element = norm(row[2])
-        rarity = row[3]
+        name, element, rarity = norm(row[1]), norm(row[2]), row[3]
         if not name:
             raise SystemExit(f"{path}: row {row_index}: character name is empty")
 
@@ -69,8 +65,7 @@ def read_table(game_id, path):
                 next_number += 1
             char_id = f"{game_id}.{next_number}"
             ws.cell(row=row_index, column=1, value=char_id)
-            changed = True
-            next_number += 1
+            changed, next_number = True, next_number + 1
 
         if char_id in used:
             raise SystemExit(f"{path}: duplicate ID {char_id}")
@@ -84,8 +79,9 @@ def read_table(game_id, path):
         records.append({
             "id": char_id,
             "game": GAME_NAMES[game_id],
-            "gameId": {1: "wuwa", 2: "genshin", 3: "starrail", 4: "endfield", 5: "zzz"}[game_id],
+            "gameId": GAME_IDS[game_id],
             "name": name,
+            "slug": slugify(name),
             "element": element,
             "rarity": rarity_int,
             "portrait": f"{char_id}.webp",
@@ -98,9 +94,7 @@ def read_table(game_id, path):
 
 def main():
     SOURCE.mkdir(parents=True, exist_ok=True)
-    all_records = []
-    changed_files = []
-    missing = []
+    all_records, changed_files, missing = [], [], []
 
     for game_id, filename in FILES.items():
         path = SOURCE / filename
@@ -123,14 +117,15 @@ def main():
     payload = {
         "version": 1,
         "games": [
-            {"id": gid, "name": GAME_NAMES[gid], "characters": [x for x in all_records if x["gameId"] == game_id]}
-            for gid, game_id in [(1, "wuwa"), (2, "genshin"), (3, "starrail"), (4, "endfield"), (5, "zzz")]
+            {"id": GAME_IDS[gid], "name": GAME_NAMES[gid],
+             "characters": [x for x in all_records if x["gameId"] == GAME_IDS[gid]]}
+            for gid in range(1, 6)
         ],
     }
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Generated {OUT} with {len(all_records)} characters")
     if missing:
-        print("Missing optional tables:", ", ".join(missing))
+        print("Missing tables:", ", ".join(missing))
     if changed_files:
         print("Assigned IDs in:", ", ".join(changed_files))
 
