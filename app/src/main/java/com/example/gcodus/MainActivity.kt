@@ -151,6 +151,7 @@ class MainActivity : AppCompatActivity() {
 
         scroll.addView(column)
         root.addView(scroll)
+        animateScreenIn(column)
     }
 
     private fun showGame(gameId: String) {
@@ -212,6 +213,7 @@ class MainActivity : AppCompatActivity() {
             val scroll = makeScroll()
             scroll.addView(column)
             root.addView(scroll)
+            animateScreenIn(column)
             return
         }
         // Always reload the latest live promo snapshot when entering a game.
@@ -317,14 +319,20 @@ class MainActivity : AppCompatActivity() {
                 .translationY(dp(8).toFloat())
                 .setDuration(110)
                 .setInterpolator(android.view.animation.AccelerateInterpolator())
+                .scaleX(0.985f)
+                .scaleY(0.985f)
                 .withEndAction {
                     content.removeAllViews()
                     build()
                     content.alpha = 0f
                     content.translationY = dp(-8).toFloat()
+                    content.scaleX = 0.985f
+                    content.scaleY = 0.985f
                     content.animate()
                         .alpha(1f)
                         .translationY(0f)
+                        .scaleX(1f)
+                        .scaleY(1f)
                         .setDuration(210)
                         .setInterpolator(android.view.animation.DecelerateInterpolator())
                         .withEndAction { pageAnimationRunning = false }
@@ -382,6 +390,7 @@ class MainActivity : AppCompatActivity() {
 
         scroll.addView(column)
         root.addView(scroll)
+        animateScreenIn(column)
     }
 
     private fun makeTopGameBar(): View {
@@ -501,7 +510,10 @@ class MainActivity : AppCompatActivity() {
             setPageTransformer { page, position ->
                 val factor = (1f - kotlin.math.abs(position)).coerceIn(0f, 1f)
                 page.alpha = 0.65f + factor * 0.35f
+                page.scaleX = 0.965f + factor * 0.035f
                 page.scaleY = 0.96f + factor * 0.04f
+                page.translationY = dp(4) * kotlin.math.abs(position)
+                page.rotation = position.coerceIn(-1f, 1f) * -1.2f
             }
         }
         pager.adapter = BannerPagerAdapter(banners) { banner -> bannerCard(banner, isNext, gameId) }
@@ -630,6 +642,19 @@ class MainActivity : AppCompatActivity() {
             setPadding(0, dp(10), 0, dp(2))
         })
         card.addView(info, LinearLayout.LayoutParams(0, -1, 1f))
+
+        card.alpha = 0f
+        card.scaleX = 0.975f
+        card.scaleY = 0.975f
+        card.post {
+            card.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setDuration(260)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
         return card
     }
 
@@ -837,6 +862,7 @@ class MainActivity : AppCompatActivity() {
         renderWishlist("")
         scroll.addView(column)
         root.addView(scroll)
+        animateScreenIn(column)
     }
 
     private fun trackingSection(gameId: String): View {
@@ -940,7 +966,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 holder.addView(row, LinearLayout.LayoutParams(-1, -2))
             }
-            row?.addView(trackingCharacterCell(character), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
+            val cell = trackingCharacterCell(character)
+            animateReveal(cell, index)
+            row?.addView(cell, LinearLayout.LayoutParams(0, dp(194), 1f).apply {
                 marginStart = if (index % 3 == 0) 0 else dp(3)
                 marginEnd = dp(3)
                 bottomMargin = dp(8)
@@ -1444,6 +1472,7 @@ class MainActivity : AppCompatActivity() {
         column.addView(trackingSection(gameId))
         scroll.addView(column)
         root.addView(scroll)
+        animateScreenIn(column)
     }
 
     private enum class Screen { HOME, GAME, TRACKING, WISHLIST }
@@ -2159,6 +2188,64 @@ class MainActivity : AppCompatActivity() {
             else android.graphics.Typeface.DEFAULT
         }
 
+    private fun animateScreenIn(container: android.view.ViewGroup) {
+        for (index in 0 until container.childCount) {
+            val child = container.getChildAt(index)
+            if (child.visibility != View.VISIBLE) continue
+            child.animate().cancel()
+            child.alpha = 0f
+            child.translationY = dp(16).toFloat()
+            child.scaleX = 0.985f
+            child.scaleY = 0.985f
+            child.animate()
+                .alpha(1f)
+                .translationY(0f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .setStartDelay((index * 45L).coerceAtMost(260L))
+                .setDuration(260)
+                .setInterpolator(android.view.animation.DecelerateInterpolator())
+                .start()
+        }
+    }
+
+    private fun animateReveal(view: View, index: Int) {
+        view.animate().cancel()
+        view.alpha = 0f
+        view.scaleX = 0.94f
+        view.scaleY = 0.94f
+        view.translationY = dp(10).toFloat()
+        view.post {
+            view.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setStartDelay((index % 12) * 28L)
+                .setDuration(300)
+                .setInterpolator(android.view.animation.OvershootInterpolator(1.1f))
+                .start()
+        }
+    }
+
+    private fun pulseView(view: View) {
+        view.animate().cancel()
+        view.animate()
+            .scaleX(1.16f)
+            .scaleY(1.16f)
+            .setDuration(90)
+            .setInterpolator(android.view.animation.DecelerateInterpolator())
+            .withEndAction {
+                view.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(180)
+                    .setInterpolator(android.view.animation.OvershootInterpolator(1.6f))
+                    .start()
+            }
+            .start()
+    }
+
     private fun addPressEffect(view: View) {
         view.setOnTouchListener { v, event ->
             when (event.actionMasked) {
@@ -2167,6 +2254,7 @@ class MainActivity : AppCompatActivity() {
                     v.animate()
                         .scaleX(0.92f)
                         .scaleY(0.92f)
+                        .translationY(dp(2).toFloat())
                         .setDuration(75)
                         .setInterpolator(android.view.animation.DecelerateInterpolator())
                         .start()
@@ -2177,6 +2265,7 @@ class MainActivity : AppCompatActivity() {
                     v.animate()
                         .scaleX(1f)
                         .scaleY(1f)
+                        .translationY(0f)
                         .setDuration(150)
                         .setInterpolator(android.view.animation.OvershootInterpolator(1.5f))
                         .withEndAction { v.performClick() }
