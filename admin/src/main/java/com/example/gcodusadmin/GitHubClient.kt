@@ -16,7 +16,7 @@ class GitHubClient(private val token: String) {
         private const val TEST_FILE = "library/seed/01_Wuthering_Waves.xlsx"
     }
 
-    private fun apiConnection(method: String, path: String): HttpURLConnection {
+    private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
         val conn = URL(API + "/repos/" + REPO + "/" + path).openConnection() as HttpURLConnection
         conn.requestMethod = method
         conn.instanceFollowRedirects = true
@@ -24,8 +24,10 @@ class GitHubClient(private val token: String) {
         conn.readTimeout = 30_000
         conn.setRequestProperty("Accept", "application/vnd.github+json")
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-        conn.setRequestProperty("Authorization", "Bearer " + token)
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.3")
+        if (authorized && token.isNotBlank()) {
+            conn.setRequestProperty("Authorization", "Bearer " + token)
+        }
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.4")
         return conn
     }
 
@@ -36,20 +38,20 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        // The repository is public. We only validate the token itself by requesting
-        // the repository metadata through the API. File access is checked when loading data.
-        val conn = apiConnection("GET", "")
+        // Do not reject a valid token at login because GitHub can return 404 for
+        // fine-grained tokens on endpoints that are not granted to them.
+        // The repository is public, so login only verifies public API connectivity.
+        val conn = apiConnection("GET", "", authorized = false)
         val text = body(conn)
         if (conn.responseCode !in 200..299) {
-            throw IllegalStateException("GitHub: HTTP " + conn.responseCode + " " + shortError(text))
+            throw IllegalStateException("GitHub API недоступен: HTTP " + conn.responseCode + " " + shortError(text))
         }
     }
 
     fun getFile(path: String): GitFile {
-        // IMPORTANT: do not use raw.githubusercontent.com here. The Android client
-        // previously received a 404 from raw even though the file exists. The Contents
-        // API returns the binary XLSX as base64 and its real blob SHA in one response.
-        val conn = apiConnection("GET", "contents/" + path + "?ref=main")
+        // Public repository: read through Contents API without authenticating.
+        // The PAT is reserved for write operations.
+        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = false)
         val text = body(conn)
         if (conn.responseCode !in 200..299) {
             throw IllegalStateException(
