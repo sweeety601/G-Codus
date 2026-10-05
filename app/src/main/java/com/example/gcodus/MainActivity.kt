@@ -114,6 +114,7 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
+        scheduleCharacterSync()
         refreshCodesInBackground()
         refreshBannerFeedInBackground()
         refreshCharacterDatabaseInBackground()
@@ -661,6 +662,20 @@ class MainActivity : AppCompatActivity() {
         return card
     }
 
+    private fun scheduleCharacterSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val request = PeriodicWorkRequestBuilder<CharacterSyncWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
+            "g_codus_character_sync",
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request
+        )
+    }
+
     private fun scheduleCodeSync() {
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -900,68 +915,34 @@ class MainActivity : AppCompatActivity() {
         val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val games = if (gameId == null) gameMeta else gameMeta.filter { it.id == gameId }
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
-        val rawEntries = mutableListOf<TrackedCharacter>()
+        val entries = mutableListOf<TrackedCharacter>()
 
         games.forEach { meta ->
-            val localFiles = listCharacterFiles(meta.id)
-            localFiles.forEach { file ->
-                val name = canonicalCharacterDisplayName(meta.id, characterDisplayName(file))
-                if (isForbiddenTrackingCharacter(meta.id, name, file)) return@forEach
-                if (isMainProtagonist(meta.id, file, name)) return@forEach
-                if ((gameId != null || isTracked(meta.id, file)) &&
-                    (normalizedQuery.isBlank() || name.lowercase().contains(normalizedQuery))) {
-                    rawEntries += TrackedCharacter(meta.id, meta.name, name, canonicalPreferredTrackingFile(meta.id, file))
-                }
-            }
-
             onlineCharacters
                 .filter { it.gameId == meta.id }
-                .filterNot { online -> isForbiddenTrackingCharacter(meta.id, online.name, online.slug) }
-                .filterNot { online -> isMainProtagonist(meta.id, online.slug, online.name) }
+                .filterNot { isForbiddenTrackingCharacter(meta.id, it.name, it.id) }
+                .filterNot { isMainProtagonist(meta.id, it.id, it.name) }
+                .filter { normalizedQuery.isBlank() || it.name.lowercase().contains(normalizedQuery) }
                 .forEach { online ->
-                    val displayOnlineName = canonicalCharacterDisplayName(meta.id, online.name)
-                    val duplicateLocal = localFiles.any { localFile ->
-                        sameCharacterIdentity(
-                            meta.id,
-                            characterDisplayName(localFile),
-                            displayOnlineName,
-                            online.slug,
-                            localFile
-                        )
-                    }
-                    if (!duplicateLocal) {
-                        val file = "__online_" + meta.id + "_" + online.slug + ".webp"
-                        if ((gameId != null || isTracked(meta.id, file)) &&
-                            (normalizedQuery.isBlank() || displayOnlineName.lowercase().contains(normalizedQuery))) {
-                            rawEntries += TrackedCharacter(meta.id, meta.name, displayOnlineName, file)
-                        }
-                    }
+                    val file = "__online_" + meta.id + "_" + online.id + ".webp"
+                    entries += TrackedCharacter(meta.id, meta.name, online.name, file)
                 }
         }
 
-        // Final canonical merge protects the Tracking/Wishlist screen from
-        // duplicate aliases that can come from either local assets or the
-        // online character list. One game + one canonical character = one card.
-        val entries = rawEntries
-            .filterNot { isForbiddenTrackingCharacter(it.gameId, it.name, it.file) }
-            .groupBy { trackedIdentityKey(it.gameId, it.file) }
-            .values
-            .map { group ->
-                group.firstOrNull { it.file == canonicalPreferredTrackingFile(it.gameId, it.file) }
-                    ?: group.first()
-            }
+        val sorted = entries
+            .distinctBy { trackedIdentityKey(it.gameId, it.file) }
             .sortedWith(
                 compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }
                     .thenBy { it.name.lowercase() }
             )
 
-        if (entries.isEmpty()) {
+        if (sorted.isEmpty()) {
             holder.addView(emptyCard(if (normalizedQuery.isBlank()) "Персонажей пока нет" else "Ничего не найдено"))
             return holder
         }
 
         var row: LinearLayout? = null
-        entries.forEachIndexed { index, character ->
+        sorted.forEachIndexed { index, character ->
             if (index % 3 == 0) {
                 row = LinearLayout(this).apply {
                     orientation = LinearLayout.HORIZONTAL
@@ -976,8 +957,7 @@ class MainActivity : AppCompatActivity() {
                 marginEnd = dp(3)
                 bottomMargin = dp(8)
             })
-
-            if (index == entries.lastIndex && (index + 1) % 3 != 0) {
+            if (index == sorted.lastIndex && (index + 1) % 3 != 0) {
                 repeat(3 - ((index + 1) % 3)) {
                     row?.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
                         marginStart = dp(3)
@@ -1133,8 +1113,8 @@ class MainActivity : AppCompatActivity() {
         if (!file.startsWith("__online_")) return null
         val prefix = "__online_" + gameId + "_"
         if (!file.startsWith(prefix)) return null
-        val slug = file.removePrefix(prefix).removeSuffix(".webp")
-        return onlineCharacters.firstOrNull { it.gameId == gameId && it.slug == slug }
+        val id = file.removePrefix(prefix).removeSuffix(".webp")
+        return onlineCharacters.firstOrNull { it.gameId == gameId && it.id == id }
     }
 
     private fun cleanCharacterName(value: String): String =
@@ -1250,14 +1230,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun trackedCharacterName(gameId: String, file: String): String {
         if (file.startsWith("__online_")) {
-            val prefix = "__online_" + gameId + "_"
-            if (file.startsWith(prefix)) {
-                val slug = file.removePrefix(prefix).removeSuffix(".webp")
-                return canonicalCharacterDisplayName(
-                    gameId,
-                    slug.replace("-", " ")
-                )
-            }
+            onlineCharacterFor(gameId, file)?.let { return canonicalCharacterDisplayName(gameId, it.name) }
         }
         return canonicalCharacterDisplayName(gameId, characterDisplayName(file))
     }
@@ -1387,8 +1360,7 @@ class MainActivity : AppCompatActivity() {
 
         val online = onlineCharacterFor(gameId, file)
         if (online != null) {
-            // Prydwen is the second-priority portrait source for online-only entries.
-            loadPortrait(image, online.name, gameId)
+            loadRemoteImage(image, listOf(CharacterDatabase.imageUrl(online.id)))
             return
         }
 
@@ -1448,7 +1420,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             } catch (_: Exception) { }
-        }, 60, 60, TimeUnit.MINUTES)
+        }, 15, 15, TimeUnit.MINUTES)
     }
 
     private fun refreshCurrentScreen() {

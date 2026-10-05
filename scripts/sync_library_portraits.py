@@ -5,7 +5,7 @@ import shutil
 from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
-LIBRARY = ROOT / "library"
+LIBRARY = ROOT / "library" / "seed"
 IMAGES = ROOT / "images"
 
 TABLES = {
@@ -60,6 +60,9 @@ ALIASES = {
     ("zzz", "Nekomata"): "nekomata",
     ("zzz", "Nekomiya Mana"): "nekomata",
     ("starrail", "Dan Heng • Imbibitor Lunae"): "imbibitor-lunae",
+    ("starrail", "Waveflair"): "aventurine-waveflair",
+    ("starrail", "Black"): "black-swan",
+    ("starrail", "Swan"): "black-swan",
     ("starrail", "Dan Heng Imbibitor Lunae"): "imbibitor-lunae",
     ("starrail", "Imbibitor Lunae"): "imbibitor-lunae",
     ("starrail", "Mortenax Blade"): "blade-mortenax",
