@@ -35,6 +35,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.Executors
+import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
 
 data class Banner(
@@ -52,6 +53,7 @@ data class Banner(
 class MainActivity : AppCompatActivity() {
     companion object {}
     private val executor = Executors.newSingleThreadScheduledExecutor()
+    private var foregroundLiveRefreshFuture: ScheduledFuture<*>? = null
     private val countdownExecutor = Executors.newSingleThreadScheduledExecutor()
     private val imageExecutor = Executors.newFixedThreadPool(4)
     private val portraitCache = LruCache<String, Bitmap>(48)
@@ -81,7 +83,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        refreshLiveDatabaseOnce()
+        startForegroundLiveRefresh()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        foregroundLiveRefreshFuture?.cancel(false)
+        foregroundLiveRefreshFuture = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -1162,19 +1170,44 @@ class MainActivity : AppCompatActivity() {
     private fun refreshLiveDatabaseOnce() {
         executor.execute {
             var changed = false
+
             try {
                 val freshCharacters = CharacterDatabase.fetch(this@MainActivity)
                 if (freshCharacters.isNotEmpty()) {
-                    onlineCharacters = freshCharacters
-                    changed = true
+                    val newFingerprint = freshCharacters
+                        .sortedWith(compareBy<OnlineCharacter> { it.gameId }.thenBy { it.id })
+                        .joinToString("|") {
+                            it.gameId + ":" + it.id + ":" + it.name + ":" + it.rarity + ":" + it.element
+                        }
+
+                    val oldFingerprint = onlineCharacters
+                        .sortedWith(compareBy<OnlineCharacter> { it.gameId }.thenBy { it.id })
+                        .joinToString("|") {
+                            it.gameId + ":" + it.id + ":" + it.name + ":" + it.rarity + ":" + it.element
+                        }
+
+                    if (newFingerprint != oldFingerprint) {
+                        onlineCharacters = freshCharacters
+                        changed = true
+                    }
                 }
             } catch (_: Exception) { }
 
             try {
                 val freshFeed = BannerSource.fetchNormalized(this@MainActivity)
                 if (JSONObject(freshFeed).getJSONArray("games").length() > 0) {
-                    bannerFeedJson = freshFeed
-                    changed = true
+                    // generated_at changes on every request; compare only actual table data.
+                    val newStableFeed = JSONObject(freshFeed).apply {
+                        remove("generated_at")
+                    }.toString()
+                    val oldStableFeed = bannerFeedJson?.let {
+                        JSONObject(it).apply { remove("generated_at") }.toString()
+                    }
+
+                    if (newStableFeed != oldStableFeed) {
+                        bannerFeedJson = freshFeed
+                        changed = true
+                    }
                 }
             } catch (_: Exception) { }
 
@@ -1186,6 +1219,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Foreground live-sync: while G-Codus is visible, check the Excel tables
+     * every 20 seconds. RemoteXlsx uses ETag validation, so unchanged XLSX files
+     * are normally returned as HTTP 304 instead of being downloaded again.
+     */
+    private fun startForegroundLiveRefresh() {
+        foregroundLiveRefreshFuture?.cancel(false)
+        refreshLiveDatabaseOnce()
+        foregroundLiveRefreshFuture = executor.scheduleAtFixedRate(
+            { refreshLiveDatabaseOnce() },
+            20,
+            20,
+            TimeUnit.SECONDS
+        )
+    }
+
+    /**
+     * Background fallback. Android limits ordinary periodic background work,
+     * so this remains the slower safety net when the activity is not visible.
+     */
     private fun refreshLiveDatabaseInBackground() {
         refreshLiveDatabaseOnce()
         executor.scheduleAtFixedRate({
