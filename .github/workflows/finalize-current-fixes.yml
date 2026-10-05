@@ -12,17 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Apply current fixes
-        run: python3 scripts/apply_current_portrait_fixes.py
-      - name: Repair notification tracking
-        run: python3 scripts/repair_notification_tracking.py
       - name: Apply repository character source
         run: python3 scripts/migrate_character_repository.py
       - name: Commit generated fixes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt scripts/sync_game_icons.py data/gacha_character_manifest.json app/src/main/java/com/example/gcodus/NotificationSyncWorker.kt scripts/repair_notification_tracking.py .github/workflows/finalize-current-fixes.yml
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt
           git diff --cached --check
           if git diff --cached --quiet; then
             echo "No generated changes."
