@@ -1,6 +1,8 @@
 name: Generate character data and portraits
 
 on:
+  repository_dispatch:
+    types: [gcodus-data-sync]
   push:
   schedule:
     - cron: '*/5 * * * *'
