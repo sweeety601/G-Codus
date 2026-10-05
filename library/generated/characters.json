@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-05T15:21:26.393448+00:00",
+  "generatedAt": "2026-10-05T16:41:06.892687+00:00",
   "games": [
     {
       "id": "1",
@@ -496,7 +496,7 @@
         {
           "id": "1.55",
           "gameId": "wuwa",
-          "name": "gandonka",
+          "name": "Scar",
           "element": "Fusion",
           "rarity": 5,
           "announced": false,
