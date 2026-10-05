@@ -3,7 +3,7 @@ name: Generate banner data from Excel
 on:
   push:
     paths:
-      - 'banners/*.xlsx'
+      - 'banners/**'
       - 'scripts/generate_banner_data.py'
       - '.github/workflows/generate-banner-data.yml'
   workflow_dispatch:
@@ -29,6 +29,75 @@ jobs:
 
       - name: Install Excel parser
         run: pip install openpyxl
+
+      - name: Migrate legacy banner files without .xlsx extension
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from openpyxl import load_workbook, Workbook
+
+          root = Path("banners")
+          bases = [
+              "01_Wuthering_Waves",
+              "02_Genshin_Impact",
+              "03_Honkai_Star_Rail",
+              "04_Arknights_Endfield",
+              "05_Zenless_Zone_Zero",
+          ]
+
+          for base in bases:
+              for status in ("confirmed", "leaks"):
+                  legacy = root / f"{base}_{status}"
+                  target = root / f"{base}_{status}.xlsx"
+                  if not legacy.exists():
+                      continue
+
+                  legacy_wb = load_workbook(legacy, read_only=True, data_only=True)
+                  legacy_ws = legacy_wb.active
+                  legacy_rows = [list(r) for r in legacy_ws.iter_rows(values_only=True)]
+                  legacy_wb.close()
+
+                  legacy_data = [r for r in legacy_rows[1:] if any(v is not None and str(v).strip() for v in r)] if legacy_rows else []
+                  if not legacy_data:
+                      legacy.unlink()
+                      print(f"Removed empty legacy file: {legacy}")
+                      continue
+
+                  target_data = []
+                  if target.exists():
+                      target_wb = load_workbook(target, read_only=True, data_only=True)
+                      target_ws = target_wb.active
+                      target_rows = [list(r) for r in target_ws.iter_rows(values_only=True)]
+                      target_wb.close()
+                      target_data = [r for r in target_rows[1:] if any(v is not None and str(v).strip() for v in r)] if target_rows else []
+
+                  if not target_data:
+                      legacy.replace(target)
+                      print(f"Migrated legacy banner table: {legacy} -> {target}")
+                      continue
+
+                  # Both files contain data: keep the correctly named .xlsx as authoritative
+                  # and append only legacy phases that are not already present.
+                  header = ["Версия и фаза", "Дата начала", "Дата окончания", "Персонажи в составе баннера", "4* в баннере"]
+                  existing_phases = {str(r[0]).strip().lower() for r in target_data if r}
+                  merged = target_data[:]
+                  for row in legacy_data:
+                      phase = str(row[0] if row else "").strip()
+                      if phase and phase.lower() not in existing_phases:
+                          merged.append(row)
+
+                  wb = Workbook()
+                  ws = wb.active
+                  ws.title = "Banners"
+                  ws.append(header)
+                  for row in merged:
+                      ws.append([("" if v is None else str(v)) for v in row[:5]])
+                  wb.save(target)
+                  legacy.unlink()
+                  print(f"Merged and removed legacy banner file: {legacy}")
+
+          print("Legacy banner migration finished.")
+          PY
 
       - name: Generate banner feed
         run: python scripts/generate_banner_data.py
