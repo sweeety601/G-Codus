@@ -66,7 +66,7 @@ class GitHubClient(private val token: String) {
     }
 
     fun getFileSha(path: String): String? {
-        val conn = apiConnection("GET", "contents/" + path + "?ref=main")
+        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = false)
         val text = body(conn)
         if (conn.responseCode == 404) {
             return null
