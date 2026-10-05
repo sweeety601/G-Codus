@@ -42,6 +42,9 @@ def read_table(path, game_prefix):
     wb = load_workbook(path, read_only=True, data_only=True)
     ws = wb.active
     headers = [str(c.value or "").strip().lower() for c in ws[1]]
+    missing = [h for h in HEADERS if h.lower() not in headers]
+    if missing:
+        raise SystemExit(f"{path}: missing columns: {missing}")
     indexes = {h.lower(): headers.index(h.lower()) for h in HEADERS}
     rows = []
     for row in ws.iter_rows(min_row=2, values_only=True):
@@ -59,7 +62,13 @@ def read_table(path, game_prefix):
                 raise SystemExit(f"{path}: invalid character id '{cid}', expected {game_prefix}.N")
         if not start or not end:
             raise SystemExit(f"{path}: {phase} requires start and end dates")
-        rows.append({"phase": phase, "start": start, "end": end, "characters": characters, "four_star": four})
+        rows.append({
+            "phase": phase,
+            "start": start,
+            "end": end,
+            "characters": characters,
+            "four_star": four,
+        })
     return rows
 
 
@@ -75,33 +84,67 @@ def parse_date(value):
 
 
 def normalize(row, confirmed):
-    return {**row, "source_status": "confirmed" if confirmed else "unconfirmed", "unconfirmed": not confirmed}
+    return {
+        **row,
+        "source_status": "confirmed" if confirmed else "unconfirmed",
+        "unconfirmed": not confirmed,
+    }
 
 
 def build_game(game_id, game_name, prefix):
     _, base = GAMES[game_id]
     confirmed_path = BANNERS / f"{base}_confirmed.xlsx"
     leaks_path = BANNERS / f"{base}_leaks.xlsx"
-    if not confirmed_path.exists(): make_initial_workbook(confirmed_path)
-    if not leaks_path.exists(): make_initial_workbook(leaks_path)
-    confirmed = {r["phase"].lower(): normalize(r, True) for r in read_table(confirmed_path, prefix)}
-    leaks = {r["phase"].lower(): normalize(r, False) for r in read_table(leaks_path, prefix)}
+    if not confirmed_path.exists():
+        make_initial_workbook(confirmed_path)
+    if not leaks_path.exists():
+        make_initial_workbook(leaks_path)
+
+    confirmed = {
+        r["phase"].lower(): normalize(r, True)
+        for r in read_table(confirmed_path, prefix)
+    }
+    leaks = {
+        r["phase"].lower(): normalize(r, False)
+        for r in read_table(leaks_path, prefix)
+    }
+
     merged = dict(leaks)
     merged.update(confirmed)
     rows = sorted(merged.values(), key=lambda x: parse_date(x["start"]))
     now = datetime.now(timezone.utc)
+
     current = [x for x in rows if parse_date(x["start"]) <= now < parse_date(x["end"])]
     future = [x for x in rows if parse_date(x["start"]) > now]
     history = [x for x in rows if parse_date(x["end"]) <= now]
-    return {"id": game_id, "name": game_name, "current": current, "next": future[:1], "upcoming": future[1:], "history": list(reversed(history)), "source": "G-Codus banner Excel tables"}
+
+    return {
+        "id": game_id,
+        "name": game_name,
+        "current": current,
+        "next": future[:1],
+        "upcoming": future[1:],
+        "history": list(reversed(history)),
+        "source": "G-Codus banner Excel tables",
+    }
 
 
 def main():
     BANNERS.mkdir(parents=True, exist_ok=True)
-    games = [build_game(gid, name, str(i)) for i, (gid, (name, _)) in enumerate(GAMES.items(), 1)]
-    payload = {"version": 5, "generated_at": datetime.now(timezone.utc).isoformat(), "source": "G-Codus banner Excel tables", "games": {g["name"]: g for g in games}}
+    games = [
+        build_game(gid, name, str(i))
+        for i, (gid, (name, _)) in enumerate(GAMES.items(), 1)
+    ]
+    payload = {
+        "version": 6,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source": "G-Codus banner Excel tables",
+        "games": {g["name"]: g for g in games},
+    }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-    print("Generated banner feed using character IDs.")
+    print("Generated banner feed exclusively from banners/*.xlsx")
 
-if __name__ == "__main__": main()
+
+if __name__ == "__main__":
+    main()
