@@ -1,6 +1,8 @@
 name: Generate banner data from Excel
 
 on:
+  repository_dispatch:
+    types: [gcodus-data-sync]
   push:
     paths:
       - 'banners/**'
