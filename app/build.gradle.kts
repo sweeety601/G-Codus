@@ -10,8 +10,8 @@ android {
         applicationId = "com.example.gcodus"
         minSdk = 26
         targetSdk = 36
-        versionCode = 5
-        versionName = "0.5.0"
+        versionCode = 6
+        versionName = "0.6.0"
     }
 
     // Character portraits, banner JSON and other character assets are NOT packaged in the APK.
