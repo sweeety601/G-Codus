@@ -17,7 +17,7 @@ data class OnlineCharacter(
 )
 
 object CharacterDatabase {
-    private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/characters.json"
+    private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/generated/characters.json"
 
     fun fetch(context: Context): List<OnlineCharacter> {
         val json = try { get(DATA_URL) } catch (_: Exception) { return emptyList() }
@@ -35,18 +35,16 @@ object CharacterDatabase {
                         val name = c.optString("name").trim()
                         if (id.isBlank() || name.isBlank()) continue
                         if (isForbidden(name)) continue
-                        add(
-                            OnlineCharacter(
-                                gameId = gameId,
-                                name = name,
-                                slug = id,
-                                announced = c.optBoolean("announced", false),
-                                portraitUrl = c.optString("portraitUrl").ifBlank { imageUrl(id) },
-                                rarity = c.optInt("rarity", 0),
-                                id = id,
-                                element = c.optString("element")
-                            )
-                        )
+                        add(OnlineCharacter(
+                            gameId = gameId,
+                            name = name,
+                            slug = id,
+                            announced = c.optBoolean("announced", false),
+                            portraitUrl = c.optString("portraitUrl").ifBlank { imageUrl(id) },
+                            rarity = c.optInt("rarity", 0),
+                            id = id,
+                            element = c.optString("element")
+                        ))
                     }
                 }
             }.distinctBy { it.id }
@@ -55,14 +53,14 @@ object CharacterDatabase {
         }
     }
 
+    fun imageUrl(id: String): String =
+        "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp"
+
     private fun isForbidden(name: String): Boolean {
         val n = normalize(name)
         return n == "storyteller" || n.startsWith("thestoryteller") ||
             n == "sunbringer" || n.startsWith("sunbringer")
     }
-
-    fun imageUrl(id: String): String =
-        "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp"
 
     private fun normalize(value: String): String =
         value.lowercase().replace(Regex("[^a-z0-9]+"), "")
