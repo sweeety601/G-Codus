@@ -1,4 +1,4 @@
-# Repository character migration V2: Excel -> JSON metadata + images/<id>.webp.
+# Repository character migration V3: Excel -> JSON metadata + images/<id>.webp.
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -51,11 +51,7 @@ object CharacterDatabase {
                 val id = c.optString("id").trim()
                 val name = c.optString("name").trim()
                 if (id.isBlank() || name.isBlank()) continue
-                result += OnlineCharacter(
-                    gameId, name, c.optString("slug", name.lowercase()), c.optBoolean("announced", false),
-                    "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp",
-                    c.optInt("rarity", 0), c.optString("element", ""), id
-                )
+                result += OnlineCharacter(gameId, name, c.optString("slug", name.lowercase()), c.optBoolean("announced", false), "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/$id.webp", c.optInt("rarity", 0), c.optString("element", ""), id)
             }
         }
         return result.distinctBy { it.id }
@@ -71,10 +67,8 @@ object CharacterDatabase {
     }
 }
 '''
-
 DB.write_text(NEW_DB, encoding="utf-8")
 s = MAIN.read_text(encoding="utf-8")
-
 start = s.index("    private fun trackingGrid(gameId: String?, query: String?): View {")
 end = s.index("    private fun trackingCharacterCell(character: TrackedCharacter): View {", start)
 new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): View {
@@ -89,7 +83,6 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
                 .map { online -> TrackedCharacter(meta.id, meta.name, canonicalCharacterDisplayName(meta.id, online.name), online.id + ".webp", online.element, online.rarity) }
         }.distinctBy { it.gameId + "|" + it.file }
             .sortedWith(compareByDescending<TrackedCharacter> { isTracked(it.gameId, it.file) }.thenBy { it.gameName }.thenBy { it.name.lowercase() })
-
         if (entries.isEmpty()) {
             holder.addView(emptyCard(if (normalizedQuery.isBlank()) "Персонажей пока нет" else "Ничего не найдено"))
             return holder
@@ -102,15 +95,9 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
             }
             val cell = trackingCharacterCell(character)
             animateReveal(cell, index)
-            row?.addView(cell, LinearLayout.LayoutParams(0, dp(194), 1f).apply {
-                marginStart = if (index % 3 == 0) 0 else dp(3); marginEnd = dp(3); bottomMargin = dp(8)
-            })
+            row?.addView(cell, LinearLayout.LayoutParams(0, dp(194), 1f).apply { marginStart = if (index % 3 == 0) 0 else dp(3); marginEnd = dp(3); bottomMargin = dp(8) })
             if (index == entries.lastIndex && (index + 1) % 3 != 0) {
-                repeat(3 - ((index + 1) % 3)) {
-                    row?.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f).apply {
-                        marginStart = dp(3); marginEnd = dp(3); bottomMargin = dp(8)
-                    })
-                }
+                repeat(3 - ((index + 1) % 3)) { row?.addView(Space(this), LinearLayout.LayoutParams(0, dp(194), 1f).apply { marginStart = dp(3); marginEnd = dp(3); bottomMargin = dp(8) }) }
             }
         }
         return holder
@@ -118,7 +105,6 @@ new_grid = r'''    private fun trackingGrid(gameId: String?, query: String?): Vi
 
 '''
 s = s[:start] + new_grid + s[end:]
-
 start = s.index("    private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {")
 end = s.index("    private fun refreshCharacterDatabaseInBackground() {", start)
 s = s[:start] + r'''    private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
@@ -129,33 +115,24 @@ s = s[:start] + r'''    private fun loadTrackingPortrait(image: ImageView, file:
     }
 
 ''' + s[end:]
-
 start = s.index("    private fun trackedCharacterName(gameId: String, file: String): String {")
 end = s.index("    private fun trackedIdentityKey(gameId: String, file: String): String =", start)
 s = s[:start] + r'''    private fun trackedCharacterName(gameId: String, file: String): String {
         val id = file.removeSuffix(".webp")
-        return onlineCharacters.firstOrNull { it.gameId == gameId && it.id == id }?.name
-            ?: canonicalCharacterDisplayName(gameId, characterDisplayName(file))
+        return onlineCharacters.firstOrNull { it.gameId == gameId && it.id == id }?.name ?: canonicalCharacterDisplayName(gameId, characterDisplayName(file))
     }
 
 ''' + s[end:]
-
 start = s.index("    private fun trackedIdentityKey(gameId: String, file: String): String =")
 end = s.index("    private fun trackingKey(gameId: String, file: String) =", start)
-s = s[:start] + r'''    private fun trackedIdentityKey(gameId: String, file: String): String =
-        "tracked_v3_" + gameId + "_" + file.removeSuffix(".webp")
+s = s[:start] + r'''    private fun trackedIdentityKey(gameId: String, file: String): String = "tracked_v3_" + gameId + "_" + file.removeSuffix(".webp")
 
 ''' + s[end:]
-
 start = s.index("    private fun canonicalPreferredTrackingFile(gameId: String, file: String): String {")
 end = s.index("    private fun trackingKey(gameId: String, file: String) =", start)
 s = s[:start] + r'''    private fun canonicalPreferredTrackingFile(gameId: String, file: String): String = file
 
 ''' + s[end:]
-
-s = s.replace(
-    'data class TrackedCharacter(val gameId: String, val gameName: String, val name: String, val file: String)',
-    'data class TrackedCharacter(val gameId: String, val gameName: String, val name: String, val file: String, val element: String = "", val rarity: Int = 0)'
-)
+s = s.replace('data class TrackedCharacter(val gameId: String, val gameName: String, val name: String, val file: String)', 'data class TrackedCharacter(val gameId: String, val gameName: String, val name: String, val file: String, val element: String = "", val rarity: Int = 0)')
 MAIN.write_text(s, encoding="utf-8")
 print("Character repository migration applied")
