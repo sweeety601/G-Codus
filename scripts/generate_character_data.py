@@ -6,13 +6,13 @@ from openpyxl import load_workbook
 
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = {
-    "1_wuthering_waves.xlsx": ("1", "wuwa", "Wuthering Waves"),
-    "2_genshin_impact.xlsx": ("2", "genshin", "Genshin Impact"),
-    "3_honkai_star_rail.xlsx": ("3", "starrail", "Honkai: Star Rail"),
-    "4_arknights_endfield.xlsx": ("4", "endfield", "Arknights: Endfield"),
-    "5_zenless_zone_zero.xlsx": ("5", "zzz", "Zenless Zone Zero"),
+    "01_Wuthering_Waves.xlsx": ("1", "wuwa", "Wuthering Waves"),
+    "02_Genshin_Impact.xlsx": ("2", "genshin", "Genshin Impact"),
+    "03_Honkai_Star_Rail.xlsx": ("3", "starrail", "Honkai: Star Rail"),
+    "04_Arknights_Endfield.xlsx": ("4", "endfield", "Arknights: Endfield"),
+    "05_Zenless_Zone_Zero.xlsx": ("5", "zzz", "Zenless Zone Zero"),
 }
-OUT = ROOT / "data" / "characters.json"
+OUT = ROOT / "data" / "generated" / "characters.json"
 IMAGE_BASE = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images"
 ALIASES = {"Имя персонажа":"name", "Имя":"name", "Стихия":"element", "Элемент":"element", "Редкость":"rarity", "Rarity":"rarity", "ID":"id"}
 
