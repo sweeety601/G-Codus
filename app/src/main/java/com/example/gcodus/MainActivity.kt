@@ -1088,6 +1088,11 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private fun trackedCharacterName(gameId: String, file: String): String {
+        onlineCharacterFor(gameId, file)?.let { return it.id }
+        return file.substringBeforeLast(".")
+    }
+
     private fun trackedIdentityKey(gameId: String, file: String): String =
         "tracked_v2_" + gameId + "_" + normalizeCharacterForMatch(trackedCharacterName(gameId, file))
 
