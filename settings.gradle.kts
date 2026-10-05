@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "G-Codus"
-include(":app")
+include(":app", ":admin")
