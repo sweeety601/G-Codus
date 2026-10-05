@@ -24,14 +24,21 @@ object CharacterDatabase {
 
     fun fetch(context: Context): List<OnlineCharacter> {
         val result = mutableListOf<OnlineCharacter>()
+        var failedTables = 0
+
         for ((filename, prefix, gameId) in tables) {
             val rows = try {
                 RemoteXlsx.fetchRows(listOf("library/seed/" + filename))
             } catch (_: Exception) {
+                failedTables++
                 continue
             }
             parseTable(rows, prefix, gameId, result)
         }
+
+        // Never replace a complete live database with a partial download.
+        if (failedTables > 0) return emptyList()
+
         return result.distinctBy { it.gameId + "|" + it.id }
     }
 
