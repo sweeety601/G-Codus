@@ -715,7 +715,7 @@ class MainActivity : AppCompatActivity() {
     private fun refreshCodesInBackground() {
         executor.execute {
             try {
-                val json = PromoCodeSource.fetchJson(this@MainActivity)
+                val json = PromoCodeSource.fetchJson()
                 codesFeed = parseCodesFeed(json)
                 val old = prefs.getString("codes_feed", null)
                 if (old != json) {
@@ -726,7 +726,7 @@ class MainActivity : AppCompatActivity() {
         }
         executor.scheduleAtFixedRate({
             try {
-                val json = PromoCodeSource.fetchJson(this@MainActivity)
+                val json = PromoCodeSource.fetchJson()
                 val old = prefs.getString("codes_feed", null)
                 if (old != json) {
                     prefs.edit().putString("codes_feed", json).apply()
