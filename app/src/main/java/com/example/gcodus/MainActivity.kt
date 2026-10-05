@@ -119,8 +119,18 @@ class MainActivity : AppCompatActivity() {
         refreshBannerFeedInBackground()
         refreshCharacterDatabaseInBackground()
         migrateTrackingKeys()
-        showHome()
+        showBannerDatabaseLoading()
         startCountdownTicker()
+    }
+
+    private fun showBannerDatabaseLoading() {
+        val root = findViewById<FrameLayout>(R.id.root)
+        root.removeAllViews()
+        val column = makeColumn().apply {
+            gravity = Gravity.CENTER
+        }
+        column.addView(label("Загрузка данных баннеров…", 18f, text, true))
+        root.addView(column)
     }
 
     private fun showHome() {
@@ -1737,9 +1747,10 @@ class MainActivity : AppCompatActivity() {
                 val games = JSONObject(fresh).getJSONArray("games")
                 if (games.length() == 0) return
                 bannerFeedJson = fresh
-                prefs.edit().putString("banner_feed", fresh).apply()
                 runOnUiThread {
-                    if (!isFinishing) refreshCurrentScreen()
+                    if (!isFinishing) {
+                        if (currentScreen == Screen.HOME) showHome() else refreshCurrentScreen()
+                    }
                 }
             } catch (_: Exception) {
                 bannerFeedJson = null
