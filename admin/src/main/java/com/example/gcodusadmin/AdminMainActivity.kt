@@ -4,6 +4,8 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.graphics.Color
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Bundle
@@ -27,10 +29,13 @@ class AdminMainActivity : AppCompatActivity() {
     private val bg = 0xFF0D0E13.toInt()
     private val surface = 0xFF171923.toInt()
     private val ink = 0xFFF5F5F7.toInt()
-    private val muted = 0xFFA5A7B1.toInt()
+    private val muted = ink
     private val accent = 0xFF8A63E8.toInt()
+    private val portraitExecutor = Executors.newFixedThreadPool(4)
+    private val portraitCache = android.util.LruCache<String, Bitmap>(72)
     private var pendingPortrait: ByteArray? = null
     private var pendingPortraitTarget: TextView? = null
+    private var pendingPortraitPreview: ImageView? = null
 
     private val portraitPicker = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri == null) return@registerForActivityResult
@@ -38,6 +43,7 @@ class AdminMainActivity : AppCompatActivity() {
         runBackground({ repo!!.readPortrait(uri, contentResolver) }, { bytes ->
             pendingPortrait = bytes
             target?.text = "Портрет выбран • WebP • " + (bytes.size / 1024) + " KB"
+            BitmapFactory.decodeByteArray(bytes, 0, bytes.size)?.let { pendingPortraitPreview?.setImageBitmap(it) }
         }, { e -> toast("Ошибка изображения: " + (e.message ?: "неизвестная ошибка")) })
     }
 
@@ -72,7 +78,7 @@ class AdminMainActivity : AppCompatActivity() {
         val input = EditText(this).apply {
             hint = "github_pat_..."
             inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
-            setTextColor(ink); setHintTextColor(muted); setSingleLine(true)
+            setTextColor(ink); setHintTextColor(ink); setSingleLine(true)
             setPadding(dp(14), dp(12), dp(14), dp(12)); setBackgroundColor(surface)
         }
         box.addView(input, lp())
@@ -111,6 +117,8 @@ class AdminMainActivity : AppCompatActivity() {
         runBackground({ r.loadCharacters(game) }, { list ->
             val id = existing?.id ?: r.nextId(game, list)
             pendingPortrait = null
+            pendingPortraitTarget = null
+            pendingPortraitPreview = null
             val box = vertical()
             box.addView(title(if (existing == null) "Новый персонаж" else "Редактирование персонажа"))
             box.addView(label("ID закреплён автоматически", muted, 13f))
@@ -121,8 +129,24 @@ class AdminMainActivity : AppCompatActivity() {
             box.addView(label("Стихия", muted, 12f)); val elementSpinner = spinner(elements.toList(), existing?.element); box.addView(elementSpinner, lp())
             val rarities = (list.map { it.rarity.toString() } + listOf("4", "5")).distinct().sorted()
             box.addView(label("Редкость", muted, 12f)); val raritySpinner = spinner(rarities, existing?.rarity?.toString()); box.addView(raritySpinner, lp())
-            val portrait = button(if (existing == null) "Загрузить портрет" else "Заменить портрет"); box.addView(portrait, lp())
-            portrait.setOnClickListener { pendingPortraitTarget = portrait; portraitPicker.launch("image/*") }
+            box.addView(label("Текущий портрет", ink, 12f))
+            val portraitPreview = ImageView(this).apply {
+                setBackgroundColor(surface)
+                scaleType = ImageView.ScaleType.CENTER_CROP
+                contentDescription = "Текущий портрет персонажа"
+            }
+            box.addView(portraitPreview, LinearLayout.LayoutParams(-1, dp(220)).apply {
+                setMargins(0, dp(6), 0, dp(8))
+            })
+            loadCurrentPortrait(id, portraitPreview)
+
+            val portrait = button(if (existing == null) "Загрузить портрет" else "Заменить портрет")
+            box.addView(portrait, lp())
+            portrait.setOnClickListener {
+                pendingPortraitTarget = portrait
+                pendingPortraitPreview = portraitPreview
+                portraitPicker.launch("image/*")
+            }
             val save = bigButton("Сохранить в GitHub"); box.addView(save, lp(0, 58))
             save.setOnClickListener {
                 val nm = name.text.toString().trim(); if (nm.isBlank()) { toast("Введи имя"); return@setOnClickListener }
@@ -146,13 +170,109 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showCharacterDatabase() {
         val r = repo ?: return
         runBackground({ r.loadAllCharacters() }, { all ->
-            val box = vertical(); val header = horizontal()
-            header.addView(title("База персонажей"), LinearLayout.LayoutParams(0, -2, 1f)); val refresh = button("Обновить")
-            header.addView(refresh, LinearLayout.LayoutParams(dp(120), dp(48))); refresh.setOnClickListener { showCharacterDatabase() }; box.addView(header)
-            val search = EditText(this).apply { hint = "Поиск по имени или ID"; setTextColor(ink); setHintTextColor(muted); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
-            box.addView(search, lp()); val listBox = vertical(); box.addView(listBox)
-            fun render(query: String) { listBox.removeAllViews(); all.filter { query.isBlank() || it.name.contains(query, true) || it.id.contains(query, true) }.sortedBy { it.id }.forEach { c -> val card = bigButton(c.id + "   " + c.name + "   ★" + c.rarity); listBox.addView(card, lp(0, 56)); card.setOnClickListener { GameCatalog.games.firstOrNull { g -> c.id.startsWith(g.idPrefix + ".") }?.let { g -> showCharacterEditor(g, c) } }; }; if (listBox.childCount == 0) listBox.addView(label("Ничего не найдено", muted, 14f)) }
-            search.addTextChangedListener(SimpleTextWatcher { render(it) }); render(""); addBack(box); setContentView(wrap(box))
+            val box = vertical()
+            val header = horizontal()
+            header.addView(title("База персонажей"), LinearLayout.LayoutParams(0, -2, 1f))
+            val refresh = button("Обновить")
+            header.addView(refresh, LinearLayout.LayoutParams(dp(120), dp(48)))
+            refresh.setOnClickListener { showCharacterDatabase() }
+            box.addView(header)
+
+            val search = EditText(this).apply {
+                hint = "Поиск по имени или ID"
+                setTextColor(ink)
+                setHintTextColor(ink)
+                setSingleLine(true)
+                setPadding(dp(14), dp(10), dp(14), dp(10))
+                setBackgroundColor(surface)
+            }
+            box.addView(search, lp())
+
+            val scroll = makeScroll()
+            val grid = LinearLayout(this).apply {
+                orientation = LinearLayout.VERTICAL
+                setPadding(0, dp(6), 0, dp(24))
+                setBackgroundColor(bg)
+            }
+            scroll.addView(grid, ScrollView.LayoutParams(-1, -2))
+            box.addView(scroll, LinearLayout.LayoutParams(-1, 0, 1f))
+
+            fun openCharacter(c: AdminCharacter) {
+                GameCatalog.games.firstOrNull { g -> c.id.startsWith(g.idPrefix + ".") }
+                    ?.let { game -> showCharacterEditor(game, c) }
+            }
+
+            fun makeCharacterCard(c: AdminCharacter): LinearLayout {
+                val card = LinearLayout(this).apply {
+                    orientation = LinearLayout.VERTICAL
+                    gravity = Gravity.CENTER_HORIZONTAL
+                    setPadding(dp(7), dp(7), dp(7), dp(7))
+                    background = roundedDrawable(surface, 16f)
+                    isClickable = true
+                    setOnClickListener { openCharacter(c) }
+                }
+                val image = ImageView(this).apply {
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setBackgroundColor(bg)
+                    contentDescription = c.name
+                }
+                card.addView(image, LinearLayout.LayoutParams(-1, dp(118)).apply {
+                    setMargins(0, 0, 0, dp(6))
+                })
+                card.addView(TextView(this).apply {
+                    text = c.name
+                    setTextColor(ink)
+                    textSize = 14f
+                    gravity = Gravity.CENTER
+                    maxLines = 2
+                    ellipsize = android.text.TextUtils.TruncateAt.END
+                }, LinearLayout.LayoutParams(-1, dp(38)))
+                card.addView(TextView(this).apply {
+                    text = c.id + " • ★" + c.rarity
+                    setTextColor(ink)
+                    textSize = 11f
+                    gravity = Gravity.CENTER
+                }, LinearLayout.LayoutParams(-1, dp(22)))
+                loadCurrentPortrait(c.id, image)
+                return card
+            }
+
+            fun render(query: String) {
+                grid.removeAllViews()
+                val filtered = all.filter {
+                    query.isBlank() ||
+                        it.name.contains(query, true) ||
+                        it.id.contains(query, true)
+                }.sortedBy { it.id }
+
+                if (filtered.isEmpty()) {
+                    grid.addView(label("Ничего не найдено", ink, 14f))
+                    return
+                }
+
+                filtered.chunked(3).forEach { chunk ->
+                    val row = horizontal().apply {
+                        setPadding(0, dp(4), 0, dp(4))
+                    }
+                    chunk.forEach { c ->
+                        row.addView(
+                            makeCharacterCard(c),
+                            LinearLayout.LayoutParams(0, dp(190), 1f).apply {
+                                setMargins(dp(3), 0, dp(3), 0)
+                            }
+                        )
+                    }
+                    repeat(3 - chunk.size) {
+                        row.addView(Space(this), LinearLayout.LayoutParams(0, dp(190), 1f))
+                    }
+                    grid.addView(row)
+                }
+            }
+
+            search.addTextChangedListener(SimpleTextWatcher { render(it) })
+            render("")
+            addBack(box)
+            setContentView(wrap(box))
         }, { e -> toast("Ошибка базы: " + (e.message ?: "неизвестная ошибка")) })
     }
 
@@ -176,8 +296,20 @@ class AdminMainActivity : AppCompatActivity() {
         val r = repo ?: return
         runBackground({ r.loadCharacters(game) }, { chars ->
             val box = vertical(); box.addView(title(if (existing == null) "Новый баннер" else "Редактирование баннера"))
-            val phase = field("Версия и фаза", existing?.phase.orEmpty()); val start = field("Дата начала", existing?.startDate.orEmpty(), enabled = false); val end = field("Дата окончания", existing?.endDate.orEmpty(), enabled = false)
-            box.addView(phase); box.addView(start); box.addView(end); start.setOnClickListener { pickDate(start) }; end.setOnClickListener { pickDate(end) }
+            val phase = field("Версия и фаза", existing?.phase.orEmpty())
+            val start = field("Дата начала", existing?.startDate.orEmpty()).apply {
+                isFocusable = false
+                isCursorVisible = false
+                isClickable = true
+            }
+            val end = field("Дата окончания", existing?.endDate.orEmpty()).apply {
+                isFocusable = false
+                isCursorVisible = false
+                isClickable = true
+            }
+            box.addView(phase); box.addView(start); box.addView(end)
+            start.setOnClickListener { pickDate(start) }
+            end.setOnClickListener { pickDate(end) }
             box.addView(label("Персонажи", muted, 12f)); val selected = existing?.characters?.toMutableSet() ?: mutableSetOf(); val selectedView = bigButton("Выбрано: " + selected.size); box.addView(selectedView, lp(0, 58))
             selectedView.setOnClickListener { val labels = chars.map { it.id + " • " + it.name + " • ★" + it.rarity }.toTypedArray(); val checked = BooleanArray(chars.size) { selected.contains(chars[it].id) }; AlertDialog.Builder(this).setTitle("Персонажи").setMultiChoiceItems(labels, checked) { _, which, isChecked -> if (isChecked) selected.add(chars[which].id) else selected.remove(chars[which].id); selectedView.text = "Выбрано: " + selected.size }.setPositiveButton("Готово", null).show() }
             val save = bigButton("Сохранить в GitHub"); box.addView(save, lp(0, 58)); save.setOnClickListener { val row = BannerRow(phase.text.toString().trim(), start.text.toString().trim(), end.text.toString().trim(), selected.toMutableList(), existing?.fourStars ?: mutableListOf()); if (row.phase.isBlank() || row.startDate.isBlank() || row.endDate.isBlank()) { toast("Заполни версию и обе даты"); return@setOnClickListener }; runBackground({ val all = r.loadBanners(game, confirmed).first.toMutableList(); val idx = existing?.let { old -> all.indexOfFirst { it.phase == old.phase && it.startDate == old.startDate && it.endDate == old.endDate } } ?: -1; if (idx >= 0) all[idx] = row else all.add(row); r.saveBanners(game, confirmed, all) }, { toast("Баннер сохранён"); showBannerList(game, confirmed) }, { e -> toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка")) }) }
@@ -185,18 +317,73 @@ class AdminMainActivity : AppCompatActivity() {
         }, { e -> toast("Ошибка чтения персонажей: " + (e.message ?: "неизвестная ошибка")) })
     }
 
+    private fun loadCurrentPortrait(id: String, image: ImageView) {
+        portraitCache.get(id)?.let {
+            image.setImageBitmap(it)
+            return
+        }
+        portraitExecutor.execute {
+            try {
+                val url = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/" + id + ".webp"
+                val connection = java.net.URL(url).openConnection() as java.net.HttpURLConnection
+                connection.connectTimeout = 10_000
+                connection.readTimeout = 15_000
+                connection.instanceFollowRedirects = true
+                connection.setRequestProperty("User-Agent", "G-Codus-Admin/2.0")
+                val bitmap = connection.inputStream.use { input -> BitmapFactory.decodeStream(input) }
+                connection.disconnect()
+                if (bitmap != null) {
+                    portraitCache.put(id, bitmap)
+                    runOnUiThread {
+                        if (!isFinishing) image.setImageBitmap(bitmap)
+                    }
+                }
+            } catch (_: Exception) {
+                // A character can exist in the database before its portrait is uploaded.
+            }
+        }
+    }
+
     private fun pickDate(target: EditText) { val now = LocalDate.now(); DatePickerDialog(this, { _, y, m, d -> target.setText(String.format("%04d-%02d-%02d", y, m + 1, d)) }, now.year, now.monthValue - 1, now.dayOfMonth).show() }
     private fun defaultElements(game: GameMeta): List<String> = when (game.idPrefix) { "1" -> listOf("Fusion", "Glacio", "Electro", "Aero", "Spectro", "Havoc"); "2" -> listOf("Pyro", "Hydro", "Anemo", "Electro", "Cryo", "Geo", "Dendro"); "3" -> listOf("Physical", "Fire", "Ice", "Lightning", "Wind", "Quantum", "Imaginary"); "4" -> listOf("Physical", "Arts", "Electric", "Cryo", "Fire", "Wind"); else -> listOf("Physical", "Fire", "Ice", "Electric", "Ether") }
     private fun runBackground(work: () -> Unit, ok: () -> Unit) { executor.execute { try { work(); runOnUiThread(ok) } catch (e: Exception) { runOnUiThread { toast(e.message ?: "Ошибка") } } } }
     private fun <T> runBackground(work: () -> T, ok: (T) -> Unit, fail: (Exception) -> Unit) { executor.execute { try { val value = work(); runOnUiThread { ok(value) } } catch (e: Exception) { runOnUiThread { fail(e) } } } }
-    private fun addBack(box: LinearLayout) { box.addView(button("← Назад").also { it.setOnClickListener { showHome() } }, lp()) }
+    private fun addBack(box: LinearLayout) {
+        val back = button("← Назад").also { it.setOnClickListener { showHome() } }
+        box.addView(back, 0, lp(120, 48))
+    }
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(24), dp(24), dp(24)); setBackgroundColor(bg) }
     private fun horizontal() = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(bg) }
     private fun wrap(v: View): FrameLayout = FrameLayout(this).apply { addView(v, FrameLayout.LayoutParams(-1, -1)); setBackgroundColor(bg) }
     private fun title(t: String) = TextView(this).apply { text = t; setTextColor(ink); textSize = 24f; setTypeface(typeface, Typeface.BOLD); setPadding(0, 0, 0, dp(12)) }
     private fun label(t: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { text = t; setTextColor(color); textSize = size; if (bold) setTypeface(typeface, Typeface.BOLD); setPadding(0, dp(4), 0, dp(8)) }
     private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
-    private fun spinner(items: List<String>, selected: String?) = Spinner(this).apply { adapter = ArrayAdapter(this@AdminMainActivity, android.R.layout.simple_spinner_dropdown_item, items); selected?.let { val i = items.indexOf(it); if (i >= 0) setSelection(i) } }
+    private fun spinner(items: List<String>, selected: String?) = Spinner(this).apply {
+        adapter = object : ArrayAdapter<String>(
+            this@AdminMainActivity,
+            android.R.layout.simple_spinner_item,
+            items
+        ) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent) as TextView
+                view.setTextColor(ink)
+                view.textSize = 15f
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent) as TextView
+                view.setTextColor(ink)
+                view.setBackgroundColor(surface)
+                view.textSize = 15f
+                return view
+            }
+        }.also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        selected?.let {
+            val i = items.indexOf(it)
+            if (i >= 0) setSelection(i)
+        }
+    }
     private fun button(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setBackgroundColor(surface) }
     private fun bigButton(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setTextSize(15f); setBackgroundColor(surface); gravity = Gravity.CENTER_VERTICAL; setPadding(dp(16), dp(8), dp(16), dp(8)) }
     private fun space(h: Int) = Space(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(h)) }
