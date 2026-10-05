@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
         codesFeed = loadCachedCodes()
-        bannerFeedJson = loadCachedBannerFeed()
+        bannerFeedJson = null
         requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
@@ -1669,32 +1669,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isUsableBannerFeed(source: String?): Boolean {
-        if (source.isNullOrBlank()) return false
-        return try {
-            val games = JSONObject(source).opt("games")
-            when (games) {
-                is JSONArray -> games.length() > 0
-                is JSONObject -> games.length() > 0
-                else -> false
-            }
-        } catch (_: Exception) {
-            false
-        }
-    }
-
-    private fun loadCachedBannerFeed(): String? {
-        val candidates = listOf(
-            prefs.getString("banner_feed", null),
-            try {
-                assets.open("banner_feed.json").use { it.bufferedReader().readText() }
-            } catch (_: Exception) {
-                null
-            }
-        )
-        return candidates.firstOrNull { isUsableBannerFeed(it) }
-    }
-
+    // Banner source of truth: only the current G-Codus GitHub database.
     private fun loadFeed(): List<GameFeed> {
         val source = bannerFeedJson ?: loadCachedBannerFeed()?.also { bannerFeedJson = it }
             ?: return emptyList()
@@ -1758,20 +1733,19 @@ class MainActivity : AppCompatActivity() {
     private fun refreshBannerFeedInBackground() {
         fun refreshOnce() {
             try {
+                // Only G-Codus GitHub database. Never use bundled/old local banner data.
                 val fresh = BannerSource.fetchNormalized(this@MainActivity)
                 val games = JSONObject(fresh).getJSONArray("games")
                 if (games.length() == 0) return
-
-                if (bannerFeedJson != fresh) {
-                    bannerFeedJson = fresh
-                    prefs.edit().putString("banner_feed", fresh).apply()
-                    runOnUiThread {
-                        if (!isFinishing) refreshCurrentScreen()
-                    }
+                bannerFeedJson = fresh
+                prefs.edit().putString("banner_feed", fresh).apply()
+                runOnUiThread {
+                    if (!isFinishing) refreshCurrentScreen()
                 }
-            } catch (_: Exception) { }
+            } catch (_: Exception) {
+                bannerFeedJson = null
+            }
         }
-
         executor.execute { refreshOnce() }
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
     }
