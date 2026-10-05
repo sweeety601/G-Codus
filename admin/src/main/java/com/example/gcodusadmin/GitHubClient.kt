@@ -56,15 +56,8 @@ class GitHubClient(private val token: String) {
             )
         }
 
-        val api = apiConnection("GET", "contents/" + TEST_FILE + "?ref=main")
-        val apiText = body(api)
-        if (api.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "GitHub видит репозиторий, но токен не имеет доступа через Contents API: HTTP " +
-                    api.responseCode + " " + shortError(apiText) +
-                    ". Для Fine-grained token: G-Codus → Contents → Read and write."
-            )
-        }
+        // Чтение публичных данных не должно блокировать запуск админки.
+        // Contents API проверяется только в момент реального сохранения, когда это действительно необходимо.
     }
 
     fun getFile(path: String): GitFile {
