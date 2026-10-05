@@ -240,12 +240,11 @@ class AdminMainActivity : AppCompatActivity() {
                 card.addView(TextView(this).apply {
                     text = c.name
                     setTextColor(ink)
-                    textSize = 13f
+                    textSize = 12f
                     gravity = Gravity.CENTER
                     maxLines = 3
                     ellipsize = android.text.TextUtils.TruncateAt.END
                     includeFontPadding = false
-                    setAutoSizeTextTypeUniformWithConfiguration(dp(10), dp(13), dp(1), android.util.TypedValue.COMPLEX_UNIT_SP)
                 }, LinearLayout.LayoutParams(-1, dp(48)))
                 card.addView(TextView(this).apply {
                     text = c.id + " • ★" + c.rarity
