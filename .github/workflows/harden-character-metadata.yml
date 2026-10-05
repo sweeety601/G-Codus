@@ -1,0 +1,100 @@
+name: Harden character metadata and tracking
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/harden-character-metadata.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Patch character sources and canonical tracking
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          db = Path('app/src/main/java/com/example/gcodus/CharacterDatabase.kt')
+          s = db.read_text()
+
+          old = '''        result += fetchGame("wuwa", WUWA_CHARACTERS)
+          result += fetchGame("zzz", ZZZ_CHARACTERS)
+          result += fetchGame("genshin", GENSHIN_CHARACTERS)
+          result += fetchGame("starrail", HSR_CHARACTERS)
+          result += fetchGame("endfield", ENDFIELD_CHARACTERS)
+
+          // Static roster fallback compiled from the current public database lists.
+          // This keeps the Wishlist usable even when a character-list page is down.
+          result += fallbackCharacters("starrail", HSR_FALLBACK)
+          result += fallbackCharacters("zzz", ZZZ_FALLBACK)
+          result += fallbackCharacters("endfield", ENDFIELD_FALLBACK)'''
+          new = '''        val sources = listOf(
+              Triple("wuwa", WUWA_CHARACTERS, emptyList<String>()),
+              Triple("zzz", ZZZ_CHARACTERS, ZZZ_FALLBACK),
+              Triple("genshin", GENSHIN_CHARACTERS, emptyList<String>()),
+              Triple("starrail", HSR_CHARACTERS, HSR_FALLBACK),
+              Triple("endfield", ENDFIELD_CHARACTERS, ENDFIELD_FALLBACK)
+          )
+          for ((gameId, url, fallback) in sources) {
+              val live = fetchGame(gameId, url)
+              result += if (live.isNotEmpty()) live else fallbackCharacters(gameId, fallback)
+          }'''
+          if old in s:
+              s = s.replace(old, new)
+
+          s = s.replace(
+              '"href=[\\\\\\\"]/(?:wuthering-waves|zenless|genshin-impact)/characters/([^\\\\\\\"?#/]+)[\\\\\\\"][^>]*>(.*?)</a>"',
+              '"href=[\\\\\\\"]/(?:wuthering-waves|zenless|genshin-impact|star-rail|arknights-endfield)/characters/([^\\\\\\\"?#/]+)[\\\\\\\"][^>]*>(.*?)</a>"'
+          )
+          s = s.replace('''        "Pearl","Pela"''', '''        "Pela"''')
+          s = s.replace('''        "Wulfgard","Xaihi","Yvonne","Zhuang Fangyi"''', '''        "Wulfgard","Xaihi","Yvonne","Zhuang Fangyi"''')
+          s = s.replace('''        "Pogranichnik","Purrchena","Rossi","Si","Snowshine","Tangtang","Typhoeus",''', '''        "Pogranichnik","Purrchena","Rossi","Snowshine","Tangtang","Typhoeus",''')
+
+          # Add aliases for names used by live Prydwen pages and banner feeds.
+          marker = '''        if (gameId == "zzz") {\n            return "zzz|" + normalize(canonicalZzzName(name.ifBlank { slug }))\n        }'''
+          replacement = '''        if (gameId == "zzz") {\n            return "zzz|" + canonicalIdentity(gameId, name.ifBlank { slug })\n        }\n        if (gameId == "genshin") return "genshin|" + canonicalIdentity(gameId, slug.ifBlank { name })\n        if (gameId == "wuwa") return "wuwa|" + canonicalIdentity(gameId, slug.ifBlank { name })\n        if (gameId == "endfield") return "endfield|" + canonicalIdentity(gameId, slug.ifBlank { name })'''
+          if marker in s:
+              s = s.replace(marker, replacement)
+
+          insert_before = '''    private fun portraitUrl(gameId: String, slug: String): String ='''
+          identity_fn = '''    private fun canonicalIdentity(gameId: String, value: String): String {\n        val n = normalize(value)\n        return when (gameId) {\n            "genshin" -> when (n) {\n                "kaedeharakazuha", "kazuha" -> "kazuha"\n                "raidenshogun", "raiden" -> "raidenshogun"\n                "tartaglia", "childe" -> "tartaglia"\n                "wanderer", "scaramouche" -> "wanderer"\n                "kamisatoayaka", "ayaka" -> "kamisatoayaka"\n                "kamisatoayato", "ayato" -> "kamisatoayato"\n                else -> n\n            }\n            "wuwa" -> when (n) {\n                "theshorekeeper", "shorekeeper" -> "shorekeeper"\n                "yangyangxuanling", "yangyang" -> "yangyang"\n                else -> n\n            }\n            "zzz" -> when (n) {\n                "billy", "billykid" -> "billykid"\n                "anby", "anbydemara", "anbysoldier0", "soldier0anby" -> "anby"\n                "grace", "gracehoward" -> "grace"\n                "lucy", "lucyalt", "lucialt" -> "lucy"\n                "yuzuha", "ukinamiyuzuha" -> "yuzuha"\n                "nicole", "nicoledemara" -> "nicole"\n                "orphieandmagus", "orhpieandmagus", "orhpiemagus" -> "orphieandmagus"\n                else -> n\n            }\n            "starrail" -> when (n) {\n                "blademortenax", "mortenaxblade" -> "mortenaxblade"\n                "imbibitorlunae", "danhengimbibitorlunae" -> "imbibitorlunae"\n                "topaz", "topazandnumby" -> "topaz"\n                else -> n\n            }\n            "endfield" -> when (n) {\n                "orhpieandmagus", "orhpiemagus", "orphieandmagus" -> "orphieandmagus"\n                else -> n\n            }\n            else -> n\n        }\n    }\n\n'''
+          if insert_before in s and 'private fun canonicalIdentity(gameId: String' not in s:
+              s = s.replace(insert_before, identity_fn + insert_before)
+
+          db.write_text(s)
+
+          worker = Path('app/src/main/java/com/example/gcodus/NotificationSyncWorker.kt')
+          w = worker.read_text()
+          # Replace the tracked identity normalization with the same canonical identity rules.
+          w = w.replace('''            .map { it.key.removePrefix(prefix) }\n            .filter { it.isNotBlank() }\n            .filterNot {\n                val n = normalizeIdentity(it)''', '''            .map { canonicalCharacterId(gameId, it.key.removePrefix(prefix)) }\n            .filter { it.isNotBlank() }\n            .filterNot {\n                val n = normalizeIdentity(it)''')
+
+          start = w.find('    private fun sameCharacter(gameId: String, name: String, identity: String): Boolean {')
+          end = w.find('\n    private fun normalizeIdentity', start)
+          if start != -1 and end != -1:
+              replacement = '''    private fun sameCharacter(gameId: String, name: String, identity: String): Boolean {\n        return canonicalCharacterId(gameId, name) == canonicalCharacterId(gameId, identity)\n    }\n\n    private fun canonicalCharacterId(gameId: String, value: String): String {\n        val n = normalizeIdentity(value)\n        return when (gameId) {\n            "genshin" -> when (n) {\n                "kaedeharakazuha", "kazuha" -> "kazuha"\n                "raidenshogun", "raiden" -> "raidenshogun"\n                "tartaglia", "childe" -> "tartaglia"\n                "wanderer", "scaramouche" -> "wanderer"\n                "kamisatoayaka", "ayaka" -> "kamisatoayaka"\n                "kamisatoayato", "ayato" -> "kamisatoayato"\n                else -> n\n            }\n            "wuwa" -> when (n) {\n                "theshorekeeper", "shorekeeper" -> "shorekeeper"\n                "yangyangxuanling", "yangyang" -> "yangyang"\n                else -> n\n            }\n            "zzz" -> when (n) {\n                "billy", "billykid" -> "billykid"\n                "anby", "anbydemara", "anbysoldier0", "soldier0anby" -> "anby"\n                "grace", "gracehoward" -> "grace"\n                "lucy", "lucyalt", "lucialt" -> "lucy"\n                "yuzuha", "ukinamiyuzuha" -> "yuzuha"\n                "nicole", "nicoledemara" -> "nicole"\n                "orphieandmagus", "orhpieandmagus", "orhpiemagus" -> "orphieandmagus"\n                else -> n\n            }\n            "starrail" -> when (n) {\n                "blademortenax", "mortenaxblade" -> "mortenaxblade"\n                "imbibitorlunae", "danhengimbibitorlunae" -> "imbibitorlunae"\n                "topaz", "topazandnumby" -> "topaz"\n                else -> n\n            }\n            "endfield" -> when (n) {\n                "orhpieandmagus", "orhpiemagus", "orphieandmagus" -> "orphieandmagus"\n                else -> n\n            }\n            else -> n\n        }\n    }\n'''
+              w = w[:start] + replacement + w[end:]
+
+          worker.write_text(w)
+          PY
+
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add app/src/main/java/com/example/gcodus/CharacterDatabase.kt app/src/main/java/com/example/gcodus/NotificationSyncWorker.kt
+          if git diff --cached --quiet; then
+            echo "No changes needed"
+            exit 0
+          fi
+          git commit -m "Harden character metadata and canonical tracking"
+          git push
