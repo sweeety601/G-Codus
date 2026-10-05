@@ -80,7 +80,7 @@ object XlsxCodec {
         val result = ArrayList<String>(nodes.length)
         for (i in 0 until nodes.length) {
             val si = nodes.item(i)
-            val texts = si.getElementsByTagName("t")
+            val texts = (si as org.w3c.dom.Element).getElementsByTagName("t")
             val b = StringBuilder()
             for (j in 0 until texts.length) b.append(texts.item(j).textContent)
             result += b.toString()
