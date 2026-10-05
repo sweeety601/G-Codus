@@ -61,5 +61,6 @@ jobs:
             echo 'No generated changes.'
           else
             git commit -m 'Sync banner library from Excel tables'
-            git push
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
