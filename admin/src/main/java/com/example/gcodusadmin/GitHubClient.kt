@@ -7,12 +7,14 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+
 data class GitFile(val bytes: ByteArray, val sha: String)
 
 class GitHubClient(private val token: String) {
     companion object {
         const val REPO = "sweeety601/G-Codus"
         private const val API = "https://api.github.com"
+        private const val TEST_FILE = "library/seed/01_Wuthering_Waves.xlsx"
     }
 
     private fun connection(method: String, path: String): HttpURLConnection {
@@ -34,20 +36,23 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        val repoConn = URL(API + "/repos/" + REPO).openConnection() as HttpURLConnection
-        repoConn.requestMethod = "GET"
-        repoConn.connectTimeout = 15_000
-        repoConn.readTimeout = 15_000
-        repoConn.setRequestProperty("Accept", "application/vnd.github+json")
-        repoConn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-        repoConn.setRequestProperty("Authorization", "Bearer " + token)
-        repoConn.setRequestProperty("User-Agent", "G-Codus-Admin")
+        val repoConn = connection("GET", "")
         val repoText = body(repoConn)
         if (repoConn.responseCode !in 200..299) {
             throw IllegalStateException(
-                "Нет доступа к репозиторию " + REPO +
-                    ": HTTP " + repoConn.responseCode + " " + shortError(repoText) +
-                    ". В Fine-grained token выбери только G-Codus и Contents = Read and write."
+                "Нет доступа к репозиторию " + REPO + ": HTTP " + repoConn.responseCode + " " + shortError(repoText) +
+                    ". Проверь Repository access и Contents = Read and write."
+            )
+        }
+
+        val fileConn = connection("GET", "contents/" + TEST_FILE + "?ref=main")
+        val fileText = body(fileConn)
+        if (fileConn.responseCode !in 200..299) {
+            throw IllegalStateException(
+                "К репозиторию доступ есть, но нет доступа к файлам Contents. " +
+                    "Файл " + TEST_FILE + " вернул HTTP " + fileConn.responseCode + ": " + shortError(fileText) +
+                    ". Для Fine-grained token: Repository access → Only select repositories → G-Codus; " +
+                    "Repository permissions → Contents → Read and write."
             )
         }
     }
