@@ -1,1 +1,3173 @@
-{"version":1,"generatedAt":"2026-10-05T09:00:00Z","games":[{"id":"1","gameId":"wuwa","name":"Wuthering Waves","characters":[{"id":"1.1","gameId":"wuwa","name":"Sigrika","element":"Aero","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.1.webp"},{"id":"1.2","gameId":"wuwa","name":"Luuk Herssen","element":"Spectro","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.2.webp"},{"id":"1.3","gameId":"wuwa","name":"Mornye","element":"Fusion","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.3.webp"},{"id":"1.4","gameId":"wuwa","name":"Roccia","element":"Havoc","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.4.webp"},{"id":"1.5","gameId":"wuwa","name":"Lynae","element":"Spectro","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.5.webp"},{"id":"1.6","gameId":"wuwa","name":"Aalto","element":"Aero","rarity":4,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.6.webp"},{"id":"1.7","gameId":"wuwa","name":"Augusta","element":"Electro","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.7.webp"},{"id":"1.8","gameId":"wuwa","name":"Baizhi","element":"Glacio","rarity":4,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.8.webp"},{"id":"1.9","gameId":"wuwa","name":"Buling","element":"Electro","rarity":4,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.9.webp"},{"id":"1.10","gameId":"wuwa","name":"Brant","element":"Fusion","rarity":5,"announced":false,"portraitUrl":"https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.10.webp"}]}]}
+{
+  "version": 1,
+  "generatedAt": "2026-10-05T10:00:00Z",
+  "games": [
+    {
+      "id": "1",
+      "gameId": "wuwa",
+      "name": "Wuthering Waves",
+      "characters": [
+        {
+          "id": "1.1",
+          "gameId": "wuwa",
+          "name": "Sigrika",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.1.webp"
+        },
+        {
+          "id": "1.2",
+          "gameId": "wuwa",
+          "name": "Luuk Herssen",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.2.webp"
+        },
+        {
+          "id": "1.3",
+          "gameId": "wuwa",
+          "name": "Mornye",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.3.webp"
+        },
+        {
+          "id": "1.4",
+          "gameId": "wuwa",
+          "name": "Roccia",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.4.webp"
+        },
+        {
+          "id": "1.5",
+          "gameId": "wuwa",
+          "name": "Lynae",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.5.webp"
+        },
+        {
+          "id": "1.6",
+          "gameId": "wuwa",
+          "name": "Aalto",
+          "element": "Aero",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.6.webp"
+        },
+        {
+          "id": "1.7",
+          "gameId": "wuwa",
+          "name": "Augusta",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.7.webp"
+        },
+        {
+          "id": "1.8",
+          "gameId": "wuwa",
+          "name": "Baizhi",
+          "element": "Glacio",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.8.webp"
+        },
+        {
+          "id": "1.9",
+          "gameId": "wuwa",
+          "name": "Buling",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.9.webp"
+        },
+        {
+          "id": "1.10",
+          "gameId": "wuwa",
+          "name": "Brant",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.10.webp"
+        },
+        {
+          "id": "1.11",
+          "gameId": "wuwa",
+          "name": "Camellya",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.11.webp"
+        },
+        {
+          "id": "1.12",
+          "gameId": "wuwa",
+          "name": "Cantarella",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.12.webp"
+        },
+        {
+          "id": "1.13",
+          "gameId": "wuwa",
+          "name": "Carlotta",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.13.webp"
+        },
+        {
+          "id": "1.14",
+          "gameId": "wuwa",
+          "name": "Changli",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.14.webp"
+        },
+        {
+          "id": "1.15",
+          "gameId": "wuwa",
+          "name": "Shorekeeper",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.15.webp"
+        },
+        {
+          "id": "1.16",
+          "gameId": "wuwa",
+          "name": "Lumi",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.16.webp"
+        },
+        {
+          "id": "1.17",
+          "gameId": "wuwa",
+          "name": "Phoebe",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.17.webp"
+        },
+        {
+          "id": "1.18",
+          "gameId": "wuwa",
+          "name": "Xiangli Yao",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.18.webp"
+        },
+        {
+          "id": "1.19",
+          "gameId": "wuwa",
+          "name": "Youhu",
+          "element": "Glacio",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.19.webp"
+        },
+        {
+          "id": "1.20",
+          "gameId": "wuwa",
+          "name": "Zani",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.20.webp"
+        },
+        {
+          "id": "1.21",
+          "gameId": "wuwa",
+          "name": "Zhezhi",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.21.webp"
+        },
+        {
+          "id": "1.22",
+          "gameId": "wuwa",
+          "name": "Cartethyia",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.22.webp"
+        },
+        {
+          "id": "1.23",
+          "gameId": "wuwa",
+          "name": "Chisa",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.23.webp"
+        },
+        {
+          "id": "1.24",
+          "gameId": "wuwa",
+          "name": "Chixia",
+          "element": "Fusion",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.24.webp"
+        },
+        {
+          "id": "1.25",
+          "gameId": "wuwa",
+          "name": "Ciaccona",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.25.webp"
+        },
+        {
+          "id": "1.26",
+          "gameId": "wuwa",
+          "name": "Danjin",
+          "element": "Havoc",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.26.webp"
+        },
+        {
+          "id": "1.27",
+          "gameId": "wuwa",
+          "name": "Denia",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.27.webp"
+        },
+        {
+          "id": "1.28",
+          "gameId": "wuwa",
+          "name": "Encore",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.28.webp"
+        },
+        {
+          "id": "1.29",
+          "gameId": "wuwa",
+          "name": "Galbrena",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.29.webp"
+        },
+        {
+          "id": "1.30",
+          "gameId": "wuwa",
+          "name": "Hiyuki",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.30.webp"
+        },
+        {
+          "id": "1.31",
+          "gameId": "wuwa",
+          "name": "Hsin",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.31.webp"
+        },
+        {
+          "id": "1.32",
+          "gameId": "wuwa",
+          "name": "Iuno",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.32.webp"
+        },
+        {
+          "id": "1.33",
+          "gameId": "wuwa",
+          "name": "Jianxin",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.33.webp"
+        },
+        {
+          "id": "1.34",
+          "gameId": "wuwa",
+          "name": "Jinhsi",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.34.webp"
+        },
+        {
+          "id": "1.35",
+          "gameId": "wuwa",
+          "name": "Jingran",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.35.webp"
+        },
+        {
+          "id": "1.36",
+          "gameId": "wuwa",
+          "name": "Jiyan",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.36.webp"
+        },
+        {
+          "id": "1.37",
+          "gameId": "wuwa",
+          "name": "Lingyang",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.37.webp"
+        },
+        {
+          "id": "1.38",
+          "gameId": "wuwa",
+          "name": "Lupa",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.38.webp"
+        },
+        {
+          "id": "1.39",
+          "gameId": "wuwa",
+          "name": "Lucy",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.39.webp"
+        },
+        {
+          "id": "1.40",
+          "gameId": "wuwa",
+          "name": "Aemeath",
+          "element": "Fusion",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.40.webp"
+        },
+        {
+          "id": "1.41",
+          "gameId": "wuwa",
+          "name": "Mortefi",
+          "element": "Fusion",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.41.webp"
+        },
+        {
+          "id": "1.42",
+          "gameId": "wuwa",
+          "name": "Phrolova",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.42.webp"
+        },
+        {
+          "id": "1.43",
+          "gameId": "wuwa",
+          "name": "Qiuyuan",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.43.webp"
+        },
+        {
+          "id": "1.44",
+          "gameId": "wuwa",
+          "name": "Qingxiao",
+          "element": "Aero",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.44.webp"
+        },
+        {
+          "id": "1.45",
+          "gameId": "wuwa",
+          "name": "Rebecca",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.45.webp"
+        },
+        {
+          "id": "1.46",
+          "gameId": "wuwa",
+          "name": "Sanhua",
+          "element": "Glacio",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.46.webp"
+        },
+        {
+          "id": "1.47",
+          "gameId": "wuwa",
+          "name": "Suisui",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.47.webp"
+        },
+        {
+          "id": "1.48",
+          "gameId": "wuwa",
+          "name": "Suoming",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.48.webp"
+        },
+        {
+          "id": "1.49",
+          "gameId": "wuwa",
+          "name": "Taoqi",
+          "element": "Havoc",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.49.webp"
+        },
+        {
+          "id": "1.50",
+          "gameId": "wuwa",
+          "name": "Verina",
+          "element": "Spectro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.50.webp"
+        },
+        {
+          "id": "1.51",
+          "gameId": "wuwa",
+          "name": "Yangyang",
+          "element": "Aero",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.51.webp"
+        },
+        {
+          "id": "1.52",
+          "gameId": "wuwa",
+          "name": "Yangyang: Xuanling",
+          "element": "Havoc",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.52.webp"
+        },
+        {
+          "id": "1.53",
+          "gameId": "wuwa",
+          "name": "Yinlin",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.53.webp"
+        },
+        {
+          "id": "1.54",
+          "gameId": "wuwa",
+          "name": "Yuanwu",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.54.webp"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "gameId": "genshin",
+      "name": "Genshin Impact",
+      "characters": [
+        {
+          "id": "2.1",
+          "gameId": "genshin",
+          "name": "Aino",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.1.webp"
+        },
+        {
+          "id": "2.2",
+          "gameId": "genshin",
+          "name": "Albedo",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.2.webp"
+        },
+        {
+          "id": "2.3",
+          "gameId": "genshin",
+          "name": "Alhaitham",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.3.webp"
+        },
+        {
+          "id": "2.4",
+          "gameId": "genshin",
+          "name": "Aloy",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.4.webp"
+        },
+        {
+          "id": "2.5",
+          "gameId": "genshin",
+          "name": "Amber",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.5.webp"
+        },
+        {
+          "id": "2.6",
+          "gameId": "genshin",
+          "name": "Arataki Itto",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.6.webp"
+        },
+        {
+          "id": "2.7",
+          "gameId": "genshin",
+          "name": "Arlecchino",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.7.webp"
+        },
+        {
+          "id": "2.8",
+          "gameId": "genshin",
+          "name": "Baizhu",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.8.webp"
+        },
+        {
+          "id": "2.9",
+          "gameId": "genshin",
+          "name": "Barbara",
+          "element": "Hydro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.9.webp"
+        },
+        {
+          "id": "2.10",
+          "gameId": "genshin",
+          "name": "Beidou",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.10.webp"
+        },
+        {
+          "id": "2.11",
+          "gameId": "genshin",
+          "name": "Bennett",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.11.webp"
+        },
+        {
+          "id": "2.12",
+          "gameId": "genshin",
+          "name": "Candace",
+          "element": "Hydro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.12.webp"
+        },
+        {
+          "id": "2.13",
+          "gameId": "genshin",
+          "name": "Charlotte",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.13.webp"
+        },
+        {
+          "id": "2.14",
+          "gameId": "genshin",
+          "name": "Chasca",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.14.webp"
+        },
+        {
+          "id": "2.15",
+          "gameId": "genshin",
+          "name": "Chevreuse",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.15.webp"
+        },
+        {
+          "id": "2.16",
+          "gameId": "genshin",
+          "name": "Chiori",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.16.webp"
+        },
+        {
+          "id": "2.17",
+          "gameId": "genshin",
+          "name": "Chongyun",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.17.webp"
+        },
+        {
+          "id": "2.18",
+          "gameId": "genshin",
+          "name": "Citlali",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.18.webp"
+        },
+        {
+          "id": "2.19",
+          "gameId": "genshin",
+          "name": "Clorinde",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.19.webp"
+        },
+        {
+          "id": "2.20",
+          "gameId": "genshin",
+          "name": "Collei",
+          "element": "Dendro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.20.webp"
+        },
+        {
+          "id": "2.21",
+          "gameId": "genshin",
+          "name": "Columbina",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.21.webp"
+        },
+        {
+          "id": "2.22",
+          "gameId": "genshin",
+          "name": "Cyno",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.22.webp"
+        },
+        {
+          "id": "2.23",
+          "gameId": "genshin",
+          "name": "Dahlia",
+          "element": "Hydro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.23.webp"
+        },
+        {
+          "id": "2.24",
+          "gameId": "genshin",
+          "name": "Dehya",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.24.webp"
+        },
+        {
+          "id": "2.25",
+          "gameId": "genshin",
+          "name": "Diluc",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.25.webp"
+        },
+        {
+          "id": "2.26",
+          "gameId": "genshin",
+          "name": "Diona",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.26.webp"
+        },
+        {
+          "id": "2.27",
+          "gameId": "genshin",
+          "name": "Dori",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.27.webp"
+        },
+        {
+          "id": "2.28",
+          "gameId": "genshin",
+          "name": "Durin",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.28.webp"
+        },
+        {
+          "id": "2.29",
+          "gameId": "genshin",
+          "name": "Emilie",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.29.webp"
+        },
+        {
+          "id": "2.30",
+          "gameId": "genshin",
+          "name": "Escoffier",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.30.webp"
+        },
+        {
+          "id": "2.31",
+          "gameId": "genshin",
+          "name": "Eula",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.31.webp"
+        },
+        {
+          "id": "2.32",
+          "gameId": "genshin",
+          "name": "Faruzan",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.32.webp"
+        },
+        {
+          "id": "2.33",
+          "gameId": "genshin",
+          "name": "Fischl",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.33.webp"
+        },
+        {
+          "id": "2.34",
+          "gameId": "genshin",
+          "name": "Flins",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.34.webp"
+        },
+        {
+          "id": "2.35",
+          "gameId": "genshin",
+          "name": "Freminet",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.35.webp"
+        },
+        {
+          "id": "2.36",
+          "gameId": "genshin",
+          "name": "Furina",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.36.webp"
+        },
+        {
+          "id": "2.37",
+          "gameId": "genshin",
+          "name": "Gaming",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.37.webp"
+        },
+        {
+          "id": "2.38",
+          "gameId": "genshin",
+          "name": "Ganyu",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.38.webp"
+        },
+        {
+          "id": "2.39",
+          "gameId": "genshin",
+          "name": "Gorou",
+          "element": "Geo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.39.webp"
+        },
+        {
+          "id": "2.40",
+          "gameId": "genshin",
+          "name": "Hu Tao",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.40.webp"
+        },
+        {
+          "id": "2.41",
+          "gameId": "genshin",
+          "name": "Iansan",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.41.webp"
+        },
+        {
+          "id": "2.42",
+          "gameId": "genshin",
+          "name": "Ifa",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.42.webp"
+        },
+        {
+          "id": "2.43",
+          "gameId": "genshin",
+          "name": "Illuga",
+          "element": "Geo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.43.webp"
+        },
+        {
+          "id": "2.44",
+          "gameId": "genshin",
+          "name": "Ineffa",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.44.webp"
+        },
+        {
+          "id": "2.45",
+          "gameId": "genshin",
+          "name": "Jahoda",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.45.webp"
+        },
+        {
+          "id": "2.46",
+          "gameId": "genshin",
+          "name": "Jean",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.46.webp"
+        },
+        {
+          "id": "2.47",
+          "gameId": "genshin",
+          "name": "Kachina",
+          "element": "Geo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.47.webp"
+        },
+        {
+          "id": "2.48",
+          "gameId": "genshin",
+          "name": "Kaedehara Kazuha",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.48.webp"
+        },
+        {
+          "id": "2.49",
+          "gameId": "genshin",
+          "name": "Kaeya",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.49.webp"
+        },
+        {
+          "id": "2.50",
+          "gameId": "genshin",
+          "name": "Kamisato Ayaka",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.50.webp"
+        },
+        {
+          "id": "2.51",
+          "gameId": "genshin",
+          "name": "Kamisato Ayato",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.51.webp"
+        },
+        {
+          "id": "2.52",
+          "gameId": "genshin",
+          "name": "Kaveh",
+          "element": "Dendro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.52.webp"
+        },
+        {
+          "id": "2.53",
+          "gameId": "genshin",
+          "name": "Keqing",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.53.webp"
+        },
+        {
+          "id": "2.54",
+          "gameId": "genshin",
+          "name": "Kinich",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.54.webp"
+        },
+        {
+          "id": "2.55",
+          "gameId": "genshin",
+          "name": "Kirara",
+          "element": "Dendro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.55.webp"
+        },
+        {
+          "id": "2.56",
+          "gameId": "genshin",
+          "name": "Klee",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.56.webp"
+        },
+        {
+          "id": "2.57",
+          "gameId": "genshin",
+          "name": "Kujou Sara",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.57.webp"
+        },
+        {
+          "id": "2.58",
+          "gameId": "genshin",
+          "name": "Kuki Shinobu",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.58.webp"
+        },
+        {
+          "id": "2.59",
+          "gameId": "genshin",
+          "name": "Lan Yan",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.59.webp"
+        },
+        {
+          "id": "2.60",
+          "gameId": "genshin",
+          "name": "Lauma",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.60.webp"
+        },
+        {
+          "id": "2.61",
+          "gameId": "genshin",
+          "name": "Layla",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.61.webp"
+        },
+        {
+          "id": "2.62",
+          "gameId": "genshin",
+          "name": "Linnea",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.62.webp"
+        },
+        {
+          "id": "2.63",
+          "gameId": "genshin",
+          "name": "Lisa",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.63.webp"
+        },
+        {
+          "id": "2.64",
+          "gameId": "genshin",
+          "name": "Lohen",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.64.webp"
+        },
+        {
+          "id": "2.65",
+          "gameId": "genshin",
+          "name": "Lynette",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.65.webp"
+        },
+        {
+          "id": "2.66",
+          "gameId": "genshin",
+          "name": "Lyney",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.66.webp"
+        },
+        {
+          "id": "2.67",
+          "gameId": "genshin",
+          "name": "Mavuika",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.67.webp"
+        },
+        {
+          "id": "2.68",
+          "gameId": "genshin",
+          "name": "Mika",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.68.webp"
+        },
+        {
+          "id": "2.69",
+          "gameId": "genshin",
+          "name": "Mona",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.69.webp"
+        },
+        {
+          "id": "2.70",
+          "gameId": "genshin",
+          "name": "Mualani",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.70.webp"
+        },
+        {
+          "id": "2.71",
+          "gameId": "genshin",
+          "name": "Nahida",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.71.webp"
+        },
+        {
+          "id": "2.72",
+          "gameId": "genshin",
+          "name": "Navia",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.72.webp"
+        },
+        {
+          "id": "2.73",
+          "gameId": "genshin",
+          "name": "Nefer",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.73.webp"
+        },
+        {
+          "id": "2.74",
+          "gameId": "genshin",
+          "name": "Neuvillette",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.74.webp"
+        },
+        {
+          "id": "2.75",
+          "gameId": "genshin",
+          "name": "Nicole",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.75.webp"
+        },
+        {
+          "id": "2.76",
+          "gameId": "genshin",
+          "name": "Nilou",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.76.webp"
+        },
+        {
+          "id": "2.77",
+          "gameId": "genshin",
+          "name": "Ningguang",
+          "element": "Geo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.77.webp"
+        },
+        {
+          "id": "2.78",
+          "gameId": "genshin",
+          "name": "Noelle",
+          "element": "Geo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.78.webp"
+        },
+        {
+          "id": "2.79",
+          "gameId": "genshin",
+          "name": "Ororon",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.79.webp"
+        },
+        {
+          "id": "2.80",
+          "gameId": "genshin",
+          "name": "Prune",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.80.webp"
+        },
+        {
+          "id": "2.81",
+          "gameId": "genshin",
+          "name": "Qiqi",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.81.webp"
+        },
+        {
+          "id": "2.82",
+          "gameId": "genshin",
+          "name": "Raiden Shogun",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.82.webp"
+        },
+        {
+          "id": "2.83",
+          "gameId": "genshin",
+          "name": "Razor",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.83.webp"
+        },
+        {
+          "id": "2.84",
+          "gameId": "genshin",
+          "name": "Rosaria",
+          "element": "Cryo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.84.webp"
+        },
+        {
+          "id": "2.85",
+          "gameId": "genshin",
+          "name": "Sangonomiya Kokomi",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.85.webp"
+        },
+        {
+          "id": "2.86",
+          "gameId": "genshin",
+          "name": "Sayu",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.86.webp"
+        },
+        {
+          "id": "2.87",
+          "gameId": "genshin",
+          "name": "Sethos",
+          "element": "Electro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.87.webp"
+        },
+        {
+          "id": "2.88",
+          "gameId": "genshin",
+          "name": "Shenhe",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.88.webp"
+        },
+        {
+          "id": "2.89",
+          "gameId": "genshin",
+          "name": "Shikanoin Heizou",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.89.webp"
+        },
+        {
+          "id": "2.90",
+          "gameId": "genshin",
+          "name": "Sigewinne",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.90.webp"
+        },
+        {
+          "id": "2.91",
+          "gameId": "genshin",
+          "name": "Skirk",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.91.webp"
+        },
+        {
+          "id": "2.92",
+          "gameId": "genshin",
+          "name": "Sucrose",
+          "element": "Anemo",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.92.webp"
+        },
+        {
+          "id": "2.93",
+          "gameId": "genshin",
+          "name": "Tartaglia",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.93.webp"
+        },
+        {
+          "id": "2.94",
+          "gameId": "genshin",
+          "name": "Thoma",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.94.webp"
+        },
+        {
+          "id": "2.95",
+          "gameId": "genshin",
+          "name": "Tighnari",
+          "element": "Dendro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.95.webp"
+        },
+        {
+          "id": "2.96",
+          "gameId": "genshin",
+          "name": "Varesa",
+          "element": "Electro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.96.webp"
+        },
+        {
+          "id": "2.97",
+          "gameId": "genshin",
+          "name": "Varka",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.97.webp"
+        },
+        {
+          "id": "2.98",
+          "gameId": "genshin",
+          "name": "Venti",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.98.webp"
+        },
+        {
+          "id": "2.99",
+          "gameId": "genshin",
+          "name": "Wanderer",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.99.webp"
+        },
+        {
+          "id": "2.100",
+          "gameId": "genshin",
+          "name": "Wriothesley",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.100.webp"
+        },
+        {
+          "id": "2.101",
+          "gameId": "genshin",
+          "name": "Xiangling",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.101.webp"
+        },
+        {
+          "id": "2.102",
+          "gameId": "genshin",
+          "name": "Xianyun",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.102.webp"
+        },
+        {
+          "id": "2.103",
+          "gameId": "genshin",
+          "name": "Xiao",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.103.webp"
+        },
+        {
+          "id": "2.104",
+          "gameId": "genshin",
+          "name": "Xilonen",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.104.webp"
+        },
+        {
+          "id": "2.105",
+          "gameId": "genshin",
+          "name": "Xingqiu",
+          "element": "Hydro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.105.webp"
+        },
+        {
+          "id": "2.106",
+          "gameId": "genshin",
+          "name": "Xinyan",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.106.webp"
+        },
+        {
+          "id": "2.107",
+          "gameId": "genshin",
+          "name": "Yae Miko",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.107.webp"
+        },
+        {
+          "id": "2.108",
+          "gameId": "genshin",
+          "name": "Yanfei",
+          "element": "Pyro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.108.webp"
+        },
+        {
+          "id": "2.109",
+          "gameId": "genshin",
+          "name": "Yaoyao",
+          "element": "Dendro",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.109.webp"
+        },
+        {
+          "id": "2.110",
+          "gameId": "genshin",
+          "name": "Yelan",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.110.webp"
+        },
+        {
+          "id": "2.111",
+          "gameId": "genshin",
+          "name": "Yoimiya",
+          "element": "Pyro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.111.webp"
+        },
+        {
+          "id": "2.112",
+          "gameId": "genshin",
+          "name": "Yumemizuki Mizuki",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.112.webp"
+        },
+        {
+          "id": "2.113",
+          "gameId": "genshin",
+          "name": "Yun Jin",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.113.webp"
+        },
+        {
+          "id": "2.114",
+          "gameId": "genshin",
+          "name": "Zhongli",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.114.webp"
+        },
+        {
+          "id": "2.115",
+          "gameId": "genshin",
+          "name": "Zibai",
+          "element": "Geo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.115.webp"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "gameId": "starrail",
+      "name": "Honkai: Star Rail",
+      "characters": [
+        {
+          "id": "3.1",
+          "gameId": "starrail",
+          "name": "Acheron",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.1.webp"
+        },
+        {
+          "id": "3.2",
+          "gameId": "starrail",
+          "name": "Aglaea",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.2.webp"
+        },
+        {
+          "id": "3.3",
+          "gameId": "starrail",
+          "name": "Anaxa",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.3.webp"
+        },
+        {
+          "id": "3.4",
+          "gameId": "starrail",
+          "name": "Archer",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.4.webp"
+        },
+        {
+          "id": "3.5",
+          "gameId": "starrail",
+          "name": "Argenti",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.5.webp"
+        },
+        {
+          "id": "3.6",
+          "gameId": "starrail",
+          "name": "Arlan",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.6.webp"
+        },
+        {
+          "id": "3.7",
+          "gameId": "starrail",
+          "name": "Ashveil",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.7.webp"
+        },
+        {
+          "id": "3.8",
+          "gameId": "starrail",
+          "name": "Asta",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.8.webp"
+        },
+        {
+          "id": "3.9",
+          "gameId": "starrail",
+          "name": "Aventurine",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.9.webp"
+        },
+        {
+          "id": "3.10",
+          "gameId": "starrail",
+          "name": "Waveflair",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.10.webp"
+        },
+        {
+          "id": "3.11",
+          "gameId": "starrail",
+          "name": "Bailu",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.11.webp"
+        },
+        {
+          "id": "3.12",
+          "gameId": "starrail",
+          "name": "Black",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.12.webp"
+        },
+        {
+          "id": "3.13",
+          "gameId": "starrail",
+          "name": "Swan",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.13.webp"
+        },
+        {
+          "id": "3.14",
+          "gameId": "starrail",
+          "name": "Blade",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.14.webp"
+        },
+        {
+          "id": "3.15",
+          "gameId": "starrail",
+          "name": "Boothill",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.15.webp"
+        },
+        {
+          "id": "3.16",
+          "gameId": "starrail",
+          "name": "Bronya",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.16.webp"
+        },
+        {
+          "id": "3.17",
+          "gameId": "starrail",
+          "name": "Castorice",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.17.webp"
+        },
+        {
+          "id": "3.18",
+          "gameId": "starrail",
+          "name": "Cerydra",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.18.webp"
+        },
+        {
+          "id": "3.19",
+          "gameId": "starrail",
+          "name": "Cipher",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.19.webp"
+        },
+        {
+          "id": "3.20",
+          "gameId": "starrail",
+          "name": "Clara",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.20.webp"
+        },
+        {
+          "id": "3.21",
+          "gameId": "starrail",
+          "name": "Cyrene",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.21.webp"
+        },
+        {
+          "id": "3.22",
+          "gameId": "starrail",
+          "name": "Dan Heng",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.22.webp"
+        },
+        {
+          "id": "3.23",
+          "gameId": "starrail",
+          "name": "Dan Heng • Imbibitor Lunae",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.23.webp"
+        },
+        {
+          "id": "3.24",
+          "gameId": "starrail",
+          "name": "Dan Heng • Permansor Terrae",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.24.webp"
+        },
+        {
+          "id": "3.25",
+          "gameId": "starrail",
+          "name": "Dr Ratio",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.25.webp"
+        },
+        {
+          "id": "3.26",
+          "gameId": "starrail",
+          "name": "Evanescia",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.26.webp"
+        },
+        {
+          "id": "3.27",
+          "gameId": "starrail",
+          "name": "Feixiao",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.27.webp"
+        },
+        {
+          "id": "3.28",
+          "gameId": "starrail",
+          "name": "Firefly",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.28.webp"
+        },
+        {
+          "id": "3.29",
+          "gameId": "starrail",
+          "name": "Fu Xuan",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.29.webp"
+        },
+        {
+          "id": "3.30",
+          "gameId": "starrail",
+          "name": "Gallagher",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.30.webp"
+        },
+        {
+          "id": "3.31",
+          "gameId": "starrail",
+          "name": "Gepard",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.31.webp"
+        },
+        {
+          "id": "3.32",
+          "gameId": "starrail",
+          "name": "Gilgamesh",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.32.webp"
+        },
+        {
+          "id": "3.33",
+          "gameId": "starrail",
+          "name": "Guinaifen",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.33.webp"
+        },
+        {
+          "id": "3.34",
+          "gameId": "starrail",
+          "name": "Hanya",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.34.webp"
+        },
+        {
+          "id": "3.35",
+          "gameId": "starrail",
+          "name": "Herta",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.35.webp"
+        },
+        {
+          "id": "3.36",
+          "gameId": "starrail",
+          "name": "Himeko",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.36.webp"
+        },
+        {
+          "id": "3.37",
+          "gameId": "starrail",
+          "name": "Himeko Nova",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.37.webp"
+        },
+        {
+          "id": "3.38",
+          "gameId": "starrail",
+          "name": "Hook",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.38.webp"
+        },
+        {
+          "id": "3.39",
+          "gameId": "starrail",
+          "name": "Huohuo",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.39.webp"
+        },
+        {
+          "id": "3.40",
+          "gameId": "starrail",
+          "name": "Hyacine",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.40.webp"
+        },
+        {
+          "id": "3.41",
+          "gameId": "starrail",
+          "name": "Hysilens",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.41.webp"
+        },
+        {
+          "id": "3.42",
+          "gameId": "starrail",
+          "name": "Jade",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.42.webp"
+        },
+        {
+          "id": "3.43",
+          "gameId": "starrail",
+          "name": "Jiaoqiu",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.43.webp"
+        },
+        {
+          "id": "3.44",
+          "gameId": "starrail",
+          "name": "Jing Yuan",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.44.webp"
+        },
+        {
+          "id": "3.45",
+          "gameId": "starrail",
+          "name": "Jingliu",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.45.webp"
+        },
+        {
+          "id": "3.46",
+          "gameId": "starrail",
+          "name": "Kafka",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.46.webp"
+        },
+        {
+          "id": "3.47",
+          "gameId": "starrail",
+          "name": "Lingsha",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.47.webp"
+        },
+        {
+          "id": "3.48",
+          "gameId": "starrail",
+          "name": "Luka",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.48.webp"
+        },
+        {
+          "id": "3.49",
+          "gameId": "starrail",
+          "name": "Luocha",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.49.webp"
+        },
+        {
+          "id": "3.50",
+          "gameId": "starrail",
+          "name": "Lynx",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.50.webp"
+        },
+        {
+          "id": "3.51",
+          "gameId": "starrail",
+          "name": "March 7th",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.51.webp"
+        },
+        {
+          "id": "3.52",
+          "gameId": "starrail",
+          "name": "March 7th • Evernight",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.52.webp"
+        },
+        {
+          "id": "3.53",
+          "gameId": "starrail",
+          "name": "March 7th • The Hunt",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.53.webp"
+        },
+        {
+          "id": "3.54",
+          "gameId": "starrail",
+          "name": "Misha",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.54.webp"
+        },
+        {
+          "id": "3.55",
+          "gameId": "starrail",
+          "name": "Mortenax Blade",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.55.webp"
+        },
+        {
+          "id": "3.56",
+          "gameId": "starrail",
+          "name": "Moze",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.56.webp"
+        },
+        {
+          "id": "3.57",
+          "gameId": "starrail",
+          "name": "Mydei",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.57.webp"
+        },
+        {
+          "id": "3.58",
+          "gameId": "starrail",
+          "name": "Natasha",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.58.webp"
+        },
+        {
+          "id": "3.59",
+          "gameId": "starrail",
+          "name": "Pela",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.59.webp"
+        },
+        {
+          "id": "3.60",
+          "gameId": "starrail",
+          "name": "Phainon",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.60.webp"
+        },
+        {
+          "id": "3.61",
+          "gameId": "starrail",
+          "name": "Qingque",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.61.webp"
+        },
+        {
+          "id": "3.62",
+          "gameId": "starrail",
+          "name": "Rappa",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.62.webp"
+        },
+        {
+          "id": "3.63",
+          "gameId": "starrail",
+          "name": "Rin Tohsaka",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.63.webp"
+        },
+        {
+          "id": "3.64",
+          "gameId": "starrail",
+          "name": "Robin",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.64.webp"
+        },
+        {
+          "id": "3.65",
+          "gameId": "starrail",
+          "name": "Robin • Summeretto",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.65.webp"
+        },
+        {
+          "id": "3.66",
+          "gameId": "starrail",
+          "name": "Ruan Mei",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.66.webp"
+        },
+        {
+          "id": "3.67",
+          "gameId": "starrail",
+          "name": "Saber",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.67.webp"
+        },
+        {
+          "id": "3.68",
+          "gameId": "starrail",
+          "name": "Sampo",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.68.webp"
+        },
+        {
+          "id": "3.69",
+          "gameId": "starrail",
+          "name": "Seele",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.69.webp"
+        },
+        {
+          "id": "3.70",
+          "gameId": "starrail",
+          "name": "Serval",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.70.webp"
+        },
+        {
+          "id": "3.71",
+          "gameId": "starrail",
+          "name": "Silver Wolf",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.71.webp"
+        },
+        {
+          "id": "3.72",
+          "gameId": "starrail",
+          "name": "Silver Wolf • Lv. 999",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.72.webp"
+        },
+        {
+          "id": "3.73",
+          "gameId": "starrail",
+          "name": "Sparkle",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.73.webp"
+        },
+        {
+          "id": "3.74",
+          "gameId": "starrail",
+          "name": "Sparxie",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.74.webp"
+        },
+        {
+          "id": "3.75",
+          "gameId": "starrail",
+          "name": "Sunday",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.75.webp"
+        },
+        {
+          "id": "3.76",
+          "gameId": "starrail",
+          "name": "Sushang",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.76.webp"
+        },
+        {
+          "id": "3.77",
+          "gameId": "starrail",
+          "name": "The Dahlia",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.77.webp"
+        },
+        {
+          "id": "3.78",
+          "gameId": "starrail",
+          "name": "The Herta",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.78.webp"
+        },
+        {
+          "id": "3.79",
+          "gameId": "starrail",
+          "name": "Tingyun",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.79.webp"
+        },
+        {
+          "id": "3.80",
+          "gameId": "starrail",
+          "name": "Tingyun • Fugue",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.80.webp"
+        },
+        {
+          "id": "3.81",
+          "gameId": "starrail",
+          "name": "Topaz & Numby",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.81.webp"
+        },
+        {
+          "id": "3.82",
+          "gameId": "starrail",
+          "name": "Tribbie",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.82.webp"
+        },
+        {
+          "id": "3.83",
+          "gameId": "starrail",
+          "name": "Welt",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.83.webp"
+        },
+        {
+          "id": "3.84",
+          "gameId": "starrail",
+          "name": "Xueyi",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.84.webp"
+        },
+        {
+          "id": "3.85",
+          "gameId": "starrail",
+          "name": "Yanqing",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.85.webp"
+        },
+        {
+          "id": "3.86",
+          "gameId": "starrail",
+          "name": "Yao Guang",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.86.webp"
+        },
+        {
+          "id": "3.87",
+          "gameId": "starrail",
+          "name": "Yukong",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.87.webp"
+        },
+        {
+          "id": "3.88",
+          "gameId": "starrail",
+          "name": "Yunli",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.88.webp"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "gameId": "endfield",
+      "name": "Arknights: Endfield",
+      "characters": [
+        {
+          "id": "4.1",
+          "gameId": "endfield",
+          "name": "Arcane",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.1.webp"
+        },
+        {
+          "id": "4.2",
+          "gameId": "endfield",
+          "name": "Ardelia",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.2.webp"
+        },
+        {
+          "id": "4.3",
+          "gameId": "endfield",
+          "name": "Camille",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.3.webp"
+        },
+        {
+          "id": "4.4",
+          "gameId": "endfield",
+          "name": "Ember",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.4.webp"
+        },
+        {
+          "id": "4.5",
+          "gameId": "endfield",
+          "name": "Gilberta",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.5.webp"
+        },
+        {
+          "id": "4.6",
+          "gameId": "endfield",
+          "name": "Laevatain",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.6.webp"
+        },
+        {
+          "id": "4.7",
+          "gameId": "endfield",
+          "name": "Last Rite",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.7.webp"
+        },
+        {
+          "id": "4.8",
+          "gameId": "endfield",
+          "name": "Lifeng",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.8.webp"
+        },
+        {
+          "id": "4.9",
+          "gameId": "endfield",
+          "name": "Liino",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.9.webp"
+        },
+        {
+          "id": "4.10",
+          "gameId": "endfield",
+          "name": "Mi Fu",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.10.webp"
+        },
+        {
+          "id": "4.11",
+          "gameId": "endfield",
+          "name": "Pogranichnik",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.11.webp"
+        },
+        {
+          "id": "4.12",
+          "gameId": "endfield",
+          "name": "Rossi",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.12.webp"
+        },
+        {
+          "id": "4.13",
+          "gameId": "endfield",
+          "name": "Tangtang",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.13.webp"
+        },
+        {
+          "id": "4.14",
+          "gameId": "endfield",
+          "name": "Typhoeus",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.14.webp"
+        },
+        {
+          "id": "4.15",
+          "gameId": "endfield",
+          "name": "Yvonne",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.15.webp"
+        },
+        {
+          "id": "4.16",
+          "gameId": "endfield",
+          "name": "Zhuang Fangyi",
+          "element": "",
+          "rarity": 6,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.16.webp"
+        },
+        {
+          "id": "4.17",
+          "gameId": "endfield",
+          "name": "Alesh",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.17.webp"
+        },
+        {
+          "id": "4.18",
+          "gameId": "endfield",
+          "name": "Arclight",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.18.webp"
+        },
+        {
+          "id": "4.19",
+          "gameId": "endfield",
+          "name": "Avywenna",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.19.webp"
+        },
+        {
+          "id": "4.20",
+          "gameId": "endfield",
+          "name": "Chen Qianyu",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.20.webp"
+        },
+        {
+          "id": "4.21",
+          "gameId": "endfield",
+          "name": "Da Pan",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.21.webp"
+        },
+        {
+          "id": "4.22",
+          "gameId": "endfield",
+          "name": "Perlica",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.22.webp"
+        },
+        {
+          "id": "4.23",
+          "gameId": "endfield",
+          "name": "Purrchena",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.23.webp"
+        },
+        {
+          "id": "4.24",
+          "gameId": "endfield",
+          "name": "Snowshine",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.24.webp"
+        },
+        {
+          "id": "4.25",
+          "gameId": "endfield",
+          "name": "Wulfgard",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.25.webp"
+        },
+        {
+          "id": "4.26",
+          "gameId": "endfield",
+          "name": "Xaihi",
+          "element": "",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.26.webp"
+        },
+        {
+          "id": "4.27",
+          "gameId": "endfield",
+          "name": "Akekuri",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.27.webp"
+        },
+        {
+          "id": "4.28",
+          "gameId": "endfield",
+          "name": "Antal",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.28.webp"
+        },
+        {
+          "id": "4.29",
+          "gameId": "endfield",
+          "name": "Catcher",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.29.webp"
+        },
+        {
+          "id": "4.30",
+          "gameId": "endfield",
+          "name": "Estella",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.30.webp"
+        },
+        {
+          "id": "4.31",
+          "gameId": "endfield",
+          "name": "Fluorite",
+          "element": "",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.31.webp"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "gameId": "zzz",
+      "name": "Zenless Zone Zero",
+      "characters": [
+        {
+          "id": "5.1",
+          "gameId": "zzz",
+          "name": "Zhu Yuan",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.1.webp"
+        },
+        {
+          "id": "5.2",
+          "gameId": "zzz",
+          "name": "Zhao",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.2.webp"
+        },
+        {
+          "id": "5.3",
+          "gameId": "zzz",
+          "name": "Ukinami Yuzuha",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.3.webp"
+        },
+        {
+          "id": "5.4",
+          "gameId": "zzz",
+          "name": "Yixuan",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.4.webp"
+        },
+        {
+          "id": "5.5",
+          "gameId": "zzz",
+          "name": "Yidhari",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.5.webp"
+        },
+        {
+          "id": "5.6",
+          "gameId": "zzz",
+          "name": "Ye Shunguang",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.6.webp"
+        },
+        {
+          "id": "5.7",
+          "gameId": "zzz",
+          "name": "Tsukishiro Yanagi",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.7.webp"
+        },
+        {
+          "id": "5.8",
+          "gameId": "zzz",
+          "name": "Vivian",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.8.webp"
+        },
+        {
+          "id": "5.9",
+          "gameId": "zzz",
+          "name": "Velina Airgid",
+          "element": "Wind",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.9.webp"
+        },
+        {
+          "id": "5.10",
+          "gameId": "zzz",
+          "name": "Trigger",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.10.webp"
+        },
+        {
+          "id": "5.11",
+          "gameId": "zzz",
+          "name": "Sunna",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.11.webp"
+        },
+        {
+          "id": "5.12",
+          "gameId": "zzz",
+          "name": "Soukaku",
+          "element": "Ice",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.12.webp"
+        },
+        {
+          "id": "5.13",
+          "gameId": "zzz",
+          "name": "Soldier 11",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.13.webp"
+        },
+        {
+          "id": "5.14",
+          "gameId": "zzz",
+          "name": "Sigrid de L’Azur",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.14.webp"
+        },
+        {
+          "id": "5.15",
+          "gameId": "zzz",
+          "name": "Seth Lowell",
+          "element": "Electric",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.15.webp"
+        },
+        {
+          "id": "5.16",
+          "gameId": "zzz",
+          "name": "Seed",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.16.webp"
+        },
+        {
+          "id": "5.17",
+          "gameId": "zzz",
+          "name": "Roxy Ifrita Pryce",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.17.webp"
+        },
+        {
+          "id": "5.18",
+          "gameId": "zzz",
+          "name": "Alexandrina Sebastiane",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.18.webp"
+        },
+        {
+          "id": "5.19",
+          "gameId": "zzz",
+          "name": "Remielle Dan",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.19.webp"
+        },
+        {
+          "id": "5.20",
+          "gameId": "zzz",
+          "name": "Qingyi",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.20.webp"
+        },
+        {
+          "id": "5.21",
+          "gameId": "zzz",
+          "name": "Pyrois",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.21.webp"
+        },
+        {
+          "id": "5.22",
+          "gameId": "zzz",
+          "name": "Pulchra Fellini",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.22.webp"
+        },
+        {
+          "id": "5.23",
+          "gameId": "zzz",
+          "name": "Promeia",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.23.webp"
+        },
+        {
+          "id": "5.24",
+          "gameId": "zzz",
+          "name": "Piper Wheel",
+          "element": "Physical",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.24.webp"
+        },
+        {
+          "id": "5.25",
+          "gameId": "zzz",
+          "name": "Pan Yinhu",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.25.webp"
+        },
+        {
+          "id": "5.26",
+          "gameId": "zzz",
+          "name": "Orphie & Magus",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.26.webp"
+        },
+        {
+          "id": "5.27",
+          "gameId": "zzz",
+          "name": "Norma Hollowell",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.27.webp"
+        },
+        {
+          "id": "5.28",
+          "gameId": "zzz",
+          "name": "Nicole Demara",
+          "element": "Ether",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.28.webp"
+        },
+        {
+          "id": "5.29",
+          "gameId": "zzz",
+          "name": "Nekomiya Mana",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.29.webp"
+        },
+        {
+          "id": "5.30",
+          "gameId": "zzz",
+          "name": "Nangong Yu",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.30.webp"
+        },
+        {
+          "id": "5.31",
+          "gameId": "zzz",
+          "name": "Tsukishiro Miyabi",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.31.webp"
+        },
+        {
+          "id": "5.32",
+          "gameId": "zzz",
+          "name": "Komano Manato",
+          "element": "Physical",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.32.webp"
+        },
+        {
+          "id": "5.33",
+          "gameId": "zzz",
+          "name": "Von Lycaon",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.33.webp"
+        },
+        {
+          "id": "5.34",
+          "gameId": "zzz",
+          "name": "Lucy",
+          "element": "Fire",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.34.webp"
+        },
+        {
+          "id": "5.35",
+          "gameId": "zzz",
+          "name": "Lucia",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.35.webp"
+        },
+        {
+          "id": "5.36",
+          "gameId": "zzz",
+          "name": "Lighter",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.36.webp"
+        },
+        {
+          "id": "5.37",
+          "gameId": "zzz",
+          "name": "Koleda Belobog",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.37.webp"
+        },
+        {
+          "id": "5.38",
+          "gameId": "zzz",
+          "name": "Ju Fufu",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.38.webp"
+        },
+        {
+          "id": "5.39",
+          "gameId": "zzz",
+          "name": "Jane Doe",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.39.webp"
+        },
+        {
+          "id": "5.40",
+          "gameId": "zzz",
+          "name": "Hugo Vlad",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.40.webp"
+        },
+        {
+          "id": "5.41",
+          "gameId": "zzz",
+          "name": "Asaba Harumasa",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.41.webp"
+        },
+        {
+          "id": "5.42",
+          "gameId": "zzz",
+          "name": "Grace Howard",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.42.webp"
+        },
+        {
+          "id": "5.43",
+          "gameId": "zzz",
+          "name": "Evelyn Chevalier",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.43.webp"
+        },
+        {
+          "id": "5.44",
+          "gameId": "zzz",
+          "name": "Ellen Joe",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.44.webp"
+        },
+        {
+          "id": "5.45",
+          "gameId": "zzz",
+          "name": "Dialyn",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.45.webp"
+        },
+        {
+          "id": "5.46",
+          "gameId": "zzz",
+          "name": "Corin Wickes",
+          "element": "Physical",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.46.webp"
+        },
+        {
+          "id": "5.47",
+          "gameId": "zzz",
+          "name": "Claret Flint",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.47.webp"
+        },
+        {
+          "id": "5.48",
+          "gameId": "zzz",
+          "name": "Cissia",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.48.webp"
+        },
+        {
+          "id": "5.49",
+          "gameId": "zzz",
+          "name": "Caesar King",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.49.webp"
+        },
+        {
+          "id": "5.50",
+          "gameId": "zzz",
+          "name": "Burnice White",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.50.webp"
+        },
+        {
+          "id": "5.51",
+          "gameId": "zzz",
+          "name": "Starlight - Billy",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.51.webp"
+        },
+        {
+          "id": "5.52",
+          "gameId": "zzz",
+          "name": "Billy Kid",
+          "element": "Physical",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.52.webp"
+        },
+        {
+          "id": "5.53",
+          "gameId": "zzz",
+          "name": "Ben Bigger",
+          "element": "Fire",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.53.webp"
+        },
+        {
+          "id": "5.54",
+          "gameId": "zzz",
+          "name": "Banyue",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.54.webp"
+        },
+        {
+          "id": "5.55",
+          "gameId": "zzz",
+          "name": "Astra Yao",
+          "element": "Ether",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.55.webp"
+        },
+        {
+          "id": "5.56",
+          "gameId": "zzz",
+          "name": "Aria",
+          "element": "Wind",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.56.webp"
+        },
+        {
+          "id": "5.57",
+          "gameId": "zzz",
+          "name": "Anton Ivanov",
+          "element": "Electric",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.57.webp"
+        },
+        {
+          "id": "5.58",
+          "gameId": "zzz",
+          "name": "Soldier 0 - Anby",
+          "element": "Electric",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.58.webp"
+        },
+        {
+          "id": "5.59",
+          "gameId": "zzz",
+          "name": "Anby Demara",
+          "element": "Electric",
+          "rarity": 4,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.59.webp"
+        },
+        {
+          "id": "5.60",
+          "gameId": "zzz",
+          "name": "Alice Thymefield",
+          "element": "Physical",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.60.webp"
+        }
+      ]
+    }
+  ]
+}

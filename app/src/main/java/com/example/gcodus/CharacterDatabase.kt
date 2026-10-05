@@ -20,7 +20,28 @@ object CharacterDatabase {
     private const val DATA_URL = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/library/generated/characters.json"
 
     fun fetch(context: Context): List<OnlineCharacter> {
-        val json = try { get(DATA_URL) } catch (_: Exception) { return emptyList() }
+        val prefs = context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+        val json = try {
+            get(DATA_URL).also { prefs.edit().putString("character_feed_json", it).apply() }
+        } catch (_: Exception) {
+            prefs.getString("character_feed_json", null) ?: return emptyList()
+        }
+        return parse(json)
+    }
+
+    fun sync(context: Context): Boolean {
+        return try {
+            val fresh = get(DATA_URL)
+            JSONObject(fresh).optJSONArray("games") ?: return false
+            context.getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+                .edit().putString("character_feed_json", fresh).apply()
+            true
+        } catch (_: Exception) {
+            false
+        }
+    }
+
+    private fun parse(json: String): List<OnlineCharacter> {
         return try {
             val root = JSONObject(json)
             val games = root.optJSONArray("games") ?: return emptyList()

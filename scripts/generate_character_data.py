@@ -69,27 +69,24 @@ def process(path, prefix, game_id, game_name):
             "rarity": parse_rarity(ws.cell(r, rarity_col).value),
         })
 
-    # The original Excel files were created with Excel's numeric coercion,
-    # which turns 1.10 into 1.1. If duplicates are detected, repair the whole
-    # table deterministically from row order: 1.1, 1.2, ..., 1.10, ... .
-    valid_ids = [x["id"] for x in rows if valid_id(x["id"], prefix)]
-    if len(valid_ids) != len(set(valid_ids)):
-        for index, x in enumerate(rows, start=1):
-            x["id"] = f"{prefix}.{index}"
-            ws.cell(x["row"], id_col).value = x["id"]
-    else:
-        used = {int(x["id"].split(".", 1)[1]) for x in rows if valid_id(x["id"], prefix)}
-        counter = 1
-        for x in rows:
-            if not x["id"]:
-                while counter in used:
-                    counter += 1
-                x["id"] = f"{prefix}.{counter}"
-                used.add(counter)
-                ws.cell(x["row"], id_col).value = x["id"]
-                counter += 1
-            elif not valid_id(x["id"], prefix):
+    used = set()
+    for x in rows:
+        if x["id"]:
+            if not valid_id(x["id"], prefix):
                 raise SystemExit(f"{path}: invalid ID {x['id']} at row {x['row']}; expected {prefix}.N")
+            number = int(x["id"].split(".", 1)[1])
+            if number in used:
+                raise SystemExit(f"{path}: duplicate ID {x['id']} at row {x['row']}")
+            used.add(number)
+
+    counter = max(used, default=0) + 1
+    for x in rows:
+        if not x["id"]:
+            x["id"] = f"{prefix}.{counter}"
+            ws.cell(x["row"], id_col).number_format = "@"
+            ws.cell(x["row"], id_col).value = x["id"]
+            used.add(counter)
+            counter += 1
 
     result = [{
         "id": x["id"], "gameId": game_id, "name": x["name"],
@@ -101,7 +98,7 @@ def process(path, prefix, game_id, game_name):
 
 
 def main():
-    base = ROOT / "library"
+    base = ROOT / "library" / "seed"
     games = []
     for filename, meta in TABLES.items():
         path = base / filename

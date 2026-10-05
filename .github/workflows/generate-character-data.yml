@@ -3,7 +3,7 @@ name: Generate character data and portraits
 on:
   push:
     paths:
-      - 'library/*.xlsx'
+      - 'library/seed/*.xlsx'
       - 'library/seed/**'
       - 'images_big/**'
       - 'app/src/main/assets/**'
@@ -30,9 +30,6 @@ jobs:
 
       - name: Install Excel parser
         run: pip install openpyxl
-
-      - name: Repair invalid library Excel files
-        run: python scripts/ensure_library_xlsx.py
 
       - name: Normalize Excel, assign IDs and generate JSON
         run: python scripts/generate_character_data.py
@@ -66,7 +63,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add library/generated/characters.json library/generated/portrait_sync_report.json library/*.xlsx images/*.webp
+          git add library/generated/characters.json library/generated/portrait_sync_report.json library/seed/*.xlsx images/*.webp
           if git diff --cached --quiet; then
             echo 'No generated changes.'
           else
