@@ -1,0 +1,65 @@
+name: Generate banner data from Excel
+
+on:
+  push:
+    paths:
+      - 'banners/*.xlsx'
+      - 'scripts/generate_banner_data.py'
+      - '.github/workflows/generate-banner-data.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: banner-library-sync
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Excel parser
+        run: pip install openpyxl
+
+      - name: Generate banner feed
+        run: python scripts/generate_banner_data.py
+
+      - name: Validate banner feed
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('data/banner_feed.json')
+          data = json.loads(p.read_text(encoding='utf-8'))
+          assert len(data['games']) == 5
+          for game in data['games'].values():
+              for key in ('current','next','upcoming','history'):
+                  assert isinstance(game[key], list)
+              for phase in game['current'] + game['next'] + game['upcoming'] + game['history']:
+                  assert phase['phase']
+                  assert phase['start']
+                  assert phase['end']
+                  assert phase['source_status'] in ('confirmed','unconfirmed')
+          print('Banner feed validation passed.')
+          PY
+
+      - name: Commit generated feed and initial Excel tables
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/banner_feed.json banners/*.xlsx
+          if git diff --cached --quiet; then
+            echo 'No generated changes.'
+          else
+            git commit -m 'Sync banner library from Excel tables'
+            git push
+          fi
