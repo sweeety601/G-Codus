@@ -8,7 +8,7 @@ android {
         applicationId = "com.example.gcodusadmin"
         minSdk = 26
         targetSdk = 36
-        versionCode = 8
+        versionCode = 9
         versionName = "2.0.3"
     }
     compileOptions {
