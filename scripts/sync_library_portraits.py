@@ -17,7 +17,6 @@ TABLES = {
 }
 
 ALIASES = {
-    # Wuthering Waves
     ("wuwa", "Augusta"): "aug",
     ("wuwa", "Hiyuki"): "hiyuki",
     ("wuwa", "Jianxin"): "jianxin",
@@ -26,7 +25,6 @@ ALIASES = {
     ("wuwa", "The Shorekeeper"): "shorekeeper",
     ("wuwa", "Shorekeeper"): "shorekeeper",
     ("wuwa", "Yangyang"): "yangyang",
-    # Zenless Zone Zero
     ("zzz", "Billy"): "billy-kid",
     ("zzz", "Billy Kid"): "billy-kid",
     ("zzz", "Nicole"): "nicole-demara",
@@ -61,12 +59,10 @@ ALIASES = {
     ("zzz", "Qingyi"): "qingyi",
     ("zzz", "Nekomata"): "nekomata",
     ("zzz", "Nekomiya Mana"): "nekomata",
-    # Honkai: Star Rail
     ("starrail", "Dan Heng • Imbibitor Lunae"): "imbibitor-lunae",
     ("starrail", "Dan Heng Imbibitor Lunae"): "imbibitor-lunae",
     ("starrail", "Imbibitor Lunae"): "imbibitor-lunae",
     ("starrail", "Mortenax Blade"): "blade-mortenax",
-    ("starrail", "Blade Mortenax"): "blade-mortenax",
     ("starrail", "March 7th • Evernight"): "march-7th-evernight",
     ("starrail", "March 7th • The Hunt"): "march-7th-swordmaster",
     ("starrail", "Tingyun • Fugue"): "tingyun-fugue",
@@ -74,7 +70,6 @@ ALIASES = {
     ("starrail", "The Herta"): "the-herta",
     ("starrail", "Himeko Nova"): "himeko-nova",
     ("starrail", "Silver Wolf • Lv. 999"): "silver-wolf-lv-999",
-    # Endfield
     ("endfield", "Last Rite"): "last-rite",
     ("endfield", "Mi Fu"): "mi-fu",
     ("endfield", "Zhuang Fangyi"): "zhuang-fangyi",
@@ -91,13 +86,13 @@ def source_files(game_id):
         "genshin": [ROOT / "images_big" / "genshin"],
         "wuwa": [ROOT / "images_big" / "wuthering_waves"],
         "zzz": [ROOT / "images_big" / "zenless_zone_zero"],
-        "starrail": [ROOT / "app" / "src" / "main" / "assets" / "honkai_star_rail"],
-        "endfield": [ROOT / "app" / "src" / "main" / "assets" / "arknights_endfield"],
+        "starrail": [ROOT / "images_big" / "honkai_star_rail", ROOT / "app" / "src" / "main" / "assets" / "honkai_star_rail"],
+        "endfield": [ROOT / "images_big" / "arknights_endfield", ROOT / "app" / "src" / "main" / "assets" / "arknights_endfield"],
     }
     files = []
     for root in roots[game_id]:
         if root.exists():
-            files.extend(p for p in root.iterdir() if p.is_file() and p.suffix.lower() in {".webp", ".png", ".jpg", ".jpeg"})
+            files.extend(p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in {".webp", ".png", ".jpg", ".jpeg"})
     return files
 
 
@@ -116,21 +111,17 @@ def find_source(game_id, name, files):
         exact = [p for p in files if norm(stem_for(p)) == a]
         if exact:
             return exact[0]
-
     n = norm(name)
     exact = [p for p in files if norm(stem_for(p)) == n]
     if exact:
         return exact[0]
-
-    # A conservative fallback for full names where the local asset uses the
-    # short/common character name.
     candidates = [p for p in files if n and (n in norm(stem_for(p)) or norm(stem_for(p)) in n)]
     if len(candidates) == 1:
         return candidates[0]
     return None
 
 
-def read_rows(path, prefix):
+def read_rows(path):
     wb = load_workbook(path, read_only=True, data_only=True)
     ws = wb.active
     headers = [str(c.value or "").strip().lower() for c in ws[1]]
@@ -149,13 +140,12 @@ def main():
     IMAGES.mkdir(parents=True, exist_ok=True)
     report = {"copied": [], "missing": [], "duplicates": []}
     seen_ids = set()
-
     for filename, (prefix, game_id, game_name) in TABLES.items():
         path = LIBRARY / filename
         if not path.exists():
             raise SystemExit(f"Missing library table: {path}")
         files = source_files(game_id)
-        for cid, name in read_rows(path, prefix):
+        for cid, name in read_rows(path):
             if cid in seen_ids:
                 report["duplicates"].append(cid)
                 continue
@@ -165,21 +155,16 @@ def main():
                 report["missing"].append({"id": cid, "game": game_name, "name": name})
                 continue
             target = IMAGES / f"{cid}.webp"
-            if source.resolve() != target.resolve():
-                shutil.copyfile(source, target)
+            shutil.copyfile(source, target)
             report["copied"].append({"id": cid, "game": game_name, "name": name, "source": str(source.relative_to(ROOT))})
-
     (LIBRARY / "generated").mkdir(parents=True, exist_ok=True)
-    (LIBRARY / "generated" / "portrait_sync_report.json").write_text(
-        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
+    (LIBRARY / "generated" / "portrait_sync_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     if report["duplicates"]:
         raise SystemExit(f"Duplicate IDs: {report['duplicates']}")
     print(f"Copied portraits: {len(report['copied'])}")
     print(f"Missing portraits: {len(report['missing'])}")
     for item in report["missing"]:
         print(f"MISSING {item['id']} | {item['game']} | {item['name']}")
-
 
 if __name__ == "__main__":
     main()
