@@ -67,12 +67,16 @@ object BannerSource {
 
     private fun readRows(base: String, confirmed: Boolean): List<BannerRowData> {
         val suffix = if (confirmed) "confirmed" else "leaks"
-        val rows = RemoteXlsx.fetchRows(
-            listOf(
-                "banners/" + base + "_" + suffix + ".xlsx",
-                "banners/" + base + "_" + suffix
+        val rows = try {
+            RemoteXlsx.fetchRows(
+                listOf(
+                    "banners/" + base + "_" + suffix + ".xlsx",
+                    "banners/" + base + "_" + suffix
+                )
             )
-        )
+        } catch (_: Exception) {
+            emptyList()
+        }
         if (rows.isEmpty()) return emptyList()
 
         val header = rows.first().map { it.trim().lowercase().replace("ё", "е") }
