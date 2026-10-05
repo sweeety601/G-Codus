@@ -13,6 +13,7 @@ class GitHubClient(private val token: String) {
     companion object {
         const val REPO = "sweeety601/G-Codus"
         private const val API = "https://api.github.com"
+        private const val RAW = "https://raw.githubusercontent.com"
     }
 
     private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
@@ -24,7 +25,7 @@ class GitHubClient(private val token: String) {
         conn.setRequestProperty("Accept", "application/vnd.github+json")
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
         if (authorized && token.isNotBlank()) conn.setRequestProperty("Authorization", "Bearer " + token)
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.10")
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.11")
         return conn
     }
 
@@ -39,25 +40,43 @@ class GitHubClient(private val token: String) {
     }
 
     fun getFile(path: String): GitFile {
-        // The repository is public. Request the normal JSON Contents representation
-        // without authentication and decode GitHub's base64 content locally.
-        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = false)
-        val code = conn.responseCode
-        val text = body(conn)
-        if (code !in 200..299) {
-            throw IllegalStateException(
-                "Не удалось прочитать " + path + ": GitHub HTTP " + code + " — " + shortError(text)
-            )
+        // First use the authenticated Contents API. This avoids anonymous API
+        // rate limits and makes the supplied PAT actually useful for reading.
+        val api = apiConnection("GET", "contents/" + path + "?ref=main", authorized = true)
+        val code = api.responseCode
+        val text = body(api)
+        if (code in 200..299) {
+            val json = JSONObject(text)
+            if (json.optString("type") != "file") {
+                throw IllegalStateException("GitHub вернул не файл: " + path)
+            }
+            val encoded = json.optString("content").replace("\\s".toRegex(), "")
+            if (encoded.isNotBlank()) {
+                val bytes = Base64.decode(encoded, Base64.DEFAULT)
+                if (bytes.isNotEmpty()) return GitFile(bytes, json.optString("sha").ifBlank { null })
+            }
+            // Some GitHub responses may omit content; fall through to raw.
         }
-        val json = JSONObject(text)
-        if (json.optString("type") != "file") {
-            throw IllegalStateException("GitHub вернул не файл: " + path)
+
+        // Public-file fallback. This is deliberately independent of the API
+        // response body and is useful when Contents API refuses binary content.
+        val rawUrl = RAW + "/" + REPO + "/main/" + path
+        val raw = URL(rawUrl).openConnection() as HttpURLConnection
+        raw.requestMethod = "GET"
+        raw.instanceFollowRedirects = true
+        raw.connectTimeout = 20_000
+        raw.readTimeout = 30_000
+        raw.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.11")
+        val rawCode = raw.responseCode
+        if (rawCode in 200..299) {
+            val bytes = raw.inputStream.use { it.readBytes() }
+            if (bytes.isNotEmpty()) return GitFile(bytes, null)
         }
-        val encoded = json.optString("content").replace("\\s".toRegex(), "")
-        if (encoded.isBlank()) throw IllegalStateException("GitHub не вернул содержимое файла: " + path)
-        val bytes = Base64.decode(encoded, Base64.DEFAULT)
-        if (bytes.isEmpty()) throw IllegalStateException("GitHub вернул пустой файл: " + path)
-        return GitFile(bytes, json.optString("sha").ifBlank { null })
+
+        val apiMessage = shortError(text)
+        throw IllegalStateException(
+            "Не удалось прочитать файл " + path + ". GitHub API HTTP " + code + " — " + apiMessage + "; RAW HTTP " + rawCode
+        )
     }
 
     fun getFileSha(path: String): String? {
