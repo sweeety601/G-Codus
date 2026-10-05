@@ -203,7 +203,8 @@ class MainActivity : AppCompatActivity() {
                     try {
                         val fresh = BannerSource.fetchNormalized(this@MainActivity)
                         JSONObject(fresh).getJSONArray("games")
-                        prefs.edit().putString("banner_feed", fresh).apply()
+                        // The G-Codus repository database is the only banner source.
+                        // Never persist or read a separate banner cache.
                         bannerFeedJson = fresh
                         runOnUiThread {
                             if (!isFinishing && currentScreen == Screen.GAME && currentGameId == gameId) {
