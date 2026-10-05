@@ -4,38 +4,44 @@ import org.w3c.dom.Node
 import java.io.ByteArrayInputStream
 import java.net.HttpURLConnection
 import java.net.URL
-import java.util.concurrent.ConcurrentHashMap
 import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
+/**
+ * Excel is the only runtime data source.
+ *
+ * The app never writes an Excel copy, JSON snapshot, ETag cache, or other
+ * intermediate database to disk. A table is fetched from GitHub, parsed in
+ * memory, and immediately converted to rows.
+ */
 object RemoteXlsx {
-    private data class CachedFile(val bytes: ByteArray)
-
-    private val cache = ConcurrentHashMap<String, CachedFile>()
 
     fun fetchRows(pathCandidates: List<String>): MutableList<MutableList<String>> {
         var lastError: Exception? = null
         for (path in pathCandidates) {
             try {
-                return read(fetchBytes(path))
+                return readFromRemote(path)
             } catch (e: Exception) {
                 lastError = e
             }
         }
-        throw lastError ?: IllegalStateException("Не удалось получить Excel")
+        throw lastError ?: IllegalStateException("Не удалось прочитать Excel")
     }
 
-    private fun fetchBytes(path: String): ByteArray {
+    private fun readFromRemote(path: String): MutableList<MutableList<String>> {
         val encodedPath = path.split('/').joinToString("/") {
             java.net.URLEncoder.encode(it, "UTF-8").replace("+", "%20")
         }
-        // raw.githubusercontent.com can serve a cached copy. A changing query
-        // parameter forces the request to resolve the current file from GitHub.
+
+        // There is deliberately no local/intermediate cache here.
+        // The current table is read from the repository on every request.
         val url = URL(
             "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" +
-                encodedPath + "?gcodus_refresh=" + System.currentTimeMillis()
+                encodedPath +
+                "?gcodus_refresh=" + System.currentTimeMillis()
         )
         val connection = url.openConnection() as HttpURLConnection
+
         return try {
             connection.connectTimeout = 15_000
             connection.readTimeout = 20_000
@@ -48,9 +54,10 @@ object RemoteXlsx {
 
             when (connection.responseCode) {
                 in 200..299 -> {
-                    val bytes = connection.inputStream.use { it.readBytes() }
-                    cache[path] = CachedFile(bytes)
-                    bytes
+                    // The XLSX bytes exist only in memory for this read.
+                    connection.inputStream.use { input ->
+                        readZip(input)
+                    }
                 }
                 else -> error("HTTP " + connection.responseCode + " for " + path)
             }
@@ -59,9 +66,10 @@ object RemoteXlsx {
         }
     }
 
-    private fun read(bytes: ByteArray): MutableList<MutableList<String>> {
+    private fun readZip(input: java.io.InputStream): MutableList<MutableList<String>> {
         val entries = HashMap<String, ByteArray>()
-        ZipInputStream(ByteArrayInputStream(bytes)).use { zip ->
+
+        ZipInputStream(input).use { zip ->
             while (true) {
                 val entry = zip.nextEntry ?: break
                 entries[entry.name] = zip.readBytes()
