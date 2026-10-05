@@ -1,0 +1,33 @@
+name: Migrate character tracking to repository data
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/migrate_character_repository.py'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run migration
+        run: python scripts/migrate_character_repository.py
+
+      - name: Commit migration
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add app/src/main/java/com/example/gcodus/MainActivity.kt app/src/main/java/com/example/gcodus/CharacterDatabase.kt
+          if git diff --cached --quiet; then
+            echo 'Migration already applied.'
+          else
+            git commit -m 'Use repository character tables and ID portraits'
+            git push
+          fi
