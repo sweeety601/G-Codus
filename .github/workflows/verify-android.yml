@@ -32,6 +32,16 @@ jobs:
           gradle-version: "9.8.0"
       - name: Assemble debug APKs
         run: ./gradlew :app:assembleDebug :admin:assembleDebug --stacktrace
+      - name: Verify main APK contains no bundled character data
+        run: |
+          set -e
+          unzip -l app/build/outputs/apk/debug/app-debug.apk > /tmp/gcodus-apk-files.txt
+          if grep -E 'assets/.*\\.webp|assets/banner_feed\\.json|drawable.*/banner_.*\\.webp' /tmp/gcodus-apk-files.txt; then
+            echo 'ERROR: bundled character data detected in main APK'
+            exit 1
+          fi
+          echo 'Main APK contains no bundled character assets or local banner feed.'
+
       - name: Upload main app
         uses: actions/upload-artifact@v4
         with:
