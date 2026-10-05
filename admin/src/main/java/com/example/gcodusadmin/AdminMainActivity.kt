@@ -235,7 +235,7 @@ class AdminMainActivity : AppCompatActivity() {
 
             val search = EditText(this).apply {
                 hint = "Поиск по имени или ID"
-                setTextColor(text); setHintTextColor(muted); setSingleLine()
+                setTextColor(ink); setHintTextColor(muted); setSingleLine()
                 setPadding(dp(14),dp(10),dp(14),dp(10)); setBackgroundColor(surface)
             }
             box.addView(search, lp())
@@ -372,7 +372,7 @@ class AdminMainActivity : AppCompatActivity() {
     ) {
         val search = EditText(this).apply {
             hint = "Поиск по имени или ID"
-            setTextColor(text); setHintTextColor(muted); setSingleLine()
+            setTextColor(ink); setHintTextColor(muted); setSingleLine()
         }
         val listBox = vertical()
         val scroll = ScrollView(this).apply { addView(listBox) }
@@ -389,7 +389,7 @@ class AdminMainActivity : AppCompatActivity() {
                 val cb = CheckBox(this).apply {
                     text = c.id + "  " + c.name + "  ★" + c.rarity
                     isChecked = selected.contains(c.id)
-                    setTextColor(text)
+                    setTextColor(ink)
                     setPadding(dp(6),dp(7),dp(6),dp(7))
                     setOnCheckedChangeListener { _, checked ->
                         if (checked) { if (!selected.contains(c.id)) selected.add(c.id) }
@@ -439,7 +439,7 @@ class AdminMainActivity : AppCompatActivity() {
             this.hint = hint
             setText(value)
             isEnabled = enabled
-            setTextColor(text); setHintTextColor(muted)
+            setTextColor(ink); setHintTextColor(muted)
             setSingleLine(true)
             setPadding(dp(14),dp(10),dp(14),dp(10))
             setBackgroundColor(surface)
@@ -486,7 +486,7 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun title(value: String) = TextView(this).apply {
-        text = value; textSize = 24f; setTextColor(text); typeface = Typeface.DEFAULT_BOLD
+        text = value; textSize = 24f; setTextColor(ink); typeface = Typeface.DEFAULT_BOLD
         setPadding(0,dp(8),0,dp(4))
     }
 
@@ -497,12 +497,12 @@ class AdminMainActivity : AppCompatActivity() {
     }
 
     private fun button(value: String) = Button(this).apply {
-        text = value; setTextColor(text); textSize = 13f
+        text = value; setTextColor(ink); textSize = 13f
         isAllCaps = false
     }
 
     private fun bigButton(value: String) = Button(this).apply {
-        text = value; setTextColor(text); textSize = 15f
+        text = value; setTextColor(ink); textSize = 15f
         isAllCaps = false
         setBackgroundColor(accent)
     }
