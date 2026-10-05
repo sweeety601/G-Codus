@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'data/characters/**'
+      - 'images/*.webp'
       - 'scripts/build_character_feed.py'
   workflow_dispatch:
 
