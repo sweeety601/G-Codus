@@ -14,7 +14,10 @@ TABLES = {
 }
 OUT = ROOT / "library" / "generated" / "characters.json"
 IMAGE_BASE = "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images"
-ALIASES = {"Имя персонажа":"name", "Имя":"name", "Стихия":"element", "Элемент":"element", "Редкость":"rarity", "Rarity":"rarity", "ID":"id"}
+ALIASES = {
+    "Имя персонажа": "name", "Имя": "name", "Стихия": "element", "Элемент": "element",
+    "Редкость": "rarity", "Rarity": "rarity", "ID": "id",
+}
 
 
 def parse_rarity(v):
@@ -22,45 +25,79 @@ def parse_rarity(v):
     return int(m.group()) if m else 0
 
 
+def valid_id(value, prefix):
+    return bool(re.fullmatch(rf"{re.escape(prefix)}\.\d+", str(value or "").strip()))
+
+
 def process(path, prefix, game_id, game_name):
     wb = load_workbook(path)
     ws = wb.active
     headers = [str(c.value or "").strip() for c in ws[1]]
+
+    # Portrait is no longer data in Excel. Remove it automatically so old
+    # uploaded workbooks become compatible without manual editing.
+    portrait_cols = [i + 1 for i, h in enumerate(headers) if h.lower() in {"портрет", "portrait"}]
+    for col in reversed(portrait_cols):
+        ws.delete_cols(col, 1)
+    headers = [str(c.value or "").strip() for c in ws[1]]
+
     mapped = [ALIASES.get(h, h) for h in headers]
-    if "Портрет" in headers or "Portrait" in headers:
-        raise SystemExit(f"{path}: remove the Portrait column; portraits are images/<ID>.webp")
     required = {"name", "element", "rarity"}
     if not required.issubset(set(mapped)):
         raise SystemExit(f"{path}: required columns are Имя персонажа, Стихия, Редкость")
+
     if "id" not in mapped:
         ws.insert_cols(1)
         ws.cell(1, 1).value = "ID"
         mapped.insert(0, "id")
+
     id_col = mapped.index("id") + 1
     name_col = mapped.index("name") + 1
     element_col = mapped.index("element") + 1
     rarity_col = mapped.index("rarity") + 1
+
     rows = []
     for r in range(2, ws.max_row + 1):
         name = str(ws.cell(r, name_col).value or "").strip()
         if not name:
             continue
-        rows.append({"row": r, "id": str(ws.cell(r, id_col).value or "").strip(), "name": name, "element": str(ws.cell(r, element_col).value or "").strip(), "rarity": parse_rarity(ws.cell(r, rarity_col).value)})
-    used = {int(x["id"].split(".")[1]) for x in rows if re.fullmatch(rf"{prefix}\.\d+", x["id"])}
-    counter = 1
-    for x in rows:
-        if not x["id"]:
-            while counter in used:
-                counter += 1
-            x["id"] = f"{prefix}.{counter}"
-            used.add(counter)
+        rows.append({
+            "row": r,
+            "id": str(ws.cell(r, id_col).value or "").strip(),
+            "name": name,
+            "element": str(ws.cell(r, element_col).value or "").strip(),
+            "rarity": parse_rarity(ws.cell(r, rarity_col).value),
+        })
+
+    # The original Excel files were created with Excel's numeric coercion,
+    # which turns 1.10 into 1.1. If duplicates are detected, repair the whole
+    # table deterministically from row order: 1.1, 1.2, ..., 1.10, ... .
+    valid_ids = [x["id"] for x in rows if valid_id(x["id"], prefix)]
+    if len(valid_ids) != len(set(valid_ids)):
+        for index, x in enumerate(rows, start=1):
+            x["id"] = f"{prefix}.{index}"
             ws.cell(x["row"], id_col).value = x["id"]
-            counter += 1
-        elif not re.fullmatch(rf"{prefix}\.\d+", x["id"]):
-            raise SystemExit(f"{path}: invalid ID {x['id']} at row {x['row']}; expected {prefix}.N")
-    result = [{"id":x["id"], "gameId":game_id, "name":x["name"], "element":x["element"], "rarity":x["rarity"], "announced":False, "portraitUrl":f"{IMAGE_BASE}/{x['id']}.webp"} for x in rows]
+    else:
+        used = {int(x["id"].split(".", 1)[1]) for x in rows if valid_id(x["id"], prefix)}
+        counter = 1
+        for x in rows:
+            if not x["id"]:
+                while counter in used:
+                    counter += 1
+                x["id"] = f"{prefix}.{counter}"
+                used.add(counter)
+                ws.cell(x["row"], id_col).value = x["id"]
+                counter += 1
+            elif not valid_id(x["id"], prefix):
+                raise SystemExit(f"{path}: invalid ID {x['id']} at row {x['row']}; expected {prefix}.N")
+
+    result = [{
+        "id": x["id"], "gameId": game_id, "name": x["name"],
+        "element": x["element"], "rarity": x["rarity"], "announced": False,
+        "portraitUrl": f"{IMAGE_BASE}/{x['id']}.webp"
+    } for x in rows]
     wb.save(path)
-    return {"id":prefix, "gameId":game_id, "name":game_name, "characters":result}
+    return {"id": prefix, "gameId": game_id, "name": game_name, "characters": result}
 
 
 def main():
@@ -71,7 +108,7 @@ def main():
         if not path.exists():
             raise SystemExit(f"Missing source: {path}")
         games.append(process(path, *meta))
-    payload = {"version":1, "generatedAt":datetime.now(timezone.utc).isoformat(), "games":games}
+    payload = {"version": 1, "generatedAt": datetime.now(timezone.utc).isoformat(), "games": games}
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
