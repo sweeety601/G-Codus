@@ -66,7 +66,7 @@ class AdminMainActivity : AppCompatActivity() {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
         if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
-        box.addView(label("G-Codus Admin v2.0.8", muted, 14f))
+        box.addView(label("G-Codus Admin v2.0.10", muted, 14f))
         box.addView(space(10))
         box.addView(label("Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
         val input = EditText(this).apply {
@@ -92,7 +92,7 @@ class AdminMainActivity : AppCompatActivity() {
     private fun showHome() {
         val box = vertical()
         box.addView(title("G-Codus Admin"))
-        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.8", muted, 14f))
+        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.10", muted, 14f))
         box.addView(bigButton("Добавить персонажа в базу").also { it.setOnClickListener { chooseGame { game -> showCharacterEditor(game, null) } } }, lp(0, 70))
         box.addView(bigButton("Редактировать базу данных персонажей").also { it.setOnClickListener { showCharacterDatabase() } }, lp(0, 70))
         box.addView(bigButton("График баннеров").also { it.setOnClickListener { chooseGame { game -> showBannerTypes(game) } } }, lp(0, 70))
@@ -192,17 +192,24 @@ class AdminMainActivity : AppCompatActivity() {
     private fun addBack(box: LinearLayout) { box.addView(button("← Назад").also { it.setOnClickListener { showHome() } }, lp()) }
     private fun vertical() = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(dp(24), dp(24), dp(24), dp(24)); setBackgroundColor(bg) }
     private fun horizontal() = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL; setBackgroundColor(bg) }
-    private fun wrap(v: View): ScrollView = ScrollView(this).apply { setBackgroundColor(bg); addView(v) }
-    private fun title(text: String): TextView = label(text, ink, 28f, true)
-    private fun label(text: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { this.text = text; setTextColor(color); textSize = size; if (bold) typeface = Typeface.DEFAULT_BOLD; setPadding(0, dp(8), 0, dp(8)) }
-    private fun button(text: String) = Button(this).apply { this.text = text; textSize = 16f }
-    private fun bigButton(text: String) = Button(this).apply { this.text = text; textSize = 17f; setTextColor(Color.WHITE); setBackgroundColor(accent) }
-    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface); layoutParams = lp(0, 54) }
-    private fun spinner(items: List<String>, selected: String?): Spinner = Spinner(this).apply { adapter = ArrayAdapter(this@AdminMainActivity, android.R.layout.simple_spinner_dropdown_item, items); selected?.let { val i = items.indexOf(it); if (i >= 0) setSelection(i) } }
-    private fun space(h: Int) = Space(this).apply { layoutParams = lp(0, h) }
-    private fun lp(w: Int = 0, h: Int = -2): LinearLayout.LayoutParams = LinearLayout.LayoutParams(if (w == 0) -1 else dp(w), if (h < 0) h else dp(h)).apply { setMargins(0, dp(6), 0, dp(6)) }
+    private fun wrap(v: View): FrameLayout = FrameLayout(this).apply { addView(v, FrameLayout.LayoutParams(-1, -1)); setBackgroundColor(bg) }
+    private fun title(t: String) = TextView(this).apply { text = t; setTextColor(ink); textSize = 24f; setTypeface(typeface, Typeface.BOLD); setPadding(0, 0, 0, dp(12)) }
+    private fun label(t: String, color: Int, size: Float, bold: Boolean = false) = TextView(this).apply { text = t; setTextColor(color); textSize = size; if (bold) setTypeface(typeface, Typeface.BOLD); setPadding(0, dp(4), 0, dp(8)) }
+    private fun field(hint: String, value: String = "", enabled: Boolean = true) = EditText(this).apply { this.hint = hint; setText(value); isEnabled = enabled; setTextColor(ink); setHintTextColor(muted); setSingleLine(true); setPadding(dp(14), dp(10), dp(14), dp(10)); setBackgroundColor(surface) }
+    private fun spinner(items: List<String>, selected: String?) = Spinner(this).apply { adapter = ArrayAdapter(this@AdminMainActivity, android.R.layout.simple_spinner_dropdown_item, items); selected?.let { val i = items.indexOf(it); if (i >= 0) setSelection(i) } }
+    private fun button(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setBackgroundColor(surface) }
+    private fun bigButton(text: String) = Button(this).apply { this.text = text; isAllCaps = false; setTextColor(ink); setTextSize(15f); setBackgroundColor(surface); gravity = Gravity.CENTER_VERTICAL; setPadding(dp(16), dp(8), dp(16), dp(8)) }
+    private fun space(h: Int) = Space(this).apply { layoutParams = LinearLayout.LayoutParams(1, dp(h)) }
+    private fun lp(w: Int = -1, h: Int = -2) = LinearLayout.LayoutParams(if (w == 0) -1 else dp(w), if (h == 0) -2 else dp(h)).apply { setMargins(0, dp(5), 0, dp(5)) }
     private fun dp(v: Int) = (v * resources.displayMetrics.density).toInt()
     private fun toast(s: String) = Toast.makeText(this, s, Toast.LENGTH_LONG).show()
+}
+
+class TokenStore(context: Context) {
+    private val prefs = context.getSharedPreferences("github", Context.MODE_PRIVATE)
+    fun get(): String? = prefs.getString("token", null)
+    fun save(token: String) { prefs.edit().putString("token", token).apply() }
+    fun clear() { prefs.edit().remove("token").apply() }
 }
 
 class SimpleTextWatcher(private val onChanged: (String) -> Unit) : android.text.TextWatcher {
