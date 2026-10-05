@@ -1,0 +1,1 @@
+The Android client must treat library/generated/characters.json as the remote character catalog. Refresh on app launch and periodically in the background. Portraits are resolved as https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/<ID>.webp. The seed spreadsheets under library/seed are the editable source of truth.
