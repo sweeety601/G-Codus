@@ -15,11 +15,9 @@ object BannerSource {
         "https://raw.githubusercontent.com/sweeety601/G-Codus/main/data/banner_feed.json"
 
     fun fetchNormalized(context: Context): String {
-        return try {
-            normalize(fetch(FEED_URL + "?t=" + (System.currentTimeMillis() / 600000L)))
-        } catch (_: Exception) {
-            loadBundledFeed(context)
-        }
+        // The GitHub G-Codus database is the only banner source.
+        // context is kept for API compatibility with existing callers.
+        return normalize(fetch(FEED_URL + "?t=" + (System.currentTimeMillis() / 600000L)))
     }
 
     private fun normalize(source: String): String {
@@ -132,13 +130,6 @@ object BannerSource {
             if (value.isNotBlank()) result.put(value)
         }
         return result
-    }
-
-    private fun loadBundledFeed(context: Context): String {
-        val bundled = context.assets.open("banner_feed.json").use {
-            it.bufferedReader().readText()
-        }
-        return normalize(bundled)
     }
 
     private fun fetch(url: String): String {
