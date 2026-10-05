@@ -1,11 +1,13 @@
-name: Generate character data
+name: Generate character data and portraits
 
 on:
   push:
     paths:
       - 'library/*.xlsx'
-      - 'images/*.webp'
+      - 'images_big/**'
+      - 'app/src/main/assets/**'
       - 'scripts/generate_character_data.py'
+      - 'scripts/sync_library_portraits.py'
       - '.github/workflows/generate-character-data.yml'
   workflow_dispatch:
 
@@ -27,9 +29,14 @@ jobs:
       - name: Install Excel parser
         run: pip install openpyxl
 
-      - name: Generate JSON, assign IDs and validate portraits
+      - name: Normalize Excel, assign IDs and generate JSON
+        run: python scripts/generate_character_data.py
+
+      - name: Copy portraits to images/<ID>.webp
+        run: python scripts/sync_library_portraits.py
+
+      - name: Validate generated character data and portraits
         run: |
-          python scripts/generate_character_data.py
           python - <<'PY'
           import json
           from pathlib import Path
@@ -43,20 +50,21 @@ jobs:
                       errors.append(f'duplicate ID: {cid}')
                   seen.add(cid)
                   if not Path('images', f'{cid}.webp').exists():
-                      errors.append(f'missing portrait: images/{cid}.webp')
+                      errors.append(f'missing portrait: images/{cid}.webp ({c["name"]})')
           if errors:
               print('\n'.join(errors))
               raise SystemExit(1)
+          print(f'Validated {len(seen)} character IDs.')
           PY
 
-      - name: Commit generated data and assigned IDs
+      - name: Commit generated library and portraits
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add library/generated/characters.json library/*.xlsx
+          git add library/generated/characters.json library/generated/portrait_sync_report.json library/*.xlsx images/*.webp
           if git diff --cached --quiet; then
             echo 'No generated changes.'
           else
-            git commit -m 'Sync character library from Excel'
+            git commit -m 'Sync character library and ID portraits'
             git push
           fi
