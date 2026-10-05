@@ -111,6 +111,22 @@ class GitHubClient(private val token: String) {
         return JSONObject(text).optString("sha").ifBlank { null }
     }
 
+    fun triggerDataSync(reason: String) {
+        val conn = apiConnection("POST", "dispatches", authorized = true)
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/json")
+        val payload = JSONObject()
+            .put("event_type", "gcodus-data-sync")
+            .put("client_payload", JSONObject().put("reason", reason))
+        conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
+        val text = body(conn)
+        if (conn.responseCode !in 200..299) {
+            throw IllegalStateException(
+                "Не удалось запустить синхронизацию данных: GitHub HTTP " + conn.responseCode + " — " + shortError(text)
+            )
+        }
+    }
+
     fun putFile(path: String, bytes: ByteArray, sha: String?, message: String): String {
         val conn = apiConnection("PUT", "contents/" + path, authorized = true)
         conn.doOutput = true
