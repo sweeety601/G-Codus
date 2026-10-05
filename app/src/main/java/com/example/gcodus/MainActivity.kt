@@ -1030,6 +1030,7 @@ class MainActivity : AppCompatActivity() {
                 toggleTracked(character.gameId, character.file)
                 text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
                 setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
+                pulseView(this)
             }
         }
         // The portrait itself has the stronger press effect; keep the heart button tactile too.
@@ -1058,6 +1059,7 @@ class MainActivity : AppCompatActivity() {
             toggleTracked(character.gameId, character.file)
             heart.text = if (isTracked(character.gameId, character.file)) "❤️" else "🤍"
             heart.setTextColor(if (isTracked(character.gameId, character.file)) Color.rgb(255, 91, 123) else Color.WHITE)
+            pulseView(heart)
 
             // In the wishlist, untracking removes the card immediately with a
             // small iPhone-style uninstall animation: shrink, fade and tilt.
