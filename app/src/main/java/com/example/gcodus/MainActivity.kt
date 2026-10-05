@@ -1073,6 +1073,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+
+
     private fun normalizeCharacterForMatch(value: String): String =
         value.lowercase().replace("’", "").replace("'", "").replace("&", "and")
             .replace(Regex("[^a-z0-9]+"), "")
@@ -1086,6 +1088,18 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+]?\\s*)"),
+                " "
+            )
+            .replace(Regex("\\s+"), " ")
+            .trim()
+
+
+
+
+
+
+
 
 
     private fun trackedCharacterName(gameId: String, file: String): String {
@@ -1097,30 +1111,26 @@ class MainActivity : AppCompatActivity() {
         "tracked_v2_" + gameId + "_" + normalizeCharacterForMatch(trackedCharacterName(gameId, file))
 
 
+
     private fun trackingKey(gameId: String, file: String) = trackedIdentityKey(gameId, file)
 
     private fun migrateTrackingKeys() {
         val editor = prefs.edit()
         var changed = false
-
         prefs.all.keys.filter { it.startsWith("tracked_") && !it.startsWith("tracked_v2_") }.forEach { key ->
             val value = prefs.all[key] as? Boolean ?: return@forEach
             if (!value) return@forEach
-
             val remainder = key.removePrefix("tracked_")
             val separator = remainder.indexOf('_')
             if (separator <= 0 || separator >= remainder.lastIndex) return@forEach
-
             val gameId = remainder.substring(0, separator)
             val file = remainder.substring(separator + 1)
             val identity = normalizeCharacterForMatch(file.substringBeforeLast("."))
             if (identity.isBlank()) return@forEach
-
             editor.putBoolean("tracked_v2_" + gameId + "_" + identity, true)
             editor.remove(key)
             changed = true
         }
-
         if (changed) editor.apply()
     }
 
@@ -1288,6 +1298,25 @@ class MainActivity : AppCompatActivity() {
 
 
 
+
+
+
+
+    private fun startCountdownTicker() {
+        countdownExecutor.scheduleAtFixedRate({
+            runOnUiThread {
+                val now = Instant.now()
+                countdownViews.forEach { pair ->
+                    try {
+                        val target = parseBannerInstant(pair.second, endOfDay = true) ?: return@forEach
+                        val seconds = Duration.between(now, target).seconds.coerceAtLeast(0)
+                        pair.first.text = "До окончания\n" + formatCountdown(seconds)
+                    } catch (_: Exception) { }
+                }
+            }
+        }, 0, 1, TimeUnit.SECONDS)
+    }
+
     private fun parseBannerInstant(value: String, endOfDay: Boolean = false): Instant? {
         val v = value.trim()
         if (v.isBlank() || v == "null") return null
@@ -1393,16 +1422,6 @@ class MainActivity : AppCompatActivity() {
         }
         executor.execute { refreshOnce() }
         executor.scheduleAtFixedRate({ refreshOnce() }, 15, 15, TimeUnit.MINUTES)
-    }
-
-    private fun characterNameForFeedValue(gameId: String, value: String): String {
-        val clean = value.trim()
-        return onlineCharacters.firstOrNull {
-            it.gameId == gameId && (
-                it.id == clean ||
-                normalizeCharacterForMatch(it.name) == normalizeCharacterForMatch(clean)
-            )
-        }?.name ?: clean
     }
 
     private fun parseBanners(game: JSONObject, key: String): List<Banner> {
