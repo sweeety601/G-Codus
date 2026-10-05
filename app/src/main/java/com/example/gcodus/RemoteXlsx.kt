@@ -9,10 +9,7 @@ import java.util.zip.ZipInputStream
 import javax.xml.parsers.DocumentBuilderFactory
 
 object RemoteXlsx {
-    private data class CachedFile(
-        val bytes: ByteArray,
-        val etag: String?
-    )
+    private data class CachedFile(val bytes: ByteArray)
 
     private val cache = ConcurrentHashMap<String, CachedFile>()
 
@@ -32,8 +29,11 @@ object RemoteXlsx {
         val encodedPath = path.split('/').joinToString("/") {
             java.net.URLEncoder.encode(it, "UTF-8").replace("+", "%20")
         }
+        // raw.githubusercontent.com can serve a cached copy. A changing query
+        // parameter forces the request to resolve the current file from GitHub.
         val url = URL(
-            "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" + encodedPath
+            "https://raw.githubusercontent.com/sweeety601/G-Codus/main/" +
+                encodedPath + "?gcodus_refresh=" + System.currentTimeMillis()
         )
         val connection = url.openConnection() as HttpURLConnection
         return try {
@@ -42,25 +42,14 @@ object RemoteXlsx {
             connection.requestMethod = "GET"
             connection.instanceFollowRedirects = true
             connection.useCaches = false
-            connection.setRequestProperty("Cache-Control", "no-cache, max-age=0")
+            connection.setRequestProperty("Cache-Control", "no-store, max-age=0")
             connection.setRequestProperty("Pragma", "no-cache")
             connection.setRequestProperty("User-Agent", "G-Codus/1.0")
 
-            cache[path]?.etag?.let {
-                connection.setRequestProperty("If-None-Match", it)
-            }
-
             when (connection.responseCode) {
-                HttpURLConnection.HTTP_NOT_MODIFIED -> {
-                    cache[path]?.bytes
-                        ?: error("GitHub вернул 304 без локальной копии для $path")
-                }
                 in 200..299 -> {
                     val bytes = connection.inputStream.use { it.readBytes() }
-                    cache[path] = CachedFile(
-                        bytes = bytes,
-                        etag = connection.getHeaderField("ETag")
-                    )
+                    cache[path] = CachedFile(bytes)
                     bytes
                 }
                 else -> error("HTTP " + connection.responseCode + " for " + path)
