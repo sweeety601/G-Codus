@@ -162,8 +162,20 @@ def main():
                 report["missing"].append({"id": cid, "game": game_name, "name": name})
                 continue
             target = IMAGES / f"{cid}.webp"
-            shutil.copyfile(source, target)
-            report["copied"].append({"id": cid, "game": game_name, "name": name, "source": str(source.relative_to(ROOT))})
+            # Existing images/<ID>.webp are authoritative: the Admin app may
+            # have replaced the portrait manually. Never overwrite an existing
+            # portrait during automatic library synchronization.
+            if target.exists():
+                report["skipped_existing"] = report.get("skipped_existing", [])
+                report["skipped_existing"].append({
+                    "id": cid,
+                    "game": game_name,
+                    "name": name,
+                    "source": str(source.relative_to(ROOT))
+                })
+            else:
+                shutil.copyfile(source, target)
+                report["copied"].append({"id": cid, "game": game_name, "name": name, "source": str(source.relative_to(ROOT))})
     OUT = ROOT / "library" / "generated"
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "portrait_sync_report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
