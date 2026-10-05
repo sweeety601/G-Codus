@@ -6,7 +6,6 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
-import java.net.URLEncoder
 
 data class GitFile(val bytes: ByteArray, val sha: String?)
 
@@ -19,10 +18,7 @@ class GitHubClient(private val token: String) {
     }
 
     private fun apiConnection(method: String, path: String): HttpURLConnection {
-        val safePath = path.split("/").joinToString("/") { part ->
-            URLEncoder.encode(part, "UTF-8").replace("+", "%20")
-        }
-        val conn = URL(API + "/repos/" + REPO + "/" + safePath).openConnection() as HttpURLConnection
+        val conn = URL(API + "/repos/" + REPO + "/" + path).openConnection() as HttpURLConnection
         conn.requestMethod = method
         conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
@@ -35,10 +31,7 @@ class GitHubClient(private val token: String) {
     }
 
     private fun rawConnection(path: String): HttpURLConnection {
-        val encoded = path.split("/").joinToString("/") { part ->
-            URLEncoder.encode(part, "UTF-8").replace("+", "%20")
-        }
-        val conn = URL(RAW + "/" + encoded).openConnection() as HttpURLConnection
+        val conn = URL(RAW + "/" + path).openConnection() as HttpURLConnection
         conn.requestMethod = "GET"
         conn.instanceFollowRedirects = true
         conn.connectTimeout = 20_000
