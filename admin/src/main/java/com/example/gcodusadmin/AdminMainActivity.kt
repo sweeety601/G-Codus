@@ -84,7 +84,7 @@ class AdminMainActivity : AppCompatActivity() {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
         if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
-        box.addView(label("G-Codus Admin v2.0.12", muted, 14f))
+        box.addView(label("G-Codus Admin v2.0.13", muted, 14f))
         box.addView(space(10))
         box.addView(label("Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
         val input = EditText(this).apply {
