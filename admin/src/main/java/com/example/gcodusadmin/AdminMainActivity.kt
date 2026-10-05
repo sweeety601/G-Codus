@@ -422,15 +422,11 @@ class AdminMainActivity : AppCompatActivity() {
         return e
     }
 
-    private fun spinner(labelText: String, values: List<String>, selected: String?): Spinner {
-        val row = vertical()
-        row.addView(label(labelText, muted, 12f))
+    private fun spinner(values: List<String>, selected: String?): Spinner {
         val s = Spinner(this)
         s.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, values)
         val idx = values.indexOf(selected)
         if (idx >= 0) s.setSelection(idx)
-        row.addView(s, lp())
-        root?.addView(row, lp())
         return s
     }
 
