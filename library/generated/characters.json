@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-05T14:44:26.011347+00:00",
+  "generatedAt": "2026-10-05T15:21:26.393448+00:00",
   "games": [
     {
       "id": "1",
@@ -496,7 +496,7 @@
         {
           "id": "1.55",
           "gameId": "wuwa",
-          "name": "Scar",
+          "name": "gandonka",
           "element": "Fusion",
           "rarity": 5,
           "announced": false,
@@ -1543,6 +1543,24 @@
           "rarity": 5,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.115.webp"
+        },
+        {
+          "id": "2.116",
+          "gameId": "genshin",
+          "name": "Vesna",
+          "element": "Anemo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.116.webp"
+        },
+        {
+          "id": "2.117",
+          "gameId": "genshin",
+          "name": "Vodyanitsa",
+          "element": "Hydro",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/2.117.webp"
         }
       ]
     },

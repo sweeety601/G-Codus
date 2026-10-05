@@ -19,7 +19,7 @@
     {
       "id": "1.55",
       "game": "Wuthering Waves",
-      "name": "Scar"
+      "name": "gandonka"
     },
     {
       "id": "2.87",
@@ -1018,6 +1018,18 @@
       "game": "Genshin Impact",
       "name": "Zibai",
       "source": "images_big/genshin/zibai.webp"
+    },
+    {
+      "id": "2.116",
+      "game": "Genshin Impact",
+      "name": "Vesna",
+      "source": "images_big/genshin/vesna.webp"
+    },
+    {
+      "id": "2.117",
+      "game": "Genshin Impact",
+      "name": "Vodyanitsa",
+      "source": "images_big/genshin/vodyanitsa.webp"
     },
     {
       "id": "3.1",
