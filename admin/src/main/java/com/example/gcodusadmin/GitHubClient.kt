@@ -34,21 +34,6 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        val userConn = URL(API + "/user").openConnection() as HttpURLConnection
-        userConn.requestMethod = "GET"
-        userConn.connectTimeout = 15_000
-        userConn.readTimeout = 15_000
-        userConn.setRequestProperty("Accept", "application/vnd.github+json")
-        userConn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-        userConn.setRequestProperty("Authorization", "Bearer " + token)
-        userConn.setRequestProperty("User-Agent", "G-Codus-Admin")
-        val userText = body(userConn)
-        if (userConn.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "GitHub token invalid: HTTP " + userConn.responseCode + " " + shortError(userText)
-            )
-        }
-
         val repoConn = URL(API + "/repos/" + REPO).openConnection() as HttpURLConnection
         repoConn.requestMethod = "GET"
         repoConn.connectTimeout = 15_000
@@ -62,25 +47,7 @@ class GitHubClient(private val token: String) {
             throw IllegalStateException(
                 "Нет доступа к репозиторию " + REPO +
                     ": HTTP " + repoConn.responseCode + " " + shortError(repoText) +
-                    ". Для Fine-grained token выбери Repository access → Only select repositories → " + REPO +
-                    ", а Repository permissions → Contents = Read and write."
-            )
-        }
-
-        val fileConn = URL(API + "/repos/" + REPO + "/contents/library/seed/01_Wuthering_Waves.xlsx?ref=main")
-            .openConnection() as HttpURLConnection
-        fileConn.requestMethod = "GET"
-        fileConn.connectTimeout = 15_000
-        fileConn.readTimeout = 30_000
-        fileConn.setRequestProperty("Accept", "application/vnd.github+json")
-        fileConn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-        fileConn.setRequestProperty("Authorization", "Bearer " + token)
-        fileConn.setRequestProperty("User-Agent", "G-Codus-Admin")
-        val fileText = body(fileConn)
-        if (fileConn.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "Нет доступа к файлу library/seed/01_Wuthering_Waves.xlsx: HTTP " +
-                    fileConn.responseCode + " " + shortError(fileText)
+                    ". В Fine-grained token выбери только G-Codus и Contents = Read and write."
             )
         }
     }
