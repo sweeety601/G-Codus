@@ -13,7 +13,7 @@ class GitHubClient(private val token: String) {
     companion object {
         const val REPO = "sweeety601/G-Codus"
         private const val API = "https://api.github.com"
-        private const val TEST_FILE = "library/seed/01_Wuthering_Waves.xlsx"
+        private const val RAW = "https://raw.githubusercontent.com"
     }
 
     private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
@@ -24,10 +24,18 @@ class GitHubClient(private val token: String) {
         conn.readTimeout = 30_000
         conn.setRequestProperty("Accept", "application/vnd.github+json")
         conn.setRequestProperty("X-GitHub-Api-Version", "2022-11-28")
-        if (authorized && token.isNotBlank()) {
-            conn.setRequestProperty("Authorization", "Bearer " + token)
-        }
-        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.4")
+        if (authorized && token.isNotBlank()) conn.setRequestProperty("Authorization", "Bearer " + token)
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.7")
+        return conn
+    }
+
+    private fun rawConnection(path: String): HttpURLConnection {
+        val conn = URL(RAW + "/" + REPO + "/main/" + path).openConnection() as HttpURLConnection
+        conn.requestMethod = "GET"
+        conn.instanceFollowRedirects = true
+        conn.connectTimeout = 20_000
+        conn.readTimeout = 30_000
+        conn.setRequestProperty("User-Agent", "G-Codus-Admin/2.0.7")
         return conn
     }
 
@@ -38,43 +46,29 @@ class GitHubClient(private val token: String) {
     }
 
     fun testToken() {
-        // Login must not make a repository metadata request.
-        // GitHub may return 404 for fine-grained tokens on endpoints that are
-        // not granted to them. Public file reads and authenticated writes are
-        // checked when the corresponding operation is actually performed.
-        if (token.isBlank()) {
-            throw IllegalStateException("Пустой GitHub token")
-        }
+        if (token.isBlank()) throw IllegalStateException("Пустой GitHub token")
     }
 
     fun getFile(path: String): GitFile {
-        // Public repository: read through Contents API without authenticating.
-        // The PAT is reserved for write operations.
-        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = false)
-        val text = body(conn)
-        if (conn.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "Не удалось получить " + path + ": GitHub HTTP " + conn.responseCode + " — " + shortError(text)
-            )
+        // The repository is public. Read binary XLSX files directly from raw GitHub.
+        // This avoids the Contents API's JSON/base64 handling for binary files entirely.
+        val conn = rawConnection(path)
+        val code = conn.responseCode
+        if (code !in 200..299) {
+            val text = body(conn)
+            throw IllegalStateException("Не удалось прочитать " + path + ": GitHub RAW HTTP " + code + " — " + shortError(text))
         }
-        val json = JSONObject(text)
-        val encoded = json.optString("content").replace("\n", "").replace("\r", "")
-        if (encoded.isBlank()) {
-            throw IllegalStateException("GitHub не вернул содержимое файла " + path)
-        }
-        return GitFile(Base64.decode(encoded, Base64.DEFAULT), json.optString("sha").ifBlank { null })
+        val bytes = conn.inputStream.use { it.readBytes() }
+        if (bytes.isEmpty()) throw IllegalStateException("GitHub вернул пустой файл " + path)
+        return GitFile(bytes, getFileSha(path))
     }
 
     fun getFileSha(path: String): String? {
-        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = false)
+        val conn = apiConnection("GET", "contents/" + path + "?ref=main", authorized = true)
         val text = body(conn)
-        if (conn.responseCode == 404) {
-            return null
-        }
+        if (conn.responseCode == 404) return null
         if (conn.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "Не удалось получить SHA файла " + path + ": GitHub HTTP " + conn.responseCode + " — " + shortError(text)
-            )
+            throw IllegalStateException("Не удалось получить SHA файла " + path + ": GitHub HTTP " + conn.responseCode + " — " + shortError(text))
         }
         return JSONObject(text).optString("sha").ifBlank { null }
     }
@@ -91,9 +85,7 @@ class GitHubClient(private val token: String) {
         conn.outputStream.use { it.write(payload.toString().toByteArray(Charsets.UTF_8)) }
         val text = body(conn)
         if (conn.responseCode !in 200..299) {
-            throw IllegalStateException(
-                "Не удалось сохранить " + path + ": GitHub HTTP " + conn.responseCode + " — " + shortError(text)
-            )
+            throw IllegalStateException("Не удалось сохранить " + path + ": GitHub HTTP " + conn.responseCode + " — " + shortError(text))
         }
         return JSONObject(text).optJSONObject("commit")?.optString("sha").orEmpty()
     }
