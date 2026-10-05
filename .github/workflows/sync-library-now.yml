@@ -1,0 +1,48 @@
+name: Sync G-Codus library now
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install openpyxl pillow
+      - name: Repair library workbooks
+        run: python scripts/ensure_library_xlsx.py
+      - name: Generate online character JSON
+        run: python scripts/generate_character_data.py
+      - name: Sync ID portraits
+        run: python scripts/sync_library_portraits.py
+      - name: Validate
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('library/generated/characters.json').read_text(encoding='utf-8'))
+          all_chars=[c for g in d['games'] for c in g['characters']]
+          print('Characters:', len(all_chars))
+          missing=[c for c in all_chars if not Path('images', c['id']+'.webp').exists()]
+          print('Missing portraits:', len(missing))
+          for c in missing: print(c['id'], c['name'])
+          if missing: raise SystemExit(1)
+          PY
+      - name: Commit generated files
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add library images scripts
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m 'Sync library, JSON and ID portraits'
+          git push
