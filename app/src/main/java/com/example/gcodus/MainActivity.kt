@@ -1172,9 +1172,17 @@ class MainActivity : AppCompatActivity() {
             var changed = false
 
             try {
-                val freshCharacters = CharacterDatabase.fetch(this@MainActivity)
-                if (freshCharacters.isNotEmpty()) {
-                    val newFingerprint = freshCharacters
+                val fetch = CharacterDatabase.fetchDetailed(this@MainActivity)
+                if (fetch.characters.isNotEmpty()) {
+                    // Replace only games whose Excel table was read successfully.
+                    // A temporary failure in another game must not hide a valid
+                    // update such as WuWa 1.55.
+                    val mergedCharacters = (
+                        onlineCharacters.filterNot { it.gameId in fetch.successfulGameIds } +
+                            fetch.characters
+                        ).distinctBy { it.gameId + "|" + it.id }
+
+                    val newFingerprint = mergedCharacters
                         .sortedWith(compareBy<OnlineCharacter> { it.gameId }.thenBy { it.id })
                         .joinToString("|") {
                             it.gameId + ":" + it.id + ":" + it.name + ":" + it.rarity + ":" + it.element
@@ -1187,7 +1195,7 @@ class MainActivity : AppCompatActivity() {
                         }
 
                     if (newFingerprint != oldFingerprint) {
-                        onlineCharacters = freshCharacters
+                        onlineCharacters = mergedCharacters
                         changed = true
                     }
                 }
@@ -1221,8 +1229,8 @@ class MainActivity : AppCompatActivity() {
 
     /**
      * Foreground live-sync: while G-Codus is visible, check the Excel tables
-     * every 20 seconds. RemoteXlsx uses ETag validation, so unchanged XLSX files
-     * are normally returned as HTTP 304 instead of being downloaded again.
+     * every 20 seconds. RemoteXlsx reads the current GitHub XLSX directly into
+     * memory on every check and never stores an intermediate table copy.
      */
     private fun startForegroundLiveRefresh() {
         foregroundLiveRefreshFuture?.cancel(false)
