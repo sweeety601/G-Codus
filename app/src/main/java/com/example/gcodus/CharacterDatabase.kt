@@ -1,6 +1,7 @@
 package com.example.gcodus
 
 import android.content.Context
+import android.util.Log
 
 data class OnlineCharacter(
     val gameId: String,
@@ -13,6 +14,12 @@ data class OnlineCharacter(
     val element: String = ""
 )
 
+data class CharacterFetchResult(
+    val characters: List<OnlineCharacter>,
+    val successfulGameIds: Set<String>,
+    val failedGameIds: Set<String>
+)
+
 object CharacterDatabase {
     private val tables = listOf(
         Triple("01_Wuthering_Waves.xlsx", "1", "wuwa"),
@@ -22,27 +29,41 @@ object CharacterDatabase {
         Triple("05_Zenless_Zone_Zero.xlsx", "5", "zzz")
     )
 
-    fun fetch(context: Context): List<OnlineCharacter> {
+    /**
+     * Reads every character table directly from GitHub.
+     *
+     * A failure in one game's table must never block updates for the other
+     * games. The caller can replace only the successfully fetched games and
+     * keep the previous good data for a failed game.
+     */
+    fun fetchDetailed(context: Context): CharacterFetchResult {
         val result = mutableListOf<OnlineCharacter>()
-        var failedTables = 0
+        val successful = mutableSetOf<String>()
+        val failed = mutableSetOf<String>()
 
         for ((filename, prefix, gameId) in tables) {
-            val rows = try {
-                RemoteXlsx.fetchRows(listOf("library/seed/" + filename))
-            } catch (_: Exception) {
-                failedTables++
-                continue
+            try {
+                val rows = RemoteXlsx.fetchRows(listOf("library/seed/" + filename))
+                parseTable(rows, prefix, gameId, result)
+                successful += gameId
+            } catch (e: Exception) {
+                failed += gameId
+                Log.e("G-Codus", "Не удалось прочитать таблицу персонажей $filename", e)
             }
-            parseTable(rows, prefix, gameId, result)
         }
 
-        // Never replace a complete live database with a partial download.
-        if (failedTables > 0) return emptyList()
-
-        return result.distinctBy { it.gameId + "|" + it.id }
+        return CharacterFetchResult(
+            characters = result.distinctBy { it.gameId + "|" + it.id },
+            successfulGameIds = successful,
+            failedGameIds = failed
+        )
     }
 
-    fun sync(context: Context): Boolean = fetch(context).isNotEmpty()
+    fun fetch(context: Context): List<OnlineCharacter> =
+        fetchDetailed(context).characters
+
+    fun sync(context: Context): Boolean =
+        fetchDetailed(context).characters.isNotEmpty()
 
     private fun parseTable(
         rows: List<List<String>>,
@@ -64,13 +85,15 @@ object CharacterDatabase {
         val nameCol = find("имя", "имя персонажа", "название", "name", "character name")
         val elementCol = find("стихия", "элемент", "element", "attribute")
         val rarityCol = find("редкость", "rarity", "звезды", "звёзды", "stars")
-        if (idCol < 0 || nameCol < 0) return
+        if (idCol < 0 || nameCol < 0) {
+            throw IllegalStateException("В таблице $gameId не найдены обязательные столбцы ID/имя")
+        }
 
         for (row in rows.drop(1)) {
             val id = row.getOrNull(idCol)?.trim().orEmpty()
             val name = row.getOrNull(nameCol)?.trim().orEmpty()
             if (id.isBlank() || name.isBlank()) continue
-            if (!Regex("^" + Regex.escape(prefix) + "\\.[0-9]+$").matches(id)) continue
+            if (!Regex("^" + Regex.escape(prefix) + "\.[0-9]+$").matches(id)) continue
 
             val rarity = Regex("""\d+""")
                 .find(row.getOrNull(rarityCol).orEmpty())
