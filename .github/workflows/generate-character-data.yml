@@ -12,6 +12,10 @@ on:
       - '.github/workflows/generate-character-data.yml'
   workflow_dispatch:
 
+concurrency:
+  group: character-library-sync
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
