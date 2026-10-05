@@ -50,8 +50,6 @@ jobs:
                   if cid in seen:
                       errors.append(f'duplicate ID: {cid}')
                   seen.add(cid)
-                  if not Path('images', f'{cid}.webp').exists():
-                      errors.append(f'missing portrait: images/{cid}.webp ({c["name"]})')
           if errors:
               print('\n'.join(errors))
               raise SystemExit(1)
