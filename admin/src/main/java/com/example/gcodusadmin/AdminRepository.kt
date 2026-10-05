@@ -29,8 +29,8 @@ class AdminRepository(private val github: GitHubClient) {
     }
 
     fun saveCharacters(game: GameMeta, chars: List<AdminCharacter>) {
-        val current = github.getFile(game.seedPath)
-        val rows = XlsxCodec.read(current.bytes)
+        val currentBytes = github.getFile(game.seedPath).bytes
+        val rows = XlsxCodec.read(currentBytes)
         val header = if (rows.isNotEmpty()) rows.first() else mutableListOf("ID","Имя","Стихия","Редкость")
         val normalized = header.map { it.trim().lowercase() }
         val idCol = ensureColumn(header, normalized, "ID")
@@ -48,7 +48,8 @@ class AdminRepository(private val github: GitHubClient) {
                 row[rarityCol] = c.rarity.toString()
                 out += row
             }
-        github.putFile(game.seedPath, XlsxCodec.write(out), current.sha, "Admin: update " + game.name + " character database")
+        val currentSha = github.getFileSha(game.seedPath)
+        github.putFile(game.seedPath, XlsxCodec.write(out), currentSha, "Admin: update " + game.name + " character database")
     }
 
     fun nextId(game: GameMeta, chars: List<AdminCharacter>): String {
@@ -67,7 +68,7 @@ class AdminRepository(private val github: GitHubClient) {
         return try {
             val file = github.getFile(path)
             val rows = XlsxCodec.read(file.bytes)
-            if (rows.isEmpty()) Pair(mutableListOf(), file.sha)
+            if (rows.isEmpty()) Pair(mutableListOf(), null)
             else {
                 val header = rows.first().map { it.trim().lowercase() }
                 fun col(names: List<String>) = find(header, names)
@@ -84,7 +85,7 @@ class AdminRepository(private val github: GitHubClient) {
                         splitIds(row.getOrNull(four).orEmpty())
                     )
                 }.toMutableList()
-                Pair(list, file.sha)
+                Pair(list, null)
             }
         } catch (e: Exception) {
             if (e.message?.contains("HTTP 404") == true) {
@@ -97,13 +98,13 @@ class AdminRepository(private val github: GitHubClient) {
 
     fun saveBanners(game: GameMeta, confirmed: Boolean, rows: List<BannerRow>) {
         val path = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks" + ".xlsx"
-        val current = try { github.getFile(path) } catch (_: Exception) { null }
+        val currentSha = github.getFileSha(path)
         val table = mutableListOf<MutableList<String>>()
         table += mutableListOf("Версия и фаза","Дата начала","Дата окончания","Персонажи в составе баннера","4* в баннере")
         rows.forEach { b ->
             table += mutableListOf(b.phase, b.startDate, b.endDate, b.characters.joinToString(", "), b.fourStars.joinToString(", "))
         }
-        github.putFile(path, XlsxCodec.write(table), current?.sha, "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks")
+        github.putFile(path, XlsxCodec.write(table), currentSha, "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks")
     }
 
     private fun find(header: List<String>, names: List<String>): Int {
