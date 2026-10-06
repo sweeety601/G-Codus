@@ -127,6 +127,7 @@ class MainActivity : AppCompatActivity() {
         requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
+        NotificationAlarmReceiver.schedule(this)
         scheduleCharacterSync()
         refreshCodesInBackground()
         refreshLiveDatabaseInBackground()
