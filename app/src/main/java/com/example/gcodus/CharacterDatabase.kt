@@ -93,7 +93,7 @@ object CharacterDatabase {
             val id = row.getOrNull(idCol)?.trim().orEmpty()
             val name = row.getOrNull(nameCol)?.trim().orEmpty()
             if (id.isBlank() || name.isBlank()) continue
-            if (!Regex("^" + Regex.escape(prefix) + "\.[0-9]+$").matches(id)) continue
+            if (!Regex("^" + Regex.escape(prefix) + "\\.[0-9]+$").matches(id)) continue
 
             val rarity = Regex("""\d+""")
                 .find(row.getOrNull(rarityCol).orEmpty())
