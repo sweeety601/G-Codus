@@ -716,11 +716,43 @@ class MainActivity : AppCompatActivity() {
         val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, TimeUnit.MINUTES)
             .setConstraints(constraints)
             .build()
+
         WorkManager.getInstance(this).enqueueUniquePeriodicWork(
             "g_codus_notifications",
-            ExistingPeriodicWorkPolicy.KEEP,
+            ExistingPeriodicWorkPolicy.UPDATE,
             request
         )
+
+        // Do one immediate check as well. The periodic worker is deliberately
+        // only a fallback because Android schedules periodic work inexactly.
+        enqueueNotificationSyncNow()
+    }
+
+    private fun enqueueNotificationSyncNow() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(this).enqueueUniqueWork(
+            "g_codus_notifications_now",
+            androidx.work.ExistingWorkPolicy.REPLACE,
+            request
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 7001 &&
+            grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            enqueueNotificationSyncNow()
+        }
     }
 
     private fun refreshCodesInBackground() {
@@ -1127,23 +1159,25 @@ class MainActivity : AppCompatActivity() {
     private fun toggleTracked(gameId: String, file: String) {
         val enabled = !isTracked(gameId, file)
         prefs.edit().putBoolean(trackingKey(gameId, file), enabled).apply()
+
+        val notificationPrefs =
+            getSharedPreferences("g_codus_notifications", Context.MODE_PRIVATE)
+        val identity = normalizeCharacterForMatch(trackedCharacterName(gameId, file))
+
         if (enabled) {
-            val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()
-                .setConstraints(
-                    Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build()
-                )
-                .build()
-            WorkManager.getInstance(this).enqueue(request)
+            // Check immediately so adding a character that is already in a
+            // current or future banner does not wait for the next 15-minute run.
+            enqueueNotificationSyncNow()
         } else {
-            // Reset per-character notification state so re-adding a character
-            // to the Wish List can notify again for a later/active banner.
-            getSharedPreferences("g_codus_notifications", Context.MODE_PRIVATE).edit()
-                .remove("appearance_" + gameId + "_" + file)
-                .remove("wishlist_next_" + gameId + "_" + file)
-                .remove("date_" + gameId + "_" + file)
-                .remove("ending_" + gameId + "_" + file)
+            // Reset the worker's actual identity-based markers. The previous
+            // code removed keys based on the __online_* filename, which did not
+            // match the worker's tracked_v2 identity and therefore prevented
+            // notifications after re-adding a character.
+            notificationPrefs.edit()
+                .remove("appearance_" + gameId + "_" + identity)
+                .remove("next_character_" + gameId + "_" + identity)
+                .remove("next_date_" + gameId + "_" + identity)
+                .remove("ending_" + gameId + "_" + identity)
                 .apply()
         }
     }
