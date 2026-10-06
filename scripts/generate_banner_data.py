@@ -57,10 +57,13 @@ def read_table(path, game_prefix):
         # Keep the Excel value readable, but normalize Russian/English phase labels
         # to one canonical representation in the generated feed.
         phase = f"{match.group(1)} Phase {match.group(3)}"
-        start = normalize_date(row[indexes[HEADERS[1].lower()]])
-        end = normalize_date(row[indexes[HEADERS[2].lower()]])
-        characters = split_ids(row[indexes[HEADERS[3].lower()]])
-        four = split_ids(row[indexes[HEADERS[4].lower()]])
+        def value_at(index):
+            return row[index] if index < len(row) else None
+
+        start = normalize_date(value_at(indexes[HEADERS[1].lower()]))
+        end = normalize_date(value_at(indexes[HEADERS[2].lower()]))
+        characters = split_ids(value_at(indexes[HEADERS[3].lower()]))
+        four = split_ids(value_at(indexes[HEADERS[4].lower()]))
         for cid in characters + four:
             if not ID_RE.fullmatch(cid) or not cid.startswith(game_prefix + "."):
                 raise SystemExit(f"{path}: invalid character id '{cid}', expected {game_prefix}.N")
