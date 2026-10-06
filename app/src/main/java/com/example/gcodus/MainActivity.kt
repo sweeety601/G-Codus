@@ -957,12 +957,17 @@ class MainActivity : AppCompatActivity() {
     private fun trackingGrid(gameId: String?, query: String?): View {
         val holder = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         val games = if (gameId == null) gameMeta else gameMeta.filter { it.id == gameId }
+        val wishlistOnly = gameId == null
         val normalizedQuery = query?.trim()?.lowercase().orEmpty()
         val entries = mutableListOf<TrackedCharacter>()
 
         games.forEach { meta ->
             onlineCharacters
                 .filter { it.gameId == meta.id }
+                // The global Wishlist is a list of tracked characters only.
+                // A game's Tracking page intentionally keeps showing the whole
+                // character database so characters can be selected there.
+                .filter { !wishlistOnly || isTracked(meta.id, "__online_" + meta.id + "_" + it.id + ".webp") }
                 .filter { normalizedQuery.isBlank() || it.name.lowercase().contains(normalizedQuery) }
                 .forEach { online ->
                     val file = "__online_" + meta.id + "_" + online.id + ".webp"
