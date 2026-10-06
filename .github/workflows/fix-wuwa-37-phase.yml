@@ -1,0 +1,65 @@
+name: One-time fix WuWa 3.7 phase data
+
+on:
+  push:
+    paths:
+      - .github/workflows/fix-wuwa-37-phase.yml
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Remove 1.55 from WuWa 3.7 Phase 1
+        run: |
+          python - <<'PY'
+          from openpyxl import load_workbook
+
+          path = "banners/01_Wuthering_Waves_confirmed.xlsx"
+          wb = load_workbook(path)
+          ws = wb.active
+
+          headers = {}
+          for idx, cell in enumerate(ws[1], start=1):
+              headers[str(cell.value or "").strip().lower()] = idx
+
+          phase_col = headers["версия и фаза"]
+          chars_col = headers["персонажи в составе баннера"]
+
+          found = False
+          for row in range(2, ws.max_row + 1):
+              phase = str(ws.cell(row, phase_col).value or "").strip().lower().replace("фаза", "phase")
+              if phase == "3.7 phase 1":
+                  values = [
+                      x.strip()
+                      for x in str(ws.cell(row, chars_col).value or "").replace(";", ",").split(",")
+                      if x.strip()
+                  ]
+                  new_values = [x for x in values if x != "1.55"]
+                  if new_values != values:
+                      ws.cell(row, chars_col).value = ", ".join(new_values)
+                      found = True
+                  break
+
+          if not found:
+              raise SystemExit("3.7 Phase 1 did not contain 1.55; refusing to change data")
+
+          wb.save(path)
+          print("Fixed:", path)
+          PY
+
+      - name: Commit correction
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add banners/01_Wuthering_Waves_confirmed.xlsx
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Fix WuWa 3.7 Phase 1 banner data"
+            git push
+          fi
