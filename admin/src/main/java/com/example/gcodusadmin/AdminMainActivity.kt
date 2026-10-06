@@ -84,7 +84,7 @@ class AdminMainActivity : AppCompatActivity() {
         val box = vertical()
         box.addView(title("Подключение к GitHub"))
         if (!errorMessage.isNullOrBlank()) box.addView(label(errorMessage, 0xFFFF6B6B.toInt(), 14f, true))
-        box.addView(label("G-Codus Admin v2.0.14", muted, 14f))
+        box.addView(label("G-Codus Admin v2.0.15", muted, 14f))
         box.addView(space(10))
         box.addView(label("Fine-grained token: Repository access → G-Codus → Contents: Read and write.", muted, 14f))
         val input = EditText(this).apply {
@@ -111,7 +111,7 @@ class AdminMainActivity : AppCompatActivity() {
         isHomeScreen = true
         val box = vertical()
         box.addView(title("G-Codus Admin"))
-        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.14", muted, 14f))
+        box.addView(label("Редактор онлайн-базы G-Codus • v2.0.15", muted, 14f))
         box.addView(bigButton("Добавить персонажа в базу").also { it.setOnClickListener { chooseGame { game -> showCharacterEditor(game, null) } } }, lp(0, 70))
         box.addView(bigButton("Редактировать базу данных персонажей").also { it.setOnClickListener { showCharacterDatabase() } }, lp(0, 70))
         box.addView(bigButton("График баннеров").also { it.setOnClickListener { chooseGame { game -> showBannerTypes(game) } } }, lp(0, 70))
@@ -172,12 +172,41 @@ class AdminMainActivity : AppCompatActivity() {
                 runBackground({
                     r.saveCharacters(game, updated)
                     if (portraitBytes != null) {
-                        val path = "images/" + id + ".webp"
-                        val oldSha = github!!.getFileSha(path)
-                        github!!.putFile(path, portraitBytes, oldSha, "Admin: portrait " + id + " " + nm)
+                        val portraitPath = "images/" + id + ".webp"
+                        val oldSha = github!!.getFileSha(portraitPath)
+                        github!!.putFile(portraitPath, portraitBytes, oldSha, "Admin: portrait " + id + " " + nm)
                     }
                 }, { save.isEnabled = true; toast("Сохранено: " + id); showCharacterDatabase() }, { e -> save.isEnabled = true; toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка")) })
             }
+
+            if (existing != null) {
+                val delete = bigButton("Удалить персонажа")
+                box.addView(delete, lp(0, 58))
+                delete.setOnClickListener {
+                    AlertDialog.Builder(this)
+                        .setTitle("Удалить персонажа?")
+                        .setMessage(
+                            "Персонаж " + existing.name +
+                                " (" + existing.id + ") будет удалён из базы, " +
+                                "его упоминания в баннерах и его портрет."
+                        )
+                        .setNegativeButton("Отмена", null)
+                        .setPositiveButton("Удалить") { _, _ ->
+                            delete.isEnabled = false
+                            runBackground({
+                                r.deleteCharacter(game, existing.id)
+                            }, {
+                                toast("Персонаж удалён: " + existing.id)
+                                showCharacterDatabase()
+                            }, { e ->
+                                delete.isEnabled = true
+                                toast("Ошибка удаления: " + (e.message ?: "неизвестная ошибка"))
+                            })
+                        }
+                        .show()
+                }
+            }
+
             addBack(box); setContentView(wrap(box))
         }, { e -> toast("Ошибка чтения базы: " + (e.message ?: "неизвестная ошибка")) })
     }
@@ -337,7 +366,78 @@ class AdminMainActivity : AppCompatActivity() {
             selectedView.setOnClickListener { val fiveChars = chars.filter { it.rarity >= 5 }; val labels = fiveChars.map { it.id + " • " + it.name + " • ★" + it.rarity }.toTypedArray(); val checked = BooleanArray(fiveChars.size) { selected.contains(fiveChars[it].id) }; AlertDialog.Builder(this).setTitle("5★ персонажи").setMultiChoiceItems(labels, checked) { _, which, isChecked -> if (isChecked) selected.add(fiveChars[which].id) else selected.remove(fiveChars[which].id); selectedView.text = "Выбрано: " + selected.size }.setPositiveButton("Готово", null).show() }
             box.addView(label("4★ персонажи", muted, 12f)); val selectedFour = existing?.fourStars?.toMutableSet() ?: mutableSetOf(); val selectedFourView = bigButton("Выбрано: " + selectedFour.size); box.addView(selectedFourView, lp(0, 58))
             selectedFourView.setOnClickListener { val fourChars = chars.filter { it.rarity == 4 }; val labels = fourChars.map { it.id + " • " + it.name + " • ★4" }.toTypedArray(); val checked = BooleanArray(fourChars.size) { selectedFour.contains(fourChars[it].id) }; AlertDialog.Builder(this).setTitle("4★ персонажи").setMultiChoiceItems(labels, checked) { _, which, isChecked -> if (isChecked) selectedFour.add(fourChars[which].id) else selectedFour.remove(fourChars[which].id); selectedFourView.text = "Выбрано: " + selectedFour.size }.setPositiveButton("Готово", null).show() }
-            val save = bigButton("Сохранить в GitHub"); box.addView(save, lp(0, 58)); save.setOnClickListener { val row = BannerRow(phase.text.toString().trim(), start.text.toString().trim(), end.text.toString().trim(), selected.toMutableList(), selectedFour.toMutableList()); if (row.phase.isBlank() || row.startDate.isBlank() || row.endDate.isBlank()) { toast("Заполни версию и обе даты"); return@setOnClickListener }; runBackground({ val all = r.loadBanners(game, confirmed).first.toMutableList(); val idx = existing?.let { old -> all.indexOfFirst { it.phase == old.phase && it.startDate == old.startDate && it.endDate == old.endDate } } ?: -1; if (idx >= 0) all[idx] = row else all.add(row); r.saveBanners(game, confirmed, all) }, { toast("Баннер сохранён"); showBannerList(game, confirmed) }, { e -> toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка")) }) }
+            val save = bigButton("Сохранить в GitHub"); box.addView(save, lp(0, 58))
+            save.setOnClickListener {
+                val row = BannerRow(
+                    phase.text.toString().trim(),
+                    start.text.toString().trim(),
+                    end.text.toString().trim(),
+                    selected.toMutableList(),
+                    selectedFour.toMutableList()
+                )
+                if (row.phase.isBlank() || row.startDate.isBlank() || row.endDate.isBlank()) {
+                    toast("Заполни версию и обе даты")
+                    return@setOnClickListener
+                }
+                save.isEnabled = false
+                runBackground({
+                    val all = r.loadBanners(game, confirmed).first.toMutableList()
+                    val idx = existing?.let { old ->
+                        all.indexOfFirst {
+                            it.phase == old.phase &&
+                                it.startDate == old.startDate &&
+                                it.endDate == old.endDate
+                        }
+                    } ?: -1
+                    if (idx >= 0) all[idx] = row else all.add(row)
+                    r.saveBanners(game, confirmed, all)
+                }, {
+                    save.isEnabled = true
+                    toast("Баннер сохранён")
+                    showBannerList(game, confirmed)
+                }, { e ->
+                    save.isEnabled = true
+                    toast("Ошибка сохранения: " + (e.message ?: "неизвестная ошибка"))
+                })
+            }
+
+            if (existing != null) {
+                val delete = bigButton("Удалить баннер")
+                box.addView(delete, lp(0, 58))
+                delete.setOnClickListener {
+                    AlertDialog.Builder(this)
+                        .setTitle("Удалить баннер?")
+                        .setMessage(
+                            "Удалить " + existing.phase +
+                                " (" + existing.startDate + " → " + existing.endDate + ")?"
+                        )
+                        .setNegativeButton("Отмена", null)
+                        .setPositiveButton("Удалить") { _, _ ->
+                            delete.isEnabled = false
+                            runBackground({
+                                val all = r.loadBanners(game, confirmed).first.toMutableList()
+                                val idx = all.indexOfFirst {
+                                    it.phase == existing.phase &&
+                                        it.startDate == existing.startDate &&
+                                        it.endDate == existing.endDate
+                                }
+                                if (idx < 0) {
+                                    throw IllegalStateException("Баннер уже отсутствует в GitHub")
+                                }
+                                all.removeAt(idx)
+                                r.saveBanners(game, confirmed, all)
+                            }, {
+                                toast("Баннер удалён")
+                                showBannerList(game, confirmed)
+                            }, { e ->
+                                delete.isEnabled = true
+                                toast("Ошибка удаления: " + (e.message ?: "неизвестная ошибка"))
+                            })
+                        }
+                        .show()
+                }
+            }
+
             addBack(box); setContentView(wrap(box))
         }, { e -> toast("Ошибка чтения персонажей: " + (e.message ?: "неизвестная ошибка")) })
     }
