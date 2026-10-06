@@ -73,7 +73,24 @@ class AdminRepository(private val github: GitHubClient) {
             currentSha,
             "Admin: update " + game.name + " character database"
         )
-        github.triggerDataSync("characters:" + game.key)
+
+        // Verify the exact character table immediately after GitHub accepts the PUT.
+        // The repository's push trigger already starts the generation workflow;
+        // a second repository_dispatch is unnecessary and could falsely report
+        // "save failed" after the file was actually written.
+        val saved = loadCharacters(game)
+        val expected = chars.map {
+            listOf(it.id, it.name, it.element, it.rarity.toString()).joinToString("|")
+        }.sorted()
+        val actual = saved.map {
+            listOf(it.id, it.name, it.element, it.rarity.toString()).joinToString("|")
+        }.sorted()
+        if (actual != expected) {
+            throw IllegalStateException(
+                "GitHub принял файл, но база персонажей не совпала после повторного чтения: " +
+                    "ожидалось " + expected.size + ", получено " + actual.size
+            )
+        }
     }
 
     fun deleteCharacter(game: GameMeta, id: String) {
@@ -245,7 +262,6 @@ class AdminRepository(private val github: GitHubClient) {
             )
         }
 
-        github.triggerDataSync("banners:" + game.key)
     }
 
     private fun bannerKey(row: BannerRow): String =
