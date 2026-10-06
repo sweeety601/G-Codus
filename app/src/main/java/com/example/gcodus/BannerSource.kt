@@ -81,12 +81,13 @@ object BannerSource {
                         confirmedCurrent.forEach { put(phaseJson(it)) }
                     })
                     .put("next", JSONArray().apply {
-                        confirmedFuture.take(1).forEach { put(phaseJson(it)) }
+                        // All future confirmed and unconfirmed phases belong to the
+                        // single main "Следующие баннеры" section.
+                        val futureRows = (confirmedFuture + leakUpcoming)
+                            .sortedBy { it.startInstant }
+                        futureRows.forEach { put(phaseJson(it)) }
                     })
-                    .put("upcoming", JSONArray().apply {
-                        confirmedFutureWithoutNext.forEach { put(phaseJson(it)) }
-                        leakUpcoming.forEach { put(phaseJson(it)) }
-                    })
+                    .put("upcoming", JSONArray())
                     .put("history", JSONArray().apply {
                         confirmedHistory.forEach { put(phaseJson(it)) }
                     })
