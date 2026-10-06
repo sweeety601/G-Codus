@@ -52,8 +52,12 @@ object BannerSource {
             // Confirmed upcoming phases first, then leak rows.
             // A leak never replaces a confirmed row and is never used for current/history.
             val confirmedFutureWithoutNext = confirmedFuture.drop(1)
+            val confirmedPhases = confirmedSorted
+                .map { it.phase.trim().lowercase() }
+                .toSet()
             val leakUpcoming = leaks
                 .filter { it.endInstant.isAfter(now) }
+                .filter { it.phase.trim().lowercase() !in confirmedPhases }
                 .sortedBy { it.startInstant }
 
             fun phaseJson(row: BannerRowData): JSONObject =
