@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-06T12:39:13.274723+00:00",
+  "generated_at": "2026-10-06T13:55:51.431407+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -13,8 +13,7 @@
           "end": "2026-10-16T00:00:00Z",
           "characters": [
             "1.31",
-            "1.32",
-            "1.55"
+            "1.32"
           ],
           "four_star": [
             "1.19",
@@ -28,18 +27,20 @@
       "next": [
         {
           "phase": "3.7 Phase 2",
-          "start": "2026-10-16T00:00:00Z",
-          "end": "2026-10-27T00:00:00Z",
+          "start": "2026-10-17T00:00:00Z",
+          "end": "2026-10-28T00:00:00Z",
           "characters": [
-            "1.55"
+            "1.7",
+            "1.10",
+            "1.11"
           ],
           "four_star": [
-            "1.24",
+            "1.41",
             "1.26",
-            "1.41"
+            "1.24"
           ],
-          "source_status": "unconfirmed",
-          "unconfirmed": true
+          "source_status": "confirmed",
+          "unconfirmed": false
         }
       ],
       "upcoming": [],
