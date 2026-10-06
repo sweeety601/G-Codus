@@ -76,6 +76,47 @@ class AdminRepository(private val github: GitHubClient) {
         github.triggerDataSync("characters:" + game.key)
     }
 
+    fun deleteCharacter(game: GameMeta, id: String) {
+        val chars = loadCharacters(game)
+        if (chars.none { it.id == id }) return
+
+        // Remove the character from the master character table first.
+        saveCharacters(game, chars.filterNot { it.id == id })
+
+        // Keep banner tables consistent: a deleted character must not remain
+        // referenced there and later appear in the app as a bare database ID.
+        listOf(true, false).forEach { confirmed ->
+            val existing = loadBanners(game, confirmed).first
+            val cleaned = existing.map { row ->
+                BannerRow(
+                    row.phase,
+                    row.startDate,
+                    row.endDate,
+                    row.characters.filterNot { it == id }.toMutableList(),
+                    row.fourStars.filterNot { it == id }.toMutableList()
+                )
+            }
+
+            val changed = cleaned.zip(existing).any { (after, before) ->
+                after.characters != before.characters || after.fourStars != before.fourStars
+            }
+            if (changed) {
+                saveBanners(game, confirmed, cleaned)
+            }
+        }
+
+        // Remove the corresponding portrait as part of character deletion.
+        val portraitPath = "images/" + id + ".webp"
+        val portraitSha = github.getFileSha(portraitPath)
+        if (portraitSha != null) {
+            github.deleteFile(
+                portraitPath,
+                portraitSha,
+                "Admin: delete portrait " + id
+            )
+        }
+    }
+
     fun nextId(game: GameMeta, chars: List<AdminCharacter>): String {
         var max = 0
         chars.forEach {
@@ -178,6 +219,19 @@ class AdminRepository(private val github: GitHubClient) {
             currentSha,
             "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks"
         )
+
+        // Once the canonical .xlsx exists, remove the old extensionless workbook.
+        // Otherwise a deleted row could be resurrected by loadBanners(), which
+        // intentionally merges legacy data as a fallback.
+        val legacyPath = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks"
+        val legacySha = github.getFileSha(legacyPath)
+        if (legacySha != null) {
+            github.deleteFile(
+                legacyPath,
+                legacySha,
+                "Admin: remove legacy banner workbook " + game.name
+            )
+        }
 
         // Verify the exact canonical workbook immediately after GitHub accepts the PUT.
         // This prevents Admin from reporting success when the wrong/old workbook was read.
