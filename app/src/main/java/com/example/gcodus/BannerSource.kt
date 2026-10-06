@@ -18,10 +18,19 @@ object BannerSource {
         Triple("zzz", "Zenless Zone Zero", "05_Zenless_Zone_Zero")
     )
 
+    /*
+     * Excel is the runtime source of truth.
+     *
+     * IMPORTANT:
+     * - confirmed.xlsx is never merged with leaks.xlsx.
+     * - current / next / history come ONLY from confirmed.xlsx.
+     * - leaks.xlsx is used ONLY for the separate upcoming section.
+     * - We never silently replace one phase with another file's row.
+     */
     fun fetchNormalized(context: Context): String {
         val now = Instant.now()
         val out = JSONObject()
-            .put("version", 7)
+            .put("version", 8)
             .put("generated_at", now.toString())
             .put("source", "G-Codus banner Excel tables (direct)")
         val resultGames = JSONArray()
@@ -30,15 +39,22 @@ object BannerSource {
             val confirmed = readRows(base, true)
                 ?: throw IllegalStateException("Не удалось скачать подтверждённую таблицу: $base")
             val leaks = readRows(base, false) ?: emptyList()
-            val merged = linkedMapOf<String, BannerRowData>()
-            leaks.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = false) }
-            confirmed.forEach { merged[it.phase.lowercase()] = it.copy(confirmed = true) }
 
-            val rows = merged.values.sortedBy { it.startInstant }
-            val current = rows.filter { !it.startInstant.isAfter(now) && now.isBefore(it.endInstant) }
-            val future = rows.filter { it.startInstant.isAfter(now) }
-            val history = rows.filter { !it.endInstant.isAfter(now) }
+            val confirmedSorted = confirmed.sortedBy { it.startInstant }
+            val confirmedCurrent = confirmedSorted.filter {
+                !it.startInstant.isAfter(now) && now.isBefore(it.endInstant)
+            }
+            val confirmedFuture = confirmedSorted.filter { it.startInstant.isAfter(now) }
+            val confirmedHistory = confirmedSorted
+                .filter { !it.endInstant.isAfter(now) }
                 .sortedByDescending { it.startInstant }
+
+            // Confirmed upcoming phases first, then leak rows.
+            // A leak never replaces a confirmed row and is never used for current/history.
+            val confirmedFutureWithoutNext = confirmedFuture.drop(1)
+            val leakUpcoming = leaks
+                .filter { it.endInstant.isAfter(now) }
+                .sortedBy { it.startInstant }
 
             fun phaseJson(row: BannerRowData): JSONObject =
                 JSONObject()
@@ -46,8 +62,8 @@ object BannerSource {
                     .put("version", row.phase)
                     .put("start", row.start)
                     .put("end", row.end)
-                    .put("characters", JSONArray(row.characters))
-                    .put("five_star", JSONArray(row.characters))
+                    .put("characters", JSONArray(row.fiveStars))
+                    .put("five_star", JSONArray(row.fiveStars))
                     .put("four_star", JSONArray(row.fourStars))
                     .put("source_status", if (row.confirmed) "confirmed" else "unconfirmed")
                     .put("unconfirmed", !row.confirmed)
@@ -56,10 +72,19 @@ object BannerSource {
                 JSONObject()
                     .put("id", gameId)
                     .put("name", gameName)
-                    .put("current", JSONArray().apply { current.forEach { put(phaseJson(it)) } })
-                    .put("next", JSONArray().apply { future.take(1).forEach { put(phaseJson(it)) } })
-                    .put("upcoming", JSONArray().apply { future.drop(1).forEach { put(phaseJson(it)) } })
-                    .put("history", JSONArray().apply { history.forEach { put(phaseJson(it)) } })
+                    .put("current", JSONArray().apply {
+                        confirmedCurrent.forEach { put(phaseJson(it)) }
+                    })
+                    .put("next", JSONArray().apply {
+                        confirmedFuture.take(1).forEach { put(phaseJson(it)) }
+                    })
+                    .put("upcoming", JSONArray().apply {
+                        confirmedFutureWithoutNext.forEach { put(phaseJson(it)) }
+                        leakUpcoming.forEach { put(phaseJson(it)) }
+                    })
+                    .put("history", JSONArray().apply {
+                        confirmedHistory.forEach { put(phaseJson(it)) }
+                    })
             )
         }
 
@@ -80,18 +105,44 @@ object BannerSource {
         }
         if (rows.isEmpty()) return emptyList()
 
-        val header = rows.first().map { it.trim().lowercase().replace("ё", "е") }
+        val header = rows.first().map { normalizeHeader(it) }
 
         fun col(vararg names: String): Int {
-            val aliases = names.map { it.trim().lowercase().replace("ё", "е") }.toSet()
+            val aliases = names.map(::normalizeHeader).toSet()
             return header.indexOfFirst { it in aliases }
         }
 
-        val phaseCol = col("версия и фаза", "phase", "version and phase")
-        val startCol = col("дата начала", "start date", "start_date")
-        val endCol = col("дата окончания", "end date", "end_date")
-        val charsCol = col("персонажи в составе баннера", "персонажи", "characters")
-        val fourCol = col("4* в баннере", "4★ в баннере", "4*", "four star", "four_star")
+        val phaseCol = col(
+            "версия и фаза", "phase", "version and phase",
+            "версия", "version"
+        )
+        val startCol = col(
+            "дата начала", "start date", "start_date",
+            "начало", "start"
+        )
+        val endCol = col(
+            "дата окончания", "end date", "end_date",
+            "конец", "end"
+        )
+
+        // Support both the old generic "characters" column and explicit 5★/4★ columns.
+        val fiveStarCol = col(
+            "5* в баннере", "5★ в баннере", "5*",
+            "5 star", "5-star", "five star", "five_star",
+            "5star", "featured 5 star", "featured 5★",
+            "персонажи 5*", "персонажи 5★"
+        )
+        val charsCol = col(
+            "персонажи в составе баннера", "персонажи", "characters",
+            "character", "featured characters"
+        )
+        val fourCol = col(
+            "4* в баннере", "4★ в баннере", "4*",
+            "4 star", "4-star", "four star", "four_star",
+            "4star", "featured 4 star", "featured 4★",
+            "персонажи 4*", "персонажи 4★"
+        )
+
         if (phaseCol < 0 || startCol < 0 || endCol < 0) return emptyList()
 
         return rows.drop(1).mapNotNull { row ->
@@ -100,19 +151,38 @@ object BannerSource {
             val end = normalizeDate(row.getOrNull(endCol).orEmpty())
             if (phase.isBlank() || start.isBlank() || end.isBlank()) return@mapNotNull null
 
+            val genericCharacters = splitIds(row.getOrNull(charsCol).orEmpty())
+            val fiveStars = if (fiveStarCol >= 0) {
+                splitIds(row.getOrNull(fiveStarCol).orEmpty())
+            } else {
+                genericCharacters
+            }
+            val fourStars = splitIds(row.getOrNull(fourCol).orEmpty())
+
             BannerRowData(
                 phase = phase,
                 start = start,
                 end = end,
-                characters = splitIds(row.getOrNull(charsCol).orEmpty()),
-                fourStars = splitIds(row.getOrNull(fourCol).orEmpty()).take(3),
+                fiveStars = fiveStars,
+                fourStars = fourStars,
                 confirmed = confirmed
             )
         }
     }
 
+    private fun normalizeHeader(value: String): String =
+        value.trim()
+            .lowercase()
+            .replace("ё", "е")
+            .replace("★", "*")
+            .replace("\u00A0", " ")
+            .replace(Regex("\\s+"), " ")
+
     private fun splitIds(value: String): List<String> =
-        value.split(',', ';', '\n').map { it.trim() }.filter { it.isNotBlank() }.distinct()
+        value.split(',', ';', '\n', '|')
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
 
     private fun normalizeDate(value: String): String {
         val v = value.trim()
@@ -156,7 +226,7 @@ object BannerSource {
         val phase: String,
         val start: String,
         val end: String,
-        val characters: List<String>,
+        val fiveStars: List<String>,
         val fourStars: List<String>,
         val confirmed: Boolean
     ) {
