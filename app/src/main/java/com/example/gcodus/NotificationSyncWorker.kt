@@ -61,7 +61,7 @@ class NotificationSyncWorker(
             val initialized = prefs.getBoolean(KEY_INITIALIZED, false)
 
             notifyFollowedGames(prefs, bannerJson, initialized)
-            notifyTrackedCharacters(prefs, bannerJson)
+            notifyTrackedCharacters(prefs, bannerJson, characterFetch)
             notifyNewCharacters(prefs, characterFetch)
 
             if (codeJson != null) {
@@ -185,7 +185,8 @@ class NotificationSyncWorker(
     /** Character lifecycle notifications for every tracked identity in every game. */
     private fun notifyTrackedCharacters(
         prefs: android.content.SharedPreferences,
-        json: String
+        json: String,
+        characterFetch: CharacterFetchResult
     ) {
         val games = JSONObject(json).optJSONArray("games") ?: JSONArray()
 
@@ -198,8 +199,24 @@ class NotificationSyncWorker(
             val next = readPhases(game, "next")
                 .sortedWith(compareBy<JSONObject> { phaseStart(it) }.thenBy { phaseIdentity(it) })
 
+            // Tracking keys are based on canonical character IDs (for example
+            // "1.55" becomes "155"). Resolve those IDs through the live
+            // character Excel table before constructing any user-facing text.
+            // Never display a numeric/database ID as a character name.
+            val namesByIdentity = characterFetch.characters
+                .filter { it.gameId == gameId && it.name.isNotBlank() }
+                .flatMap { character ->
+                    listOf(
+                        canonicalCharacterId(gameId, character.id) to character.name,
+                        canonicalCharacterId(gameId, character.name) to character.name
+                    )
+                }
+                .toMap()
+
             for (identity in trackedIdentities(gameId)) {
-                val name = notificationCharacterDisplayName(gameId, identity)
+                val name = namesByIdentity[canonicalCharacterId(gameId, identity)]
+                    ?: notificationCharacterDisplayName(gameId, identity)
+                if (name.isBlank()) continue
 
                 notifyCurrentBannerAppearance(
                     prefs, gameId, identity, name, current
@@ -586,6 +603,15 @@ class NotificationSyncWorker(
         .replace(Regex("[^a-z0-9]+"), "")
 
     private fun notificationCharacterDisplayName(gameId: String, identity: String): String {
+        // A numeric-only identity is a database ID, not a user-facing name.
+        // If live character metadata is unavailable, skip the notification
+        // instead of showing values such as "155".
+        if (normalizeIdentity(identity).isNotBlank() &&
+            normalizeIdentity(identity).all { it.isDigit() }
+        ) {
+            return ""
+        }
+
         return when (gameId) {
             "zzz" -> when (normalizeIdentity(identity)) {
                 "anby", "anbydemara", "anbysoldier0", "soldier0anby" -> "Anby"
