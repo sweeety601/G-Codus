@@ -434,28 +434,29 @@ class NotificationSyncWorker(
         if (newCodes.isEmpty()) return
 
         val byGame = newCodes.groupBy { it.substringBefore("|") }
-        var allSucceeded = true
+        val delivered = old.toMutableSet()
 
         for ((gameId, entries) in byGame) {
             val codes = entries
                 .map { it.substringAfter("|") }
                 .sorted()
 
-            if (!showNotificationSafe(
+            if (showNotificationSafe(
                     stableId("new_codes_" + gameId + "_" + codes.joinToString(",")),
                     gameName(gameId),
                     "Новые промокоды: " + codes.joinToString(", ") + "."
                 )
             ) {
-                allSucceeded = false
+                delivered.addAll(entries)
             }
         }
 
-        if (allSucceeded) {
-            prefs.edit()
-                .putString("codes_snapshot", JSONArray(current.sorted()).toString())
-                .apply()
-        }
+        // Mark only successfully delivered codes as seen. A failed game can
+        // retry later without causing already-delivered codes from other games
+        // to be shown again.
+        prefs.edit()
+            .putString("codes_snapshot", JSONArray(delivered.sorted()).toString())
+            .apply()
     }
 
     private fun saveCodeBaseline(
