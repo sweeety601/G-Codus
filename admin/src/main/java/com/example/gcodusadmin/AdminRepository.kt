@@ -88,60 +88,80 @@ class AdminRepository(private val github: GitHubClient) {
     }
 
     fun loadBanners(game: GameMeta, confirmed: Boolean): Pair<MutableList<BannerRow>, String?> {
-        val path = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks" + ".xlsx"
+        val status = if (confirmed) "confirmed" else "leaks"
+        val path = "banners/" + game.bannerPrefix + "_" + status + ".xlsx"
+        val legacyPath = "banners/" + game.bannerPrefix + "_" + status
+
+        // The .xlsx file is canonical, but old repositories may still contain an
+        // Excel workbook without the .xlsx extension. Read both so Admin never
+        // hides real banner rows just because the migration workflow has not run yet.
+        val canonical = readBannerFileOrEmpty(path)
+        val legacy = readBannerFileOrEmpty(legacyPath)
+
+        val merged = linkedMapOf<String, BannerRow>()
+        legacy.first.forEach { row -> merged[bannerKey(row)] = row }
+        canonical.first.forEach { row -> merged[bannerKey(row)] = row }
+
+        return Pair(merged.values.toMutableList(), canonical.second)
+    }
+
+    private fun readBannerFileOrEmpty(path: String): Pair<List<BannerRow>, String?> {
         return try {
             val file = github.getFile(path)
-            val rows = XlsxCodec.read(file.bytes)
-            if (rows.isEmpty()) {
-                Pair(mutableListOf(), file.sha)
-            } else {
-                val header = rows.first().map(::normalizeHeader)
-                fun col(names: List<String>) = find(header, names)
-
-                val phase = col(listOf("версия и фаза", "version and phase", "phase"))
-                val start = col(listOf("дата начала", "start date", "start_date"))
-                val end = col(listOf("дата окончания", "end date", "end_date"))
-                val chars = col(listOf("персонажи в составе баннера", "персонажи", "characters"))
-                val four = col(listOf("4* в баннере", "4★ в баннере", "4*", "four star", "four_star"))
-
-                if (phase < 0 || start < 0 || end < 0) {
-                    throw IllegalStateException(
-                        "Файл " + path + " прочитан, но не найдены обязательные колонки графика. Заголовки: " +
-                            rows.first().joinToString(" | ")
-                    )
-                }
-
-                val list = rows.drop(1).mapNotNull { row ->
-                    val p = row.getOrNull(phase).orEmpty().trim()
-                    if (p.isBlank()) {
-                        null
-                    } else {
-                        BannerRow(
-                            p,
-                            row.getOrNull(start).orEmpty().trim(),
-                            row.getOrNull(end).orEmpty().trim(),
-                            splitIds(row.getOrNull(chars).orEmpty()),
-                            splitIds(row.getOrNull(four).orEmpty())
-                        )
-                    }
-                }.toMutableList()
-
-                Pair(list, file.sha)
-            }
+            Pair(parseBannerRows(path, file.bytes), file.sha)
         } catch (e: Exception) {
             if (e.message?.contains("GitHub API HTTP 404") == true || e.message?.contains("RAW HTTP 404") == true) {
-                Pair(mutableListOf(), null)
+                Pair(emptyList(), null)
             } else {
                 throw e
             }
         }
     }
 
+    private fun parseBannerRows(path: String, bytes: ByteArray): List<BannerRow> {
+        val rows = XlsxCodec.read(bytes)
+        if (rows.isEmpty()) return emptyList()
+
+        val header = rows.first().map(::normalizeHeader)
+        fun col(names: List<String>) = find(header, names)
+
+        val phase = col(listOf("версия и фаза", "version and phase", "phase"))
+        val start = col(listOf("дата начала", "start date", "start_date"))
+        val end = col(listOf("дата окончания", "end date", "end_date"))
+        val chars = col(listOf("персонажи в составе баннера", "персонажи", "characters"))
+        val four = col(listOf("4* в баннере", "4★ в баннере", "4*", "four star", "four_star"))
+
+        if (phase < 0 || start < 0 || end < 0) {
+            throw IllegalStateException(
+                "Файл " + path + " прочитан, но не найдены обязательные колонки графика. Заголовки: " +
+                    rows.first().joinToString(" | ")
+            )
+        }
+
+        return rows.drop(1).mapNotNull { row ->
+            val p = row.getOrNull(phase).orEmpty().trim()
+            if (p.isBlank()) null else BannerRow(
+                p,
+                row.getOrNull(start).orEmpty().trim(),
+                row.getOrNull(end).orEmpty().trim(),
+                splitIds(row.getOrNull(chars).orEmpty()),
+                splitIds(row.getOrNull(four).orEmpty())
+            )
+        }
+    }
+
     fun saveBanners(game: GameMeta, confirmed: Boolean, rows: List<BannerRow>) {
         val path = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks" + ".xlsx"
         val currentSha = github.getFileSha(path)
+
         val table = mutableListOf<MutableList<String>>()
-        table += mutableListOf("Версия и фаза", "Дата начала", "Дата окончания", "Персонажи в составе баннера", "4* в баннере")
+        table += mutableListOf(
+            "Версия и фаза",
+            "Дата начала",
+            "Дата окончания",
+            "Персонажи в составе баннера",
+            "4* в баннере"
+        )
         rows.forEach { b ->
             table += mutableListOf(
                 b.phase,
@@ -151,14 +171,35 @@ class AdminRepository(private val github: GitHubClient) {
                 b.fourStars.joinToString(", ")
             )
         }
+
         github.putFile(
             path,
             XlsxCodec.write(table),
             currentSha,
             "Admin: update " + game.name + " " + if (confirmed) "confirmed banners" else "leaks"
         )
+
+        // Verify the exact canonical workbook immediately after GitHub accepts the PUT.
+        // This prevents Admin from reporting success when the wrong/old workbook was read.
+        val saved = parseBannerRows(path, github.getFile(path).bytes)
+        val expected = rows.map(::bannerKey)
+        val actual = saved.map(::bannerKey)
+        if (actual != expected) {
+            throw IllegalStateException(
+                "GitHub принял файл, но данные баннеров не совпали после повторного чтения: " +
+                    "ожидалось " + expected.size + ", получено " + actual.size
+            )
+        }
+
         github.triggerDataSync("banners:" + game.key)
     }
+
+    private fun bannerKey(row: BannerRow): String =
+        listOf(
+            row.phase.trim().lowercase(),
+            row.startDate.trim(),
+            row.endDate.trim()
+        ).joinToString("|")
 
     private fun find(header: List<String>, names: List<String>): Int {
         val aliases = names.map(::normalizeHeader).toSet()
@@ -186,7 +227,11 @@ class AdminRepository(private val github: GitHubClient) {
         Regex("""\d+""").find(value)?.value?.toIntOrNull() ?: 5
 
     private fun splitIds(value: String): MutableList<String> =
-        value.split(',').map { it.trim() }.filter { it.isNotBlank() }.distinct().toMutableList()
+        value.split(Regex("[,;\\n]+"))
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .toMutableList()
 
     fun loadAllCharacters(): List<AdminCharacter> =
         GameCatalog.games.flatMap { loadCharacters(it) }
