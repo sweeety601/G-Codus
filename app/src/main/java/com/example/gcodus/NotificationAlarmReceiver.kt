@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
@@ -23,11 +24,21 @@ class NotificationAlarmReceiver : BroadcastReceiver() {
             val pending = pendingIntent(context)
             val triggerAt = System.currentTimeMillis() + INTERVAL_MINUTES * 60_000L
             alarmManager.cancel(pending)
-            alarmManager.setAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                triggerAt,
-                pending
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                alarmManager.canScheduleExactAlarms()
+            ) {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pending
+                )
+            } else {
+                alarmManager.setAndAllowWhileIdle(
+                    AlarmManager.RTC_WAKEUP,
+                    triggerAt,
+                    pending
+                )
+            }
         }
 
         private fun pendingIntent(context: Context): PendingIntent =
