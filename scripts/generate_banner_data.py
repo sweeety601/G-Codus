@@ -16,7 +16,7 @@ GAMES = {
     "zzz": ("Zenless Zone Zero", "05_Zenless_Zone_Zero"),
 }
 HEADERS = ["Версия и фаза", "Дата начала", "Дата окончания", "Персонажи в составе баннера", "4* в баннере"]
-PHASE_RE = re.compile(r"^\d+\.\d+ Phase \d+$", re.IGNORECASE)
+PHASE_RE = re.compile(r"^(\d+\.\d+)\s+(Phase|Фаза)\s+(\d+)$", re.IGNORECASE)
 ID_RE = re.compile(r"^[1-5]\.\d+$")
 
 
@@ -51,8 +51,12 @@ def read_table(path, game_prefix):
         phase = str(row[indexes[HEADERS[0].lower()]] or "").strip()
         if not phase:
             continue
-        if not PHASE_RE.fullmatch(phase):
+        match = PHASE_RE.fullmatch(phase)
+        if not match:
             raise SystemExit(f"{path}: invalid version/phase '{phase}'")
+        # Keep the Excel value readable, but normalize Russian/English phase labels
+        # to one canonical representation in the generated feed.
+        phase = f"{match.group(1)} Phase {match.group(3)}"
         start = normalize_date(row[indexes[HEADERS[1].lower()]])
         end = normalize_date(row[indexes[HEADERS[2].lower()]])
         characters = split_ids(row[indexes[HEADERS[3].lower()]])
