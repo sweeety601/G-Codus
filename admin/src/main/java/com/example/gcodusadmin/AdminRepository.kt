@@ -74,23 +74,9 @@ class AdminRepository(private val github: GitHubClient) {
             "Admin: update " + game.name + " character database"
         )
 
-        // Verify the exact character table immediately after GitHub accepts the PUT.
-        // The repository's push trigger already starts the generation workflow;
-        // a second repository_dispatch is unnecessary and could falsely report
-        // "save failed" after the file was actually written.
-        val saved = loadCharacters(game)
-        val expected = chars.map {
-            listOf(it.id, it.name, it.element, it.rarity.toString()).joinToString("|")
-        }.sorted()
-        val actual = saved.map {
-            listOf(it.id, it.name, it.element, it.rarity.toString()).joinToString("|")
-        }.sorted()
-        if (actual != expected) {
-            throw IllegalStateException(
-                "GitHub принял файл, но база персонажей не совпала после повторного чтения: " +
-                    "ожидалось " + expected.size + ", получено " + actual.size
-            )
-        }
+        // The XLSX is generated locally from the edited table and is therefore
+        // already validated by the codec. Do not immediately re-read the binary
+        // file from GitHub: GitHub/CDN may briefly serve the previous blob.
     }
 
     fun deleteCharacter(game: GameMeta, id: String) {
@@ -250,18 +236,9 @@ class AdminRepository(private val github: GitHubClient) {
             )
         }
 
-        // Verify the exact canonical workbook immediately after GitHub accepts the PUT.
-        // This prevents Admin from reporting success when the wrong/old workbook was read.
-        val saved = parseBannerRows(path, github.getFile(path).bytes)
-        val expected = rows.map(::bannerKey)
-        val actual = saved.map(::bannerKey)
-        if (actual != expected) {
-            throw IllegalStateException(
-                "GitHub принял файл, но данные баннеров не совпали после повторного чтения: " +
-                    "ожидалось " + expected.size + ", получено " + actual.size
-            )
-        }
-
+        // Do not immediately re-read the binary XLSX from GitHub here.
+        // GitHub/CDN can briefly return the previous blob after PUT, which used
+        // to turn a successful save into a false "Excel read error".
     }
 
     private fun bannerKey(row: BannerRow): String =
