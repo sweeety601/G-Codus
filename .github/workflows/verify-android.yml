@@ -13,6 +13,8 @@ on:
       - "gradlew"
       - "gradlew.bat"
       - ".github/workflows/verify-android.yml"
+      - "banners/**/*.xlsx"
+      - "banners/**/*.xls"
   workflow_dispatch:
 
 permissions:
