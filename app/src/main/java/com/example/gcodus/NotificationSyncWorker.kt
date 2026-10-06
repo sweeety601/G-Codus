@@ -126,14 +126,15 @@ class NotificationSyncWorker(
                 oldCurrent != currentSignature
             ) {
                 val version = displayVersion(current.firstOrNull())
-                showNotificationSafe(
-                    stableId("game_current_" + gameId + "_" + currentSignature),
-                    gameName(gameId),
-                    "Началась новая фаза баннеров: " + version + "."
-                )
-            }
-
-            if (currentSignature.isNotBlank()) {
+                if (showNotificationSafe(
+                        stableId("game_current_" + gameId + "_" + currentSignature),
+                        gameName(gameId),
+                        "Началась новая фаза баннеров: " + version + "."
+                    )
+                ) {
+                    prefs.edit().putString(currentKey, currentSignature).apply()
+                }
+            } else if (currentSignature.isNotBlank()) {
                 prefs.edit().putString(currentKey, currentSignature).apply()
             } else {
                 prefs.edit().remove(currentKey).apply()
@@ -165,14 +166,15 @@ class NotificationSyncWorker(
                         "Обновилась следующая фаза баннеров: " + displayVersion(nextPhase) + "."
                 }
 
-                showNotificationSafe(
-                    stableId("game_next_" + gameId + "_" + nextSignature),
-                    gameName(gameId),
-                    body
-                )
-            }
-
-            if (nextSignature.isNotBlank()) {
+                if (showNotificationSafe(
+                        stableId("game_next_" + gameId + "_" + nextSignature),
+                        gameName(gameId),
+                        body
+                    )
+                ) {
+                    prefs.edit().putString(nextKey, nextSignature).apply()
+                }
+            } else if (nextSignature.isNotBlank()) {
                 prefs.edit().putString(nextKey, nextSignature).apply()
             } else {
                 prefs.edit().remove(nextKey).apply()
@@ -383,11 +385,14 @@ class NotificationSyncWorker(
                     val names = newIds.map {
                         current[it].orEmpty().ifBlank { prettify(it) }
                     }
-                    showNotificationSafe(
-                        stableId("new_characters_" + gameId + "_" + newIds.joinToString(",")),
-                        gameName(gameId),
-                        "Новые персонажи: " + names.joinToString(", ") + "."
-                    )
+                    if (!showNotificationSafe(
+                            stableId("new_characters_" + gameId + "_" + newIds.joinToString(",")),
+                            gameName(gameId),
+                            "Новые персонажи: " + names.joinToString(", ") + "."
+                        )
+                    ) {
+                        continue
+                    }
                 }
             }
 
