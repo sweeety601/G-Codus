@@ -52,12 +52,13 @@ object BannerSource {
             // Confirmed upcoming phases first, then leak rows.
             // A leak never replaces a confirmed row and is never used for current/history.
             val confirmedFutureWithoutNext = confirmedFuture.drop(1)
-            val confirmedPhases = confirmedSorted
-                .map { it.phase.trim().lowercase() }
+            // A conflict is defined ONLY by version + phase.
+            val confirmedVersionPhases = confirmedSorted
+                .map { versionPhaseKey(it.phase) }
                 .toSet()
             val leakUpcoming = leaks
                 .filter { it.endInstant.isAfter(now) }
-                .filter { it.phase.trim().lowercase() !in confirmedPhases }
+                .filter { versionPhaseKey(it.phase) !in confirmedVersionPhases }
                 .sortedBy { it.startInstant }
 
             fun phaseJson(row: BannerRowData): JSONObject =
@@ -171,6 +172,19 @@ object BannerSource {
                 fourStars = fourStars,
                 confirmed = confirmed
             )
+        }
+    }
+
+    private fun versionPhaseKey(value: String): String {
+        val normalized = value.trim()
+            .lowercase()
+            .replace("ё", "е")
+            .replace(Regex("\\s+"), " ")
+        val match = Regex("""^(\\d+\\.\\d+)\\s*(?:phase|фаза)\\s*(\\d+)""").find(normalized)
+        return if (match != null) {
+            "${match.groupValues[1]}:${match.groupValues[2]}"
+        } else {
+            normalized
         }
     }
 
