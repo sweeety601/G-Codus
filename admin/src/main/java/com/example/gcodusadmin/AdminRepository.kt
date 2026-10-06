@@ -195,7 +195,8 @@ class AdminRepository(private val github: GitHubClient) {
     }
 
     fun saveBanners(game: GameMeta, confirmed: Boolean, rows: List<BannerRow>) {
-        val path = "banners/" + game.bannerPrefix + "_" + if (confirmed) "confirmed" else "leaks" + ".xlsx"
+        val status = if (confirmed) "confirmed" else "leaks"
+        val path = "banners/" + game.bannerPrefix + "_" + status + ".xlsx"
         val currentSha = github.getFileSha(path)
 
         val table = mutableListOf<MutableList<String>>()
