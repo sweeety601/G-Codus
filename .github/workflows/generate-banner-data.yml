@@ -38,6 +38,7 @@ jobs:
         run: |
           python - <<'PY'
           from pathlib import Path
+          from io import BytesIO
           from openpyxl import load_workbook, Workbook
 
           root = Path("banners")
@@ -56,7 +57,7 @@ jobs:
                   if not legacy.exists():
                       continue
 
-                  legacy_wb = load_workbook(legacy, read_only=True, data_only=True)
+                  legacy_wb = load_workbook(BytesIO(legacy.read_bytes()), read_only=True, data_only=True)
                   legacy_ws = legacy_wb.active
                   legacy_rows = [list(r) for r in legacy_ws.iter_rows(values_only=True)]
                   legacy_wb.close()
