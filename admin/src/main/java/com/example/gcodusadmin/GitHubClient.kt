@@ -14,7 +14,7 @@ class GitHubClient(private val token: String) {
         const val REPO = "sweeety601/G-Codus"
         private const val API = "https://api.github.com"
         private const val RAW = "https://raw.githubusercontent.com"
-        private const val VERSION = "2.0.14"
+        private const val VERSION = "2.0.15"
     }
 
     private fun apiConnection(method: String, path: String, authorized: Boolean = true): HttpURLConnection {
