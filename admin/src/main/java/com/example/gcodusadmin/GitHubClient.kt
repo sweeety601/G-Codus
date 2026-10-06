@@ -111,6 +111,32 @@ class GitHubClient(private val token: String) {
         return JSONObject(text).optString("sha").ifBlank { null }
     }
 
+    fun deleteFile(path: String, sha: String, message: String): String {
+        if (sha.isBlank()) throw IllegalArgumentException("Не указан SHA для удаления " + path)
+
+        val conn = apiConnection("DELETE", "contents/" + path, authorized = true)
+        conn.doOutput = true
+        conn.setRequestProperty("Content-Type", "application/json")
+        val payload = JSONObject()
+            .put("message", message)
+            .put("sha", sha)
+            .put("branch", "main")
+
+        conn.outputStream.use {
+            it.write(payload.toString().toByteArray(Charsets.UTF_8))
+        }
+
+        val text = body(conn)
+        if (conn.responseCode !in 200..299) {
+            throw IllegalStateException(
+                "Не удалось удалить " + path +
+                    ": GitHub HTTP " + conn.responseCode + " — " + shortError(text)
+            )
+        }
+
+        return JSONObject(text).optJSONObject("commit")?.optString("sha").orEmpty()
+    }
+
     fun triggerDataSync(reason: String) {
         val conn = apiConnection("POST", "dispatches", authorized = true)
         conn.doOutput = true
