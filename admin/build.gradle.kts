@@ -8,8 +8,8 @@ android {
         applicationId = "com.example.gcodusadmin"
         minSdk = 26
         targetSdk = 36
-        versionCode = 18
-        versionName = "2.0.15"
+        versionCode = 19
+        versionName = "2.0.16"
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_21
