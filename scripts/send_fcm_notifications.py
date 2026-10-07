@@ -383,8 +383,16 @@ def main():
 
     current_feed = load_json("data/banner_feed.json", {"games": {}})
     snapshot = load_json(SNAPSHOT_PATH, {"games": {}})
-    old_games = game_map(snapshot)
-    current_games = game_map(current_feed)
+
+    # generated_at is informational and changes on every feed generation.
+    # It must not create a fake notification-state change.
+    comparable_feed = dict(current_feed)
+    comparable_feed.pop("generated_at", None)
+    comparable_snapshot = dict(snapshot)
+    comparable_snapshot.pop("generated_at", None)
+
+    old_games = game_map(comparable_snapshot)
+    current_games = game_map(comparable_feed)
     character_names = read_character_names()
 
     info = json.loads(secret)
@@ -488,7 +496,11 @@ def main():
                 if future:
                     next_phase = future[0]
                     start = parse_dt(next_phase.get("start"))
-                    if start and start.astimezone(tz).date() == tomorrow:
+                    if (
+                        start
+                        and not next_phase.get("unconfirmed")
+                        and start.astimezone(tz).date() == tomorrow
+                    ):
                         send_event(
                             f"phase_tomorrow|{game_id}|{phase_id(next_phase)}",
                             "phase_tomorrow",
@@ -517,7 +529,11 @@ def main():
                     if character_id not in phase_characters(phase):
                         continue
                     start = parse_dt(phase.get("start"))
-                    if start and start.astimezone(tz).date() == tomorrow:
+                    if (
+                        start
+                        and not phase.get("unconfirmed")
+                        and start.astimezone(tz).date() == tomorrow
+                    ):
                         send_event(
                             f"char_tomorrow|{game_id}|{character_id}|{phase_id(phase)}",
                             "character_tomorrow",
@@ -584,11 +600,11 @@ def main():
             else:
                 all_sends_ok = False
 
-    if not SNAPSHOT_PATH.exists() or json.dumps(snapshot, sort_keys=True, ensure_ascii=False) != json.dumps(current_feed, sort_keys=True, ensure_ascii=False):
+    if not SNAPSHOT_PATH.exists() or json.dumps(comparable_snapshot, sort_keys=True, ensure_ascii=False) != json.dumps(comparable_feed, sort_keys=True, ensure_ascii=False):
         if all_sends_ok:
             SNAPSHOT_PATH.parent.mkdir(parents=True, exist_ok=True)
             SNAPSHOT_PATH.write_text(
-                json.dumps(current_feed, ensure_ascii=False, indent=2) + "\n",
+                json.dumps(comparable_feed, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
             print("Notification snapshot updated.")
