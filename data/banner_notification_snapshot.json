@@ -1,0 +1,204 @@
+{
+  "version": 6,
+  "source": "G-Codus banner Excel tables",
+  "games": {
+    "Wuthering Waves": {
+      "id": "wuwa",
+      "name": "Wuthering Waves",
+      "current": [
+        {
+          "phase": "3.7 Phase 1",
+          "start": "2026-09-30T00:00:00Z",
+          "end": "2026-10-22T00:00:00Z",
+          "characters": [
+            "1.31",
+            "1.23",
+            "1.32"
+          ],
+          "four_star": [
+            "1.9",
+            "1.49",
+            "1.19"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "next": [
+        {
+          "phase": "3.7 Phase 2",
+          "start": "2026-10-22T00:00:00Z",
+          "end": "2026-11-11T00:00:00Z",
+          "characters": [
+            "1.48",
+            "1.5",
+            "1.56",
+            "1.10"
+          ],
+          "four_star": [
+            "1.16",
+            "1.26",
+            "1.24"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Genshin Impact": {
+      "id": "genshin",
+      "name": "Genshin Impact",
+      "current": [
+        {
+          "phase": "7.1 Phase 1",
+          "start": "2026-09-23T00:00:00Z",
+          "end": "2026-10-14T00:00:00Z",
+          "characters": [
+            "2.116",
+            "2.117"
+          ],
+          "four_star": [
+            "2.32",
+            "2.26",
+            "2.17"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "next": [
+        {
+          "phase": "7.1 Phase 2",
+          "start": "2026-10-13T00:00:00Z",
+          "end": "2026-11-03T00:00:00Z",
+          "characters": [
+            "2.91",
+            "2.30"
+          ],
+          "four_star": [],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Honkai: Star Rail": {
+      "id": "starrail",
+      "name": "Honkai: Star Rail",
+      "current": [
+        {
+          "phase": "4.6 Phase 1",
+          "start": "2026-09-28T00:00:00Z",
+          "end": "2026-10-21T00:00:00Z",
+          "characters": [
+            "3.89",
+            "3.26"
+          ],
+          "four_star": [
+            "3.84",
+            "3.61",
+            "3.54"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "next": [
+        {
+          "phase": "4.6 Phase 2",
+          "start": "2026-10-21T00:00:00Z",
+          "end": "2026-11-10T00:00:00Z",
+          "characters": [
+            "3.89",
+            "3.55"
+          ],
+          "four_star": [
+            "3.54",
+            "3.84",
+            "3.61"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Arknights: Endfield": {
+      "id": "endfield",
+      "name": "Arknights: Endfield",
+      "current": [
+        {
+          "phase": "1.5 Phase 2",
+          "start": "2026-09-24T00:00:00Z",
+          "end": "2026-10-15T00:00:00Z",
+          "characters": [
+            "4.15"
+          ],
+          "four_star": [],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "next": [
+        {
+          "phase": "1.6 Phase 1",
+          "start": "2026-10-15T00:00:00Z",
+          "end": "2026-11-05T00:00:00Z",
+          "characters": [
+            "4.32"
+          ],
+          "four_star": [],
+          "source_status": "unconfirmed",
+          "unconfirmed": true
+        }
+      ],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    },
+    "Zenless Zone Zero": {
+      "id": "zzz",
+      "name": "Zenless Zone Zero",
+      "current": [
+        {
+          "phase": "3.2 Phase 2",
+          "start": "2026-09-30T00:00:00Z",
+          "end": "2026-10-20T00:00:00Z",
+          "characters": [
+            "5.17",
+            "5.23"
+          ],
+          "four_star": [
+            "5.46",
+            "5.52"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
+      "next": [
+        {
+          "phase": "3.3 Phase 1",
+          "start": "2026-10-21T00:00:00Z",
+          "end": "2026-11-11T00:00:00Z",
+          "characters": [
+            "5.61"
+          ],
+          "four_star": [],
+          "source_status": "unconfirmed",
+          "unconfirmed": true
+        }
+      ],
+      "upcoming": [],
+      "history": [],
+      "source": "G-Codus banner Excel tables"
+    }
+  }
+}
