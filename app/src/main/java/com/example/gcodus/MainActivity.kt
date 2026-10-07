@@ -85,12 +85,6 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         startForegroundLiveRefresh()
 
-        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-        if (!setupPrefs.getBoolean("background_access_setup_done", false) &&
-            setupPrefs.getBoolean("background_access_setup_active", false)
-        ) {
-            continueBackgroundAccessSetup()
-        }
     }
 
     override fun onPause() {
@@ -132,13 +126,10 @@ class MainActivity : AppCompatActivity() {
         codesFeed = loadCachedCodes()
         bannerFeedJson = null
         scheduleCodeSync()
-        scheduleNotificationSync()
-        ensureBackgroundNotificationAccess()
         scheduleCharacterSync()
         refreshCodesInBackground()
         refreshLiveDatabaseInBackground()
         migrateTrackingKeys()
-        NotificationHelper.ensureChannel(this)
         FirebaseDeviceSync.sync(this)
         showBannerDatabaseLoading()
         startCountdownTicker()
@@ -718,53 +709,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun scheduleNotificationSync() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val request = PeriodicWorkRequestBuilder<NotificationSyncWorker>(15, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .build()
-
-        WorkManager.getInstance(this).enqueueUniquePeriodicWork(
-            "g_codus_notifications",
-            ExistingPeriodicWorkPolicy.UPDATE,
-            request
-        )
-
-        // Do one immediate check as well. The periodic worker is deliberately
-        // only a fallback because Android schedules periodic work inexactly.
-        enqueueNotificationSyncNow()
-    }
-
-    private fun enqueueNotificationSyncNow() {
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val request = OneTimeWorkRequestBuilder<NotificationSyncWorker>()
-            .setConstraints(constraints)
-            .build()
-        WorkManager.getInstance(this).enqueueUniqueWork(
-            "g_codus_notifications_now",
-            androidx.work.ExistingWorkPolicy.REPLACE,
-            request
-        )
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 7001) {
-            if (grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                enqueueNotificationSyncNow()
-            }
-            continueBackgroundAccessSetup()
-        }
-    }
-
     private fun refreshCodesInBackground() {
         executor.execute {
             try {
@@ -1182,26 +1126,6 @@ class MainActivity : AppCompatActivity() {
         editor.apply()
         FirebaseDeviceSync.sync(this)
 
-        val notificationPrefs =
-            getSharedPreferences("g_codus_notifications", Context.MODE_PRIVATE)
-        val identity = normalizeCharacterForMatch(trackedCharacterName(gameId, file))
-
-        if (enabled) {
-            // Check immediately so adding a character that is already in a
-            // current or future banner does not wait for the next 15-minute run.
-            enqueueNotificationSyncNow()
-        } else {
-            // Reset the worker's actual identity-based markers. The previous
-            // code removed keys based on the __online_* filename, which did not
-            // match the worker's tracked_v2 identity and therefore prevented
-            // notifications after re-adding a character.
-            notificationPrefs.edit()
-                .remove("appearance_" + gameId + "_" + identity)
-                .remove("next_character_" + gameId + "_" + identity)
-                .remove("next_date_" + gameId + "_" + identity)
-                .remove("ending_" + gameId + "_" + identity)
-                .apply()
-        }
     }
 
     private fun loadTrackingPortrait(image: ImageView, file: String, gameId: String) {
@@ -1836,82 +1760,4 @@ class MainActivity : AppCompatActivity() {
         val name: String,
         val resourceName: String
     )
-    private fun ensureBackgroundNotificationAccess() {
-        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-
-        // System access prompts are a first-launch setup wizard. Once the user
-        // has gone through it, reopening the app must never launch these
-        // settings screens again.
-        if (setupPrefs.getBoolean("background_access_setup_done", false)) {
-            NotificationAlarmReceiver.schedule(this)
-            return
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= 33 &&
-            androidx.core.content.ContextCompat.checkSelfPermission(
-                this, android.Manifest.permission.POST_NOTIFICATIONS
-            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
-        ) {
-            setupPrefs.edit().putBoolean("background_access_setup_active", true).apply()
-            requestNotificationPermission()
-            return
-        }
-
-        continueBackgroundAccessSetup()
-    }
-
-    private fun continueBackgroundAccessSetup() {
-        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(android.app.AlarmManager::class.java)
-            if (!alarmManager.canScheduleExactAlarms()) {
-                setupPrefs.edit().putInt("background_access_setup_stage", 1).apply()
-                try {
-                    startActivity(
-                        android.content.Intent(
-                            android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
-                            android.net.Uri.parse("package:$packageName")
-                        )
-                    )
-                    return
-                } catch (_: Exception) {
-                }
-            }
-        }
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            val pm = getSystemService(android.os.PowerManager::class.java)
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                setupPrefs.edit().putInt("background_access_setup_stage", 2).apply()
-                try {
-                    startActivity(
-                        android.content.Intent(
-                            android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
-                            android.net.Uri.parse("package:$packageName")
-                        )
-                    )
-                    return
-                } catch (_: Exception) {
-                    try {
-                        startActivity(
-                            android.content.Intent(
-                                android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
-                            )
-                        )
-                        return
-                    } catch (_: Exception) {
-                    }
-                }
-            }
-        }
-
-        setupPrefs.edit()
-            .putBoolean("background_access_setup_done", true)
-            .remove("background_access_setup_active")
-            .remove("background_access_setup_stage")
-            .apply()
-        NotificationAlarmReceiver.schedule(this)
-    }
-
 }
