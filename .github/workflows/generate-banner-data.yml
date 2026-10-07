@@ -127,16 +127,6 @@ jobs:
           print('Banner feed validation passed.')
           PY
 
-      - name: Deploy Firestore Rules
-        env:
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: |
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
-          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
-          npx --yes firebase-tools deploy --only firestore:rules --project g-codus --non-interactive
-          rm -f /tmp/firebase-service-account.json
-
-
       - name: Send Firebase push notifications for banner changes
         run: |
           pip install google-auth requests
