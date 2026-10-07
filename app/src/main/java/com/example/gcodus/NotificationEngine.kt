@@ -190,6 +190,10 @@ class NotificationEngine(private val applicationContext: Context) {
             val gameId = game.optString("id")
             if (gameId.isBlank()) continue
 
+            // Character notifications require the game to be followed with its star.
+            val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+            if (!appPrefs.getBoolean("favorite_" + gameId, false)) continue
+
             val current = readPhases(game, "current")
             val next = readPhases(game, "next")
                 .sortedWith(compareBy<JSONObject> { phaseStart(it) }.thenBy { phaseIdentity(it) })
@@ -382,7 +386,12 @@ class NotificationEngine(private val applicationContext: Context) {
     ) {
         if (fetch.characters.isEmpty()) return
 
+        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
+
         for (gameId in fetch.successfulGameIds) {
+            // New-character notifications require the game to be followed too.
+            if (!appPrefs.getBoolean("favorite_" + gameId, false)) continue
+
             val current = fetch.characters
                 .filter { it.gameId == gameId && it.id.isNotBlank() }
                 .associateBy({ it.id }, { it.name })
@@ -429,9 +438,13 @@ class NotificationEngine(private val applicationContext: Context) {
         if (newCodes.isEmpty()) return
 
         val byGame = newCodes.groupBy { it.substringBefore("|") }
+        val appPrefs = applicationContext.getSharedPreferences(APP_PREFS, Context.MODE_PRIVATE)
         val delivered = old.toMutableSet()
 
         for ((gameId, entries) in byGame) {
+            // Promo-code notifications require the game to be followed too.
+            if (!appPrefs.getBoolean("favorite_" + gameId, false)) continue
+
             val codes = entries
                 .map { it.substringAfter("|") }
                 .sorted()
