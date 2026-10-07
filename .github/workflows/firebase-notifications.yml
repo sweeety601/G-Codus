@@ -1,6 +1,10 @@
 name: Firebase G-Codus notification engine
 
 on:
+  push:
+    paths:
+      - "scripts/send_fcm_notifications.py"
+      - ".github/workflows/firebase-notifications.yml"
   workflow_run:
     workflows: ["Generate banner data from Excel"]
     types: [completed]
