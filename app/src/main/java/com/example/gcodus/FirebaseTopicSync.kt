@@ -24,8 +24,8 @@ object FirebaseTopicSync {
 
         for (entry in appPrefs.all.entries) {
             val key = entry.key
-            if (!key.startsWith("tracked_v2_") || entry.value != true) continue
-            val rest = key.removePrefix("tracked_v2_")
+            if (!key.startsWith("firebase_track_") || entry.value != true) continue
+            val rest = key.removePrefix("firebase_track_")
             val separator = rest.indexOf('_')
             if (separator <= 0 || separator >= rest.lastIndex) continue
             val game = rest.substring(0, separator)
