@@ -124,10 +124,8 @@ class MainActivity : AppCompatActivity() {
         })
         codesFeed = loadCachedCodes()
         bannerFeedJson = null
-        requestNotificationPermission()
         scheduleCodeSync()
         scheduleNotificationSync()
-        NotificationAlarmReceiver.schedule(this)
         ensureBackgroundNotificationAccess()
         scheduleCharacterSync()
         refreshCodesInBackground()
@@ -1821,18 +1819,36 @@ class MainActivity : AppCompatActivity() {
         val resourceName: String
     )
     private fun ensureBackgroundNotificationAccess() {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+
+        // System access prompts are a first-launch setup wizard. Once the user
+        // has gone through it, reopening the app must never launch these
+        // settings screens again.
+        if (setupPrefs.getBoolean("background_access_setup_done", false)) {
+            NotificationAlarmReceiver.schedule(this)
+            return
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= 33 &&
             androidx.core.content.ContextCompat.checkSelfPermission(
                 this, android.Manifest.permission.POST_NOTIFICATIONS
             ) != android.content.pm.PackageManager.PERMISSION_GRANTED
         ) {
+            setupPrefs.edit().putBoolean("background_access_setup_active", true).apply()
             requestNotificationPermission()
             return
         }
 
+        continueBackgroundAccessSetup()
+    }
+
+    private fun continueBackgroundAccessSetup() {
+        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             val alarmManager = getSystemService(android.app.AlarmManager::class.java)
             if (!alarmManager.canScheduleExactAlarms()) {
+                setupPrefs.edit().putInt("background_access_setup_stage", 1).apply()
                 try {
                     startActivity(
                         android.content.Intent(
@@ -1842,7 +1858,6 @@ class MainActivity : AppCompatActivity() {
                     )
                     return
                 } catch (_: Exception) {
-                    // Device does not expose the exact-alarm settings screen.
                 }
             }
         }
@@ -1850,6 +1865,7 @@ class MainActivity : AppCompatActivity() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
             val pm = getSystemService(android.os.PowerManager::class.java)
             if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                setupPrefs.edit().putInt("background_access_setup_stage", 2).apply()
                 try {
                     startActivity(
                         android.content.Intent(
@@ -1872,7 +1888,39 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        setupPrefs.edit()
+            .putBoolean("background_access_setup_done", true)
+            .remove("background_access_setup_active")
+            .remove("background_access_setup_stage")
+            .apply()
         NotificationAlarmReceiver.schedule(this)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 7001) {
+            continueBackgroundAccessSetup()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+        if (!setupPrefs.getBoolean("background_access_setup_done", false) &&
+            setupPrefs.getBoolean("background_access_setup_active", false)
+        ) {
+            val stage = setupPrefs.getInt("background_access_setup_stage", 0)
+            if (stage == 1) {
+                continueBackgroundAccessSetup()
+            } else if (stage == 2) {
+                setupPrefs.edit().remove("background_access_setup_stage").apply()
+                continueBackgroundAccessSetup()
+            }
+        }
     }
 
 }
