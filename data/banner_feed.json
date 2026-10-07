@@ -1,12 +1,30 @@
 {
   "version": 6,
-  "generated_at": "2026-10-07T03:52:12.511079+00:00",
+  "generated_at": "2026-10-07T03:59:18.723977+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
       "id": "wuwa",
       "name": "Wuthering Waves",
-      "current": [],
+      "current": [
+        {
+          "phase": "3.7 Phase 1",
+          "start": "2026-09-30T00:00:00Z",
+          "end": "2026-10-22T00:00:00Z",
+          "characters": [
+            "1.31",
+            "1.23",
+            "1.32"
+          ],
+          "four_star": [
+            "1.9",
+            "1.49",
+            "1.19"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "next": [],
       "upcoming": [],
       "history": [],
@@ -15,7 +33,24 @@
     "Genshin Impact": {
       "id": "genshin",
       "name": "Genshin Impact",
-      "current": [],
+      "current": [
+        {
+          "phase": "7.1 Phase 1",
+          "start": "2026-09-23T00:00:00Z",
+          "end": "2026-10-14T00:00:00Z",
+          "characters": [
+            "2.116",
+            "2.117"
+          ],
+          "four_star": [
+            "2.32",
+            "2.26",
+            "2.17"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "next": [],
       "upcoming": [],
       "history": [],
@@ -24,7 +59,24 @@
     "Honkai: Star Rail": {
       "id": "starrail",
       "name": "Honkai: Star Rail",
-      "current": [],
+      "current": [
+        {
+          "phase": "4.6 Phase 1",
+          "start": "2026-09-28T00:00:00Z",
+          "end": "2026-10-21T00:00:00Z",
+          "characters": [
+            "3.89",
+            "3.26"
+          ],
+          "four_star": [
+            "3.84",
+            "3.61",
+            "3.54"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "next": [],
       "upcoming": [],
       "history": [],
@@ -33,7 +85,19 @@
     "Arknights: Endfield": {
       "id": "endfield",
       "name": "Arknights: Endfield",
-      "current": [],
+      "current": [
+        {
+          "phase": "1.5 Phase 2",
+          "start": "2026-09-24T00:00:00Z",
+          "end": "2026-10-15T00:00:00Z",
+          "characters": [
+            "4.15"
+          ],
+          "four_star": [],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "next": [],
       "upcoming": [],
       "history": [],
@@ -42,7 +106,24 @@
     "Zenless Zone Zero": {
       "id": "zzz",
       "name": "Zenless Zone Zero",
-      "current": [],
+      "current": [
+        {
+          "phase": "3.2 Phase 2",
+          "start": "2026-09-30T00:00:00Z",
+          "end": "2026-10-20T00:00:00Z",
+          "characters": [
+            "5.17",
+            "5.23"
+          ],
+          "four_star": [
+            "5.46",
+            "5.51",
+            "5.52"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "next": [],
       "upcoming": [],
       "history": [],
