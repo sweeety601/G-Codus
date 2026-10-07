@@ -127,6 +127,23 @@ jobs:
           print('Banner feed validation passed.')
           PY
 
+      - name: Deploy Firestore rules
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$FIREBASE_SERVICE_ACCOUNT" ]; then
+            echo "FIREBASE_SERVICE_ACCOUNT is not configured; Firestore rules deployment skipped."
+            exit 0
+          fi
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > /tmp/firebase-service-account.json
+          export GOOGLE_APPLICATION_CREDENTIALS=/tmp/firebase-service-account.json
+          PROJECT_ID=$(python - <<'PY'
+          import json, os
+          print(json.loads(os.environ["FIREBASE_SERVICE_ACCOUNT"])["project_id"])
+          PY
+          )
+          npx --yes firebase-tools@latest deploy --only firestore:rules --project "$PROJECT_ID" --non-interactive
+
       - name: Send Firebase push notifications for banner changes
         run: |
           pip install google-auth requests
