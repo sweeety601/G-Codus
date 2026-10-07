@@ -1907,20 +1907,5 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
-        if (!setupPrefs.getBoolean("background_access_setup_done", false) &&
-            setupPrefs.getBoolean("background_access_setup_active", false)
-        ) {
-            val stage = setupPrefs.getInt("background_access_setup_stage", 0)
-            if (stage == 1) {
-                continueBackgroundAccessSetup()
-            } else if (stage == 2) {
-                setupPrefs.edit().remove("background_access_setup_stage").apply()
-                continueBackgroundAccessSetup()
-            }
-        }
-    }
 
 }
