@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -7,7 +8,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.gcodus"
+        applicationId = "com.sweeety601.gcodus"
         minSdk = 26
         targetSdk = 36
         versionCode = 14
@@ -59,4 +60,5 @@ dependencies {
     implementation("com.google.android.material:material:1.14.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("com.google.firebase:firebase-messaging:24.1.2")
 }
