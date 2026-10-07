@@ -15,5 +15,5 @@ class NotificationSyncWorker(
 ) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result =
-        NotificationEngine(applicationContext).run()
+        if (NotificationEngine(applicationContext).run()) Result.success() else Result.retry()
 }
