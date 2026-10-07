@@ -126,6 +126,18 @@ jobs:
           print('Banner feed validation passed.')
           PY
 
+      - name: Send Firebase push notifications for banner changes
+        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+        run: |
+          pip install google-auth requests
+          if git cat-file -e HEAD:data/banner_feed.json 2>/dev/null; then
+            git show HEAD:data/banner_feed.json > /tmp/old_banner_feed.json
+          else
+            printf '{"games":{}}' > /tmp/old_banner_feed.json
+          fi
+          python scripts/send_fcm_notifications.py /tmp/old_banner_feed.json data/banner_feed.json
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
       - name: Commit generated feed and initial Excel tables
         run: |
           git config user.name 'github-actions[bot]'
