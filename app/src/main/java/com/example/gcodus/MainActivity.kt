@@ -1564,7 +1564,7 @@ class MainActivity : AppCompatActivity() {
                 .toSet()
 
             val fiveStars = resolvedCharacters
-                .filter { it.third == 5 || (it.third == 0 && normalizeCharacterForMatch(it.second.ifBlank { it.first }) !in explicitFourStarKeys) }
+                .filter { it.third >= 5 || (it.third == 0 && normalizeCharacterForMatch(it.second.ifBlank { it.first }) !in explicitFourStarKeys) }
                 .map { it.second.ifBlank { it.first } }
                 .filter { it.isNotBlank() }
                 .distinctBy { normalizeCharacterForMatch(it) }
