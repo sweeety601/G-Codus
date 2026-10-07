@@ -11,8 +11,8 @@ android {
         applicationId = "com.sweeety601.gcodus"
         minSdk = 26
         targetSdk = 36
-        versionCode = 14
-        versionName = "0.6.8"
+        versionCode = 15
+        versionName = "0.6.9"
     }
 
     // Character portraits, banner JSON and other character assets are NOT packaged in the APK.
@@ -61,4 +61,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     implementation("androidx.work:work-runtime-ktx:2.10.1")
     implementation("com.google.firebase:firebase-messaging:24.1.2")
+    implementation("com.google.firebase:firebase-auth:24.0.1")
+    implementation("com.google.firebase:firebase-firestore:26.0.0")
 }
