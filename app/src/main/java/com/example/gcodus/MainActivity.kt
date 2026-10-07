@@ -130,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         refreshCodesInBackground()
         refreshLiveDatabaseInBackground()
         migrateTrackingKeys()
+        requestNotificationPermission()
         FirebaseDeviceSync.sync(this)
         showBannerDatabaseLoading()
         startCountdownTicker()
