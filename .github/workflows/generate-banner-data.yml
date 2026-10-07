@@ -104,6 +104,10 @@ jobs:
           print("Legacy banner migration finished.")
           PY
 
+      - name: Apply confirmed banner updates
+        if: github.event_name == 'push' && github.event.head_commit.message == 'Add banner table update script'
+        run: python scripts/update_confirmed_banners.py
+
       - name: Generate banner feed
         run: python scripts/generate_banner_data.py
 
