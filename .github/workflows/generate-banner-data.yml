@@ -104,35 +104,6 @@ jobs:
           print("Legacy banner migration finished.")
           PY
 
-      - name: Move unconfirmed Phoenix and Si to leaks
-        run: |
-          python - <<'PY'
-          from openpyxl import load_workbook
-          moves = [
-              ("banners/05_Zenless_Zone_Zero_confirmed.xlsx", "banners/05_Zenless_Zone_Zero_leaks.xlsx", "3.3 Phase 1"),
-              ("banners/04_Arknights_Endfield_confirmed.xlsx", "banners/04_Arknights_Endfield_leaks.xlsx", "1.6 Phase 1"),
-          ]
-          def rows_for(ws, name):
-              return [r for r in range(1, ws.max_row + 1) if any(str(ws.cell(r,c).value).strip().lower() == name.lower() for c in range(1, ws.max_column + 1) if ws.cell(r,c).value is not None)]
-          for src, dst, name in moves:
-              swb = load_workbook(src); dwb = load_workbook(dst)
-              sws = swb.active; dws = dwb.active
-              rows = rows_for(sws, name)
-              if not rows:
-                  swb.close(); dwb.close(); continue
-              for r in sorted(rows, reverse=True):
-                  if not rows_for(dws, name):
-                      nr = dws.max_row + 1
-                      for c in range(1, sws.max_column + 1):
-                          dws.cell(nr,c)._style = sws.cell(r,c)._style
-                          dws.cell(nr,c).value = sws.cell(r,c).value
-                      dws.row_dimensions[nr].height = sws.row_dimensions[r].height
-                  sws.delete_rows(r, 1)
-              swb.save(src); dwb.save(dst)
-              swb.close(); dwb.close()
-              print(f"Moved {name} banner from confirmed to leaks")
-          PY
-
       - name: Generate banner feed
         run: python scripts/generate_banner_data.py
 
