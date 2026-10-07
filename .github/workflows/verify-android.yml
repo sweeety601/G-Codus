@@ -47,7 +47,6 @@ jobs:
             exit 1
           fi
           echo 'Main APK contains no bundled character assets or local banner feed.'
-
       - name: Upload main app
         uses: actions/upload-artifact@v4
         with:
@@ -62,3 +61,5 @@ jobs:
           path: admin/build/outputs/apk/debug/admin-debug.apk
           if-no-files-found: error
           retention-days: 7
+
+# Trigger a fresh verification build on this workflow update.
