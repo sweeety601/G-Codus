@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-07T13:46:30.784147+00:00",
+  "generated_at": "2026-10-07T14:02:50.084064+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -33,8 +33,7 @@
           "characters": [
             "1.48",
             "1.5",
-            "1.56",
-            "1.12"
+            "1.56"
           ],
           "four_star": [
             "1.16",
