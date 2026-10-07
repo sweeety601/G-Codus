@@ -35,10 +35,10 @@ class NotificationEngine(private val applicationContext: Context) {
         private const val ENDING_WINDOW_SECONDS = 24L * 60L * 60L
     }
 
-    fun run(): Result {
+    fun run(): Boolean {
         if (!notificationsAvailable()) {
             // Do not advance state while Android permission/channel is disabled.
-            return Result.success()
+            return true
         }
 
         createChannel()
@@ -69,9 +69,9 @@ class NotificationEngine(private val applicationContext: Context) {
             }
 
             prefs.edit().putBoolean(KEY_INITIALIZED, true).apply()
-            Result.success()
+            true
         } catch (_: Exception) {
-            Result.retry()
+            false
         }
     }
 
