@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-10-07T01:00:45.005725+00:00",
+  "generatedAt": "2026-10-07T06:58:06.552102+00:00",
   "games": [
     {
       "id": "1",
@@ -501,6 +501,15 @@
           "rarity": 5,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.55.webp"
+        },
+        {
+          "id": "1.56",
+          "gameId": "wuwa",
+          "name": "Lucilla",
+          "element": "Glacio",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/1.56.webp"
         }
       ]
     },
@@ -2360,6 +2369,15 @@
           "rarity": 5,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.88.webp"
+        },
+        {
+          "id": "3.89",
+          "gameId": "starrail",
+          "name": "Pearl",
+          "element": "Ice",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/3.89.webp"
         }
       ]
     },
@@ -2646,6 +2664,15 @@
           "rarity": 4,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.31.webp"
+        },
+        {
+          "id": "4.32",
+          "gameId": "endfield",
+          "name": "Si",
+          "element": "Cryo",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/4.32.webp"
         }
       ]
     },
@@ -3193,6 +3220,15 @@
           "rarity": 5,
           "announced": false,
           "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.60.webp"
+        },
+        {
+          "id": "5.61",
+          "gameId": "zzz",
+          "name": "Phoenix",
+          "element": "Fire",
+          "rarity": 5,
+          "announced": false,
+          "portraitUrl": "https://raw.githubusercontent.com/sweeety601/G-Codus/main/images/5.61.webp"
         }
       ]
     }

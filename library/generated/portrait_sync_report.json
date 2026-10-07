@@ -336,6 +336,12 @@
       "source": "images_big/wuthering_waves/yuanwu.webp"
     },
     {
+      "id": "1.56",
+      "game": "Wuthering Waves",
+      "name": "Lucilla",
+      "source": "images_big/wuthering_waves/lucilla.webp"
+    },
+    {
       "id": "2.1",
       "game": "Genshin Impact",
       "name": "Aino",
@@ -1560,6 +1566,12 @@
       "source": "app/src/main/assets/honkai_star_rail/yunli_card.webp"
     },
     {
+      "id": "3.89",
+      "game": "Honkai: Star Rail",
+      "name": "Pearl",
+      "source": "app/src/main/assets/honkai_star_rail/pearl_card.webp"
+    },
+    {
       "id": "4.1",
       "game": "Arknights: Endfield",
       "name": "Arcane",
@@ -1744,6 +1756,12 @@
       "game": "Arknights: Endfield",
       "name": "Fluorite",
       "source": "app/src/main/assets/arknights_endfield/fluorite_card.webp"
+    },
+    {
+      "id": "4.32",
+      "game": "Arknights: Endfield",
+      "name": "Si",
+      "source": "app/src/main/assets/arknights_endfield/si_card.webp"
     },
     {
       "id": "5.1",
@@ -2104,6 +2122,12 @@
       "game": "Zenless Zone Zero",
       "name": "Alice Thymefield",
       "source": "images_big/zenless_zone_zero/alice.webp"
+    },
+    {
+      "id": "5.61",
+      "game": "Zenless Zone Zero",
+      "name": "Phoenix",
+      "source": "images_big/zenless_zone_zero/phoenix.webp"
     }
   ]
 }
