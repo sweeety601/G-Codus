@@ -42,11 +42,11 @@ object BannerSource {
                 null
             } ?: emptyList()
 
-            val leaks = try {
+            val leaks: List<BannerRowData> = try {
                 readRows(base, false)
             } catch (_: Exception) {
                 emptyList()
-            }
+            } ?: emptyList()
 
             val confirmedSorted = confirmed.sortedBy { it.startInstant }
             val confirmedCurrent = confirmedSorted.filter {
