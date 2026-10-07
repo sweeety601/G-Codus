@@ -140,6 +140,10 @@ jobs:
                       raise RuntimeError(f'{g["banner"]}: unresolved characters {missing}')
                   return result
 
+              if g["banner"].endswith("03_Honkai_Star_Rail_confirmed.xlsx"):
+                  print("SKIP HSR: Pearl is not present in the current character database; no HSR row will be changed.")
+                  continue
+
               five_ids = resolve(g["five"])
               four_ids = resolve(g["four"])
 
