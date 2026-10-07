@@ -193,10 +193,16 @@ def main():
                 game_id + "|" + normalize_identity(str(char))
                 for char in chars
             }
-            device_targets = {
-                normalize_identity(str(value))
-                for value in device["characters"]
-            }
+            device_targets = set()
+            for value in device["characters"]:
+                raw = str(value)
+                if "|" in raw:
+                    target_game, target_character = raw.split("|", 1)
+                    device_targets.add(
+                        target_game + "|" + normalize_identity(target_character)
+                    )
+                else:
+                    device_targets.add(normalize_identity(raw))
             subscribed = game_id in device["games"] or bool(character_targets & device_targets)
             if not subscribed:
                 continue
