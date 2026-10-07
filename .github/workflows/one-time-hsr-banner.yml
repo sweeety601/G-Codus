@@ -1,0 +1,130 @@
+name: One-time HSR banner update
+
+on:
+  push:
+    paths:
+      - ".github/workflows/one-time-hsr-banner.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - run: pip install openpyxl
+      - name: Update HSR 4.6 confirmed banner
+        run: |
+          python - <<'PY'
+          from openpyxl import load_workbook
+          from pathlib import Path
+          import re
+
+          chars_path = Path("library/seed/03_Honkai_Star_Rail.xlsx")
+          banner_path = Path("banners/03_Honkai_Star_Rail_confirmed.xlsx")
+
+          def norm(v):
+              return re.sub(r"[^a-z0-9а-яё]+", "", str(v or "").strip().lower())
+
+          chars = load_workbook(chars_path, data_only=False)
+          print("CHARACTER SHEETS:", chars.sheetnames)
+          pearl_id = None
+          for ws in chars.worksheets:
+              rows = list(ws.iter_rows(values_only=True))
+              print("SHEET", ws.title, "HEADERS", rows[0] if rows else [])
+              for row in rows[1:]:
+                  vals = [str(x or "").strip() for x in row]
+                  if any(norm(x) == "pearl" for x in vals):
+                      print("PEARL ROW:", vals)
+                      # Prefer a cell that looks like the game's numeric ID.
+                      for x in vals:
+                          if re.fullmatch(r"3\.\d+", x):
+                              pearl_id = x
+                              break
+                      if pearl_id is None:
+                          for x in vals:
+                              if x:
+                                  pearl_id = x
+                                  break
+                      break
+              if pearl_id:
+                  break
+
+          if not pearl_id:
+              raise SystemExit("Pearl not found in character database")
+
+          wb = load_workbook(banner_path)
+          print("BANNER SHEETS:", wb.sheetnames)
+          ws = wb.active
+          rows = list(ws.iter_rows(values_only=False))
+          headers = [c.value for c in rows[0]] if rows else []
+          print("BANNER HEADERS:", headers)
+
+          # Detect columns by common names used by the project.
+          aliases = {
+              "version": {"version","версия"},
+              "phase": {"phase","фаза"},
+              "start": {"start","startdate","начало","дата начала"},
+              "end": {"end","enddate","конец","дата окончания"},
+              "five": {"5","5star","5starcharacters","five","five_star","пятизвездочные","5персонажи"},
+              "four": {"4","4star","4starcharacters","four","four_star","четырехзвездочные","4персонажи"},
+              "status": {"status","source_status","статус"}
+          }
+          idx={}
+          for i,h in enumerate(headers):
+              n=norm(h)
+              for k,als in aliases.items():
+                  if n in {norm(a) for a in als}:
+                      idx[k]=i
+          print("COLUMN MAP:", idx)
+
+          required={"version","phase","start","end","five"}
+          if not required.issubset(idx):
+              raise SystemExit(f"Cannot safely map required columns: {idx}")
+
+          # Avoid duplicate 4.6 phase rows.
+          for row in rows[1:]:
+              vals=[c.value for c in row]
+              v=str(vals[idx["version"]] or "").strip()
+              p=str(vals[idx["phase"]] or "").strip()
+              if v=="4.6" and p=="1":
+                  print("Existing 4.6 phase 1 row found; replacing it.")
+                  for c in row:
+                      c.value=None
+                  target=row
+                  break
+          else:
+              target=ws.max_row+1
+
+          data=[None]*len(headers)
+          data[idx["version"]]="4.6"
+          data[idx["phase"]]=1
+          data[idx["start"]]="2026-09-28"
+          data[idx["end"]]="2026-10-21"
+          data[idx["five"]]=f"{pearl_id},3.26"
+          if "four" in idx:
+              data[idx["four"]]="3.84,3.61,3.54"
+          if "status" in idx:
+              data[idx["status"]]="confirmed"
+
+          if isinstance(target, int):
+              for i,v in enumerate(data,1):
+                  ws.cell(target,i).value=v
+          else:
+              for i,v in enumerate(data,1):
+                  target[i-1].value=v
+
+          print("WRITTEN:", data)
+          wb.save(banner_path)
+          PY
+      - name: Commit change
+        run: |
+          git config user.name "g-codus-bot"
+          git config user.email "g-codus-bot@users.noreply.github.com"
+          git add banners/03_Honkai_Star_Rail_confirmed.xlsx
+          git commit -m "Add HSR 4.6 confirmed banner" || exit 0
+          git push
