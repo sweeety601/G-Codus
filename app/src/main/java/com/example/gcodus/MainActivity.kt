@@ -84,6 +84,13 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         startForegroundLiveRefresh()
+
+        val setupPrefs = getSharedPreferences("g_codus", Context.MODE_PRIVATE)
+        if (!setupPrefs.getBoolean("background_access_setup_done", false) &&
+            setupPrefs.getBoolean("background_access_setup_active", false)
+        ) {
+            continueBackgroundAccessSetup()
+        }
     }
 
     override fun onPause() {
