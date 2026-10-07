@@ -125,6 +125,9 @@ def send_to_token(access_token, project_id, token, title, body, event_key):
     )
     return response
 
+def normalize_identity(value):
+    return "".join(ch for ch in str(value).lower() if ch.isalnum())
+
 def notification_text(game_name, bucket, phase):
     phase_name = phase.get("phase", "Новая фаза")
     if bucket == "current":
@@ -186,7 +189,15 @@ def main():
             if not token or token in sent_tokens:
                 continue
 
-            subscribed = game_id in device["games"] or bool(chars & device["characters"])
+            character_targets = {
+                game_id + "|" + normalize_identity(str(char))
+                for char in chars
+            }
+            device_targets = {
+                normalize_identity(str(value))
+                for value in device["characters"]
+            }
+            subscribed = game_id in device["games"] or bool(character_targets & device_targets)
             if not subscribed:
                 continue
 
