@@ -10,15 +10,17 @@ import androidx.core.app.NotificationCompat
 object NotificationHelper {
     const val CHANNEL_ID = "gcodus_firebase_updates"
 
-    fun show(context: Context, title: String, body: String) {
+    fun ensureChannel(context: Context) {
+        if (android.os.Build.VERSION.SDK_INT < 26) return
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(
-            NotificationChannel(
-                CHANNEL_ID,
-                "G-Codus — обновления",
-                NotificationManager.IMPORTANCE_HIGH
-            )
+            NotificationChannel(CHANNEL_ID, "G-Codus — обновления", NotificationManager.IMPORTANCE_HIGH)
         )
+    }
+
+    fun show(context: Context, title: String, body: String) {
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        ensureChannel(context)
 
         val launch = context.packageManager.getLaunchIntentForPackage(context.packageName)
         val pending = launch?.let {
