@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         startForegroundLiveRefresh()
-
+        FirebaseDeviceSync.sync(this)
     }
 
     override fun onPause() {
@@ -134,6 +134,17 @@ class MainActivity : AppCompatActivity() {
         FirebaseDeviceSync.sync(this)
         showBannerDatabaseLoading()
         startCountdownTicker()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 7001) {
+            FirebaseDeviceSync.sync(this)
+        }
     }
 
     private fun showBannerDatabaseLoading() {
