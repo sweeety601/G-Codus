@@ -7,7 +7,7 @@ import com.google.firebase.messaging.RemoteMessage
 class GcodusFirebaseMessagingService : FirebaseMessagingService() {
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        FirebaseTopicSync.sync(this)
+        FirebaseDeviceSync.onToken(this, token)
     }
 
     override fun onMessageReceived(message: RemoteMessage) {
