@@ -1,48 +1,13 @@
 {
   "version": 6,
-  "generated_at": "2026-10-06T14:42:15.827181+00:00",
+  "generated_at": "2026-10-07T03:51:04.558365+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
       "id": "wuwa",
       "name": "Wuthering Waves",
-      "current": [
-        {
-          "phase": "3.7 Phase 1",
-          "start": "2026-09-30T00:00:00Z",
-          "end": "2026-10-16T00:00:00Z",
-          "characters": [
-            "1.31",
-            "1.32"
-          ],
-          "four_star": [
-            "1.19",
-            "1.16",
-            "1.9"
-          ],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        }
-      ],
-      "next": [
-        {
-          "phase": "3.7 Phase 2",
-          "start": "2026-10-17T00:00:00Z",
-          "end": "2026-10-28T00:00:00Z",
-          "characters": [
-            "1.7",
-            "1.10",
-            "1.11"
-          ],
-          "four_star": [
-            "1.41",
-            "1.26",
-            "1.24"
-          ],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        }
-      ],
+      "current": [],
+      "next": [],
       "upcoming": [],
       "history": [],
       "source": "G-Codus banner Excel tables"
