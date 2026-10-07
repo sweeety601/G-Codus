@@ -1,0 +1,51 @@
+name: Firebase G-Codus notification engine
+
+on:
+  workflow_run:
+    workflows: ["Generate banner data from Excel"]
+    types: [completed]
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gcodus-firebase-notifications
+  cancel-in-progress: true
+
+jobs:
+  notify:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Firebase sender dependencies
+        run: pip install google-auth requests
+
+      - name: Process Firebase notifications
+        run: python scripts/send_fcm_notifications.py
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      - name: Commit notification snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/banner_notification_snapshot.json
+          if git diff --cached --quiet; then
+            echo 'No notification snapshot changes.'
+          else
+            git pull --rebase origin main
+            git add data/banner_notification_snapshot.json
+            git commit -m 'Update Firebase notification snapshot'
+            git push origin HEAD:main
+          fi
