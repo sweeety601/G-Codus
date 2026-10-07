@@ -75,8 +75,8 @@ jobs:
                   "phase": "3.2 Phase 2",
                   "start": "2026-09-30",
                   "end": "2026-10-20",
-                  "five": ["Roxy", "Promeia"],
-                  "four": ["Corin", "Billy"],
+                  "five": ["Roxy Ifrita Pryce", "Promeia"],
+                  "four": ["Corin Wickes", "Starlight - Billy"],
               },
           ]
 
