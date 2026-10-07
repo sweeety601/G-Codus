@@ -755,10 +755,11 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 7001 &&
-            grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED
-        ) {
-            enqueueNotificationSyncNow()
+        if (requestCode == 7001) {
+            if (grantResults.firstOrNull() == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                enqueueNotificationSyncNow()
+            }
+            continueBackgroundAccessSetup()
         }
     }
 
@@ -1902,17 +1903,5 @@ class MainActivity : AppCompatActivity() {
             .apply()
         NotificationAlarmReceiver.schedule(this)
     }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 7001) {
-            continueBackgroundAccessSetup()
-        }
-    }
-
 
 }
