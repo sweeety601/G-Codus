@@ -124,7 +124,6 @@ jobs:
                       key = norm(name)
                       cid = by_name.get(key)
                       if not cid:
-                          # tolerate accidental parenthetical suffixes in the Excel name
                           matches = [v for k, v in by_name.items() if k.split("(")[0].strip() == key]
                           cid = matches[0] if len(matches) == 1 else None
                       if not cid:
@@ -132,7 +131,13 @@ jobs:
                       else:
                           result.append(cid)
                   if missing:
-                      raise RuntimeError(f'{g["banner"]}: characters not found in {g["seed"]}: {missing}. Available similar names: {[k for k in by_name if any(norm(x) in k or k in norm(x) for x in missing)][:30]}')
+                      similar = [k for k in by_name if any(norm(x) in k or k in norm(x) for x in missing)]
+                      print(f'\nMISSING in {g["seed"]}: {missing}')
+                      print('SIMILAR:', similar[:50])
+                      print('ALL CHARACTERS:')
+                      for k, v in by_name.items():
+                          print(f'{v}\\t{k}')
+                      raise RuntimeError(f'{g["banner"]}: unresolved characters {missing}')
                   return result
 
               five_ids = resolve(g["five"])
