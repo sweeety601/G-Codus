@@ -61,13 +61,18 @@ object FirebaseDeviceSync {
 
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val selectedGames = games.filter { prefs.getBoolean("favorite_$it", false) }
+        // Store game-scoped tracked identities so character IDs cannot collide between games.
         val trackedCharacters = prefs.all.entries.asSequence()
-            .filter { it.key.startsWith("firebase_track_") && it.value == true }
+            .filter { it.key.startsWith("tracked_v2_") && it.value == true }
             .mapNotNull { entry ->
-                val rest = entry.key.removePrefix("firebase_track_")
+                val rest = entry.key.removePrefix("tracked_v2_")
                 val separator = rest.indexOf('_')
                 if (separator <= 0 || separator >= rest.lastIndex) null
-                else rest.substring(separator + 1).takeIf { it.isNotBlank() }
+                else {
+                    val game = rest.substring(0, separator)
+                    val character = rest.substring(separator + 1)
+                    if (game in games && character.isNotBlank()) "$game|$character" else null
+                }
             }
             .distinct()
             .toList()
