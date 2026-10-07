@@ -36,7 +36,7 @@ object BannerSource {
         val resultGames = JSONArray()
 
         for ((gameId, gameName, base) in games) {
-            val confirmed = try {
+            val confirmed: List<BannerRowData> = try {
                 readRows(base, true)
             } catch (_: Exception) {
                 null
