@@ -29,7 +29,6 @@ object RemoteXlsx {
             if (attempt < 2) {
                 try { Thread.sleep(350L) } catch (_: InterruptedException) {
                     Thread.currentThread().interrupt()
-                    break
                 }
             }
         }
