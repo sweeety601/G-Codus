@@ -1172,7 +1172,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun toggleTracked(gameId: String, file: String) {
         val enabled = !isTracked(gameId, file)
-        prefs.edit().putBoolean(trackingKey(gameId, file), enabled).apply()
+        val editor = prefs.edit().putBoolean(trackingKey(gameId, file), enabled)
+        val online = onlineCharacterFor(gameId, file)
+        if (online != null) {
+            val firebaseKey = "firebase_track_${gameId}_${online.id}"
+            if (enabled) editor.putBoolean(firebaseKey, true) else editor.remove(firebaseKey)
+        }
+        editor.apply()
         FirebaseTopicSync.sync(this)
 
         val notificationPrefs =
