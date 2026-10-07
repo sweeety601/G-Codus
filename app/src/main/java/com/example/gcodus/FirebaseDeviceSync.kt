@@ -83,7 +83,7 @@ object FirebaseDeviceSync {
             "characters" to trackedCharacters,
             "updatedAt" to FieldValue.serverTimestamp(),
             "platform" to "android",
-            "appVersion" to "0.6.9"
+            "appVersion" to "0.7.0"
         )
 
         FirebaseFirestore.getInstance()
