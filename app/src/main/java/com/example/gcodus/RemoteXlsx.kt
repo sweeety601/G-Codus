@@ -18,11 +18,19 @@ object RemoteXlsx {
 
     fun fetchRows(pathCandidates: List<String>): MutableList<MutableList<String>> {
         var lastError: Exception? = null
-        for (path in pathCandidates) {
-            try {
-                return readFromRemote(path)
-            } catch (e: Exception) {
-                lastError = e
+        repeat(3) { attempt ->
+            for (path in pathCandidates) {
+                try {
+                    return readFromRemote(path)
+                } catch (e: Exception) {
+                    lastError = e
+                }
+            }
+            if (attempt < 2) {
+                try { Thread.sleep(350L) } catch (_: InterruptedException) {
+                    Thread.currentThread().interrupt()
+                    break
+                }
             }
         }
         throw lastError ?: IllegalStateException("Не удалось прочитать Excel")
@@ -76,8 +84,8 @@ object RemoteXlsx {
             }
         }
 
-        val sheet = entries["xl/worksheets/sheet1.xml"]
-            ?: throw IllegalStateException("В Excel не найден первый лист")
+        val sheet = findFirstWorksheet(entries)
+            ?: throw IllegalStateException("В Excel не найден лист")
         val shared = parseSharedStrings(entries["xl/sharedStrings.xml"])
 
         val doc = DocumentBuilderFactory.newInstance()
@@ -103,6 +111,8 @@ object RemoteXlsx {
                 val value = when (type) {
                     "s" -> shared.getOrNull(raw.toIntOrNull() ?: -1) ?: raw
                     "inlineStr" -> descendantText(cell, "t").orEmpty()
+                    "str" -> raw.ifBlank { descendantText(cell, "t").orEmpty() }
+                    "b" -> if (raw == "1") "TRUE" else if (raw == "0") "FALSE" else raw
                     else -> raw
                 }
                 values[col] = value
@@ -115,6 +125,64 @@ object RemoteXlsx {
             }
         }
         return result
+    }
+
+    private fun findFirstWorksheet(entries: Map<String, ByteArray>): ByteArray? {
+        val direct = entries["xl/worksheets/sheet1.xml"]
+        if (direct != null) return direct
+
+        val workbook = entries["xl/workbook.xml"] ?: return entries
+            .filterKeys { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
+            .toSortedMap()
+            .values
+            .firstOrNull()
+
+        val doc = try {
+            DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(ByteArrayInputStream(workbook))
+        } catch (_: Exception) {
+            null
+        } ?: return entries
+            .filterKeys { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
+            .toSortedMap()
+            .values
+            .firstOrNull()
+
+        val sheets = doc.getElementsByTagName("sheet")
+        if (sheets.length == 0) return entries
+            .filterKeys { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
+            .toSortedMap()
+            .values
+            .firstOrNull()
+
+        val rels = entries["xl/_rels/workbook.xml.rels"]
+        if (rels != null) {
+            try {
+                val relDoc = DocumentBuilderFactory.newInstance()
+                    .newDocumentBuilder()
+                    .parse(ByteArrayInputStream(rels))
+                val relationships = relDoc.getElementsByTagName("Relationship")
+                val firstSheet = sheets.item(0).attributes?.getNamedItem("r:id")?.nodeValue
+                for (i in 0 until relationships.length) {
+                    val rel = relationships.item(i)
+                    if (rel.attributes?.getNamedItem("Id")?.nodeValue == firstSheet) {
+                        val target = rel.attributes?.getNamedItem("Target")?.nodeValue ?: continue
+                        val normalized = if (target.startsWith("/")) target.removePrefix("/")
+                            else "xl/" + target.removePrefix("./")
+                        entries[normalized]?.let { return it }
+                        val fixed = normalized.replace("xl/xl/", "xl/")
+                        entries[fixed]?.let { return it }
+                    }
+                }
+            } catch (_: Exception) { }
+        }
+
+        return entries
+            .filterKeys { it.startsWith("xl/worksheets/") && it.endsWith(".xml") }
+            .toSortedMap()
+            .values
+            .firstOrNull()
     }
 
     private fun parseSharedStrings(bytes: ByteArray?): List<String> {
