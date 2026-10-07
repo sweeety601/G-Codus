@@ -2,16 +2,19 @@ package com.example.gcodus
 
 import android.content.Context
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.messaging.FirebaseMessaging
+import java.time.ZoneId
 
 /**
- * Registers this installation as a Firebase device and keeps its notification
- * preferences in Firestore. FCM delivery does not depend on the activity being
- * open.
+ * Registers this installation in Firestore.
+ *
+ * FCM is the only notification delivery mechanism. The app does not schedule
+ * notification work locally.
  */
 object FirebaseDeviceSync {
     private const val TAG = "GcodusFirebase"
@@ -60,8 +63,9 @@ object FirebaseDeviceSync {
         if (token.isBlank()) return
 
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+
         val selectedGames = games.filter { prefs.getBoolean("favorite_$it", false) }
-        // Store game-scoped tracked identities so character IDs cannot collide between games.
+
         val trackedCharacters = prefs.all.entries.asSequence()
             .filter { it.key.startsWith("tracked_v2_") && it.value == true }
             .mapNotNull { entry ->
@@ -81,9 +85,11 @@ object FirebaseDeviceSync {
             "token" to token,
             "games" to selectedGames,
             "characters" to trackedCharacters,
+            "notificationsEnabled" to NotificationManagerCompat.from(context).areNotificationsEnabled(),
+            "timezone" to ZoneId.systemDefault().id,
             "updatedAt" to FieldValue.serverTimestamp(),
             "platform" to "android",
-            "appVersion" to "0.7.0"
+            "appVersion" to BuildConfig.VERSION_NAME
         )
 
         FirebaseFirestore.getInstance()
