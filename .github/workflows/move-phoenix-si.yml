@@ -1,0 +1,96 @@
+name: One-time move Phoenix and Si to leaks
+on:
+  push:
+    paths:
+      - ".github/workflows/move-phoenix-si.yml"
+permissions:
+  contents: write
+jobs:
+  move:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install openpyxl
+      - name: Move rows
+        run: |
+          cat > /tmp/move.py <<'PY'
+from openpyxl import load_workbook
+from pathlib import Path
+import urllib.request
+
+moves = [
+    ("banners/05_Zenless_Zone_Zero_confirmed.xlsx", "banners/05_Zenless_Zone_Zero_leaks.xlsx", "Phoenix"),
+    ("banners/04_Arknights_Endfield_confirmed.xlsx", "banners/04_Arknights_Endfield_leaks.xlsx", "Si"),
+]
+
+def find_row(ws, name):
+    hits=[]
+    for r in range(1, ws.max_row+1):
+        vals=[ws.cell(r,c).value for c in range(1, ws.max_column+1)]
+        if any(str(v).strip().lower()==name.lower() for v in vals if v is not None):
+            hits.append(r)
+    return hits
+
+for src_url, dst_url, name in moves:
+    src=Path('/tmp/'+Path(src_url).name)
+    dst=Path('/tmp/'+Path(dst_url).name)
+    urllib.request.urlretrieve('https://raw.githubusercontent.com/sweeety601/G-Codus/main/'+src_url, src)
+    urllib.request.urlretrieve('https://raw.githubusercontent.com/sweeety601/G-Codus/main/'+dst_url, dst)
+    swb=load_workbook(src)
+    dwb=load_workbook(dst)
+    sws=swb.active
+    dws=dwb.active
+    rows=find_row(sws,name)
+    if not rows:
+        raise SystemExit(f'{name}: row not found in confirmed')
+    for r in sorted(rows, reverse=True):
+        vals=[sws.cell(r,c).value for c in range(1,sws.max_column+1)]
+        if any(str(v).strip().lower()==name.lower() for v in vals if v is not None):
+            # avoid duplicate in leaks
+            existing=find_row(dws,name)
+            if not existing:
+                nr=dws.max_row+1
+                for c in range(1,sws.max_column+1):
+                    dws.cell(nr,c).value=sws.cell(r,c).value
+                    if sws.cell(r,c).has_style:
+                        dws.cell(nr,c)._style=sws.cell(r,c)._style
+                    if sws.cell(r,c).number_format:
+                        dws.cell(nr,c).number_format=sws.cell(r,c).number_format
+                    if sws.cell(r,c).alignment:
+                        dws.cell(nr,c).alignment=sws.cell(r,c).alignment.copy()
+                    if sws.cell(r,c).font:
+                        dws.cell(nr,c).font=sws.cell(r,c).font.copy()
+                    if sws.cell(r,c).fill:
+                        dws.cell(nr,c).fill=sws.cell(r,c).fill.copy()
+                    if sws.cell(r,c).border:
+                        dws.cell(nr,c).border=sws.cell(r,c).border.copy()
+                    if sws.cell(r,c).protection:
+                        dws.cell(nr,c).protection=sws.cell(r,c).protection.copy()
+                if sws.row_dimensions[r].height is not None:
+                    dws.row_dimensions[nr].height=sws.row_dimensions[r].height
+            sws.delete_rows(r,1)
+    swb.save(src); dwb.save(dst)
+    print(name, 'moved')
+
+Path('/tmp/out').mkdir(exist_ok=True)
+for f in ['05_Zenless_Zone_Zero_confirmed.xlsx','05_Zenless_Zone_Zero_leaks.xlsx','04_Arknights_Endfield_confirmed.xlsx','04_Arknights_Endfield_leaks.xlsx']:
+    # files already in /tmp
+    pass
+
+PY
+          python /tmp/move.py
+          cp /tmp/05_Zenless_Zone_Zero_confirmed.xlsx banners/05_Zenless_Zone_Zero_confirmed.xlsx
+          cp /tmp/05_Zenless_Zone_Zero_leaks.xlsx banners/05_Zenless_Zone_Zero_leaks.xlsx
+          cp /tmp/04_Arknights_Endfield_confirmed.xlsx banners/04_Arknights_Endfield_confirmed.xlsx
+          cp /tmp/04_Arknights_Endfield_leaks.xlsx banners/04_Arknights_Endfield_leaks.xlsx
+      - name: Commit
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add banners/05_Zenless_Zone_Zero_confirmed.xlsx banners/05_Zenless_Zone_Zero_leaks.xlsx banners/04_Arknights_Endfield_confirmed.xlsx banners/04_Arknights_Endfield_leaks.xlsx
+          git diff --cached --quiet && exit 0
+          git commit -m "Move Phoenix and Si to leaks"
+          git push
