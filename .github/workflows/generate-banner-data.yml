@@ -1,4 +1,5 @@
 name: Generate banner data from Excel
+# Firebase FCM notification verification
 
 on:
   repository_dispatch:
