@@ -83,13 +83,17 @@ def phase_id(phase):
     )
 
 
+def normalize_identity(value):
+    return "".join(ch for ch in str(value).lower() if ch.isalnum())
+
+
 def phase_characters(phase):
     values = []
     for field in ("characters", "five_star", "four_star"):
         for value in phase.get(field, []) or []:
             clean = str(value).strip()
             if clean:
-                values.append(clean)
+                values.append(normalize_identity(clean))
     return set(values)
 
 
@@ -116,7 +120,7 @@ def read_character_names():
             cid = str(character.get("id", "")).strip()
             name = str(character.get("name", "")).strip()
             if cid and name:
-                result[cid] = name
+                result[normalize_identity(cid)] = name
     return result
 
 
@@ -367,7 +371,7 @@ def tracked_targets(device):
         if "|" not in raw:
             continue
         game_id, character = raw.split("|", 1)
-        result.add((game_id, character))
+        result.add((game_id, normalize_identity(character)))
     return result
 
 
@@ -494,7 +498,7 @@ def main():
             for tracked_game, tracked_character in tracked:
                 if tracked_game != game_id:
                     continue
-                character_id = tracked_character.strip()
+                character_id = normalize_identity(tracked_character)
                 character_name = character_names.get(character_id, character_id)
 
                 for phase in game.get("current", []) or []:
