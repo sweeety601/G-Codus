@@ -105,7 +105,7 @@ jobs:
           PY
 
       - name: Apply confirmed banner updates
-        if: github.event_name == 'push' && github.event.head_commit.message == 'Add banner table update script'
+        if: github.event_name == 'push' && github.event.head_commit.message == 'Run one-time confirmed banner table update'
         run: python scripts/update_confirmed_banners.py
 
       - name: Generate banner feed
