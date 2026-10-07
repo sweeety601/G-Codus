@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "740326565652",
+    "project_id": "g-codus",
+    "storage_bucket": "g-codus.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:740326565652:android:b2bcdc1a0a1e75146bc401",
+        "android_client_info": {
+          "package_name": "com.sweeety601.gcodus"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxAHvShjOeYHdmiUQry3Se7Ly6bNzDFA0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
