@@ -8,7 +8,9 @@ from google.oauth2 import service_account
 from google.auth.transport.requests import Request
 
 FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging"
+FIRESTORE_SCOPE = "https://www.googleapis.com/auth/datastore"
 FCM_URL = "https://fcm.googleapis.com/v1/projects/{project_id}/messages:send"
+FIRESTORE_URL = "https://firestore.googleapis.com/v1/projects/{project_id}/databases/(default)/documents/devices"
 
 def load_json(path, default):
     p = Path(path)
@@ -34,20 +36,82 @@ def phase_map(feed):
                 result[key] = (game_id, game.get("name", game_id), bucket, normalized)
     return result
 
-def send(access_token, project_id, topic, title, body, event_key):
+def firestore_value(value):
+    if isinstance(value, bool):
+        return {"booleanValue": value}
+    if isinstance(value, str):
+        return {"stringValue": value}
+    if isinstance(value, list):
+        return {"arrayValue": {"values": [firestore_value(x) for x in value]}}
+    return {"nullValue": None}
+
+def decode_value(value):
+    if "stringValue" in value:
+        return value["stringValue"]
+    if "booleanValue" in value:
+        return value["booleanValue"]
+    if "arrayValue" in value:
+        return [decode_value(x) for x in value.get("arrayValue", {}).get("values", [])]
+    if "timestampValue" in value:
+        return value["timestampValue"]
+    return None
+
+def read_devices(project_id, access_token):
+    headers = {"Authorization": f"Bearer {access_token}"}
+    devices = []
+    page_token = None
+
+    while True:
+        params = {"pageSize": "1000"}
+        if page_token:
+            params["pageToken"] = page_token
+
+        response = requests.get(
+            FIRESTORE_URL.format(project_id=project_id),
+            headers=headers,
+            params=params,
+            timeout=30,
+        )
+        response.raise_for_status()
+        payload = response.json()
+
+        for document in payload.get("documents", []):
+            fields = document.get("fields", {})
+            devices.append({
+                "name": document.get("name", ""),
+                "token": decode_value(fields.get("token", {})) or "",
+                "games": set(decode_value(fields.get("games", {})) or []),
+                "characters": set(decode_value(fields.get("characters", {})) or []),
+            })
+
+        page_token = payload.get("nextPageToken")
+        if not page_token:
+            break
+
+    return devices
+
+def send_to_token(access_token, project_id, token, title, body, event_key):
     url = FCM_URL.format(project_id=project_id)
     payload = {
         "message": {
-            "topic": topic,
-            "notification": {"title": title, "body": body},
+            "token": token,
+            "notification": {
+                "title": title,
+                "body": body,
+            },
             "data": {
                 "event": event_key[:900],
-                "source": "g-codus-github"
+                "source": "g-codus-github",
+                "title": title,
+                "body": body,
             },
             "android": {
                 "priority": "high",
-                "notification": {"channel_id": "gcodus_firebase_updates"}
-            }
+                "notification": {
+                    "channel_id": "gcodus_firebase_updates",
+                    "sound": "default",
+                },
+            },
         }
     }
     response = requests.post(
@@ -59,7 +123,16 @@ def send(access_token, project_id, topic, title, body, event_key):
         json=payload,
         timeout=30,
     )
-    response.raise_for_status()
+    return response
+
+def notification_text(game_name, bucket, phase):
+    phase_name = phase.get("phase", "Новая фаза")
+    if bucket == "current":
+        return phase_name + ": баннер сейчас активен."
+    if bucket == "next":
+        status = "Неподтверждённый" if phase.get("unconfirmed") else "Подтверждённый"
+        return phase_name + ": " + status.lower() + " следующий баннер."
+    return phase_name + ": данные баннера обновлены."
 
 def main():
     secret = os.environ.get("FIREBASE_SERVICE_ACCOUNT", "").strip()
@@ -86,40 +159,51 @@ def main():
     info = json.loads(secret)
     project_id = info["project_id"]
     credentials = service_account.Credentials.from_service_account_info(
-        info, scopes=[FCM_SCOPE]
+        info, scopes=[FCM_SCOPE, FIRESTORE_SCOPE]
     )
     credentials.refresh(Request())
-    token = credentials.token
+    access_token = credentials.token
 
-    sent = set()
+    devices = read_devices(project_id, access_token)
+    print(f"Registered Firebase devices: {len(devices)}")
+
+    sent_tokens = set()
+    failed_tokens = set()
+
     for key, game_id, game_name, bucket, phase in changed:
-        phase_name = phase.get("phase", "новая фаза")
-        chars = list(dict.fromkeys(
-            [str(x) for x in phase.get("characters", []) if str(x).strip()] +
-            [str(x) for x in phase.get("four_star", []) if str(x).strip()]
-        ))
+        chars = set(
+            str(x) for x in (
+                list(phase.get("characters", [])) +
+                list(phase.get("five_star", [])) +
+                list(phase.get("four_star", []))
+            ) if str(x).strip()
+        )
+        title = game_name
+        body = notification_text(game_name, bucket, phase)
 
-        if bucket == "current":
-            body = f"{phase_name}: баннер сейчас активен."
-        elif bucket == "next":
-            status = "Неподтверждённый" if phase.get("unconfirmed") else "Подтверждённый"
-            body = f"{phase_name}: {status.lower()} следующий баннер."
-        else:
-            body = f"{phase_name}: данные баннера обновлены."
-
-        game_topic = f"gcodus_game_{game_id}"
-        if game_topic not in sent:
-            send(token, project_id, game_topic, game_name, body, key)
-            sent.add(game_topic)
-
-        for character_id in chars:
-            topic = f"gcodus_char_{character_id}"
-            if topic in sent:
+        for device in devices:
+            token = device["token"]
+            if not token or token in sent_tokens:
                 continue
-            send(token, project_id, topic, game_name, body, key)
-            sent.add(topic)
 
-    print(f"Sent Firebase pushes for {len(changed)} changed banner phases.")
+            subscribed = game_id in device["games"] or bool(chars & device["characters"])
+            if not subscribed:
+                continue
+
+            response = send_to_token(access_token, project_id, token, title, body, key)
+            if response.ok:
+                sent_tokens.add(token)
+            else:
+                failed_tokens.add(token)
+                print(
+                    f"FCM send failed for {game_id} -> {response.status_code}: "
+                    f"{response.text[:500]}"
+                )
+
+    print(
+        f"Firebase direct pushes: sent={len(sent_tokens)}, "
+        f"failed={len(failed_tokens)}, changed_phases={len(changed)}"
+    )
 
 if __name__ == "__main__":
     main()
