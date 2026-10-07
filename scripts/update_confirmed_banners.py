@@ -21,23 +21,21 @@ def seed_map(base, wanted):
     ws=wb.active
     rows=list(ws.iter_rows(values_only=True))
     wb.close()
-    headers=[n(x) for x in rows[0]]
-    id_i=next((i for i,h in enumerate(headers) if h in {"id","character id","персонаж id","ид","идентификатор"}),0)
-    name_i=next((i for i,h in enumerate(headers) if h in {"name","имя","персонаж","character","character name","имя персонажа"}),1)
     out={}
-    for r in rows[1:]:
-        if id_i<len(r) and name_i<len(r):
-            ident=str(r[id_i] or "").strip()
-            name=str(r[name_i] or "").strip()
-            if ident and name: out[n(name)]=ident
-    result={}
-    for name in wanted:
-        key=n(name)
-        if key in out: result[name]=out[key]; continue
-        matches=[(k,v) for k,v in out.items() if key in k or k in key]
-        if len(matches)!=1: raise RuntimeError(f"Cannot map {name} in {base}: {matches[:10]}")
-        result[name]=matches[0][1]
-    return result
+    for wanted_name in wanted:
+        key=n(wanted_name)
+        matches=[]
+        for row in rows[1:]:
+            cells=[str(v or "").strip() for v in row]
+            if not any(n(v)==key for v in cells):
+                continue
+            ids=[v for v in cells if __import__("re").match(r"^\\d+\\.\\d+$",v)]
+            if len(ids)==1:
+                matches.append(ids[0])
+        if len(set(matches))!=1:
+            raise RuntimeError(f"Cannot uniquely map {wanted_name} in {base}: {matches[:10]}")
+        out[wanted_name]=matches[0]
+    return out
 
 def col(headers, aliases, required=True):
     aliases={n(x) for x in aliases}
