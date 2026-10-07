@@ -62,4 +62,4 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
-# Trigger a fresh verification build on this workflow update.
+# Trigger a fresh verification build including all current main-branch changes.
