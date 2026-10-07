@@ -128,6 +128,7 @@ class MainActivity : AppCompatActivity() {
         scheduleCodeSync()
         scheduleNotificationSync()
         NotificationAlarmReceiver.schedule(this)
+        ensureBackgroundNotificationAccess()
         scheduleCharacterSync()
         refreshCodesInBackground()
         refreshLiveDatabaseInBackground()
@@ -1819,4 +1820,59 @@ class MainActivity : AppCompatActivity() {
         val name: String,
         val resourceName: String
     )
+    private fun ensureBackgroundNotificationAccess() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU &&
+            androidx.core.content.ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.POST_NOTIFICATIONS
+            ) != android.content.pm.PackageManager.PERMISSION_GRANTED
+        ) {
+            requestNotificationPermission()
+            return
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(android.app.AlarmManager::class.java)
+            if (!alarmManager.canScheduleExactAlarms()) {
+                try {
+                    startActivity(
+                        android.content.Intent(
+                            android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
+                            android.net.Uri.parse("package:$packageName")
+                        )
+                    )
+                    return
+                } catch (_: Exception) {
+                    // Device does not expose the exact-alarm settings screen.
+                }
+            }
+        }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            val pm = getSystemService(android.os.PowerManager::class.java)
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                try {
+                    startActivity(
+                        android.content.Intent(
+                            android.provider.Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                            android.net.Uri.parse("package:$packageName")
+                        )
+                    )
+                    return
+                } catch (_: Exception) {
+                    try {
+                        startActivity(
+                            android.content.Intent(
+                                android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS
+                            )
+                        )
+                        return
+                    } catch (_: Exception) {
+                    }
+                }
+            }
+        }
+
+        NotificationAlarmReceiver.schedule(this)
+    }
+
 }
