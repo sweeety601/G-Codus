@@ -127,7 +127,6 @@ jobs:
           PY
 
       - name: Send Firebase push notifications for banner changes
-        if: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
         run: |
           pip install google-auth requests
           if git cat-file -e HEAD:data/banner_feed.json 2>/dev/null; then
