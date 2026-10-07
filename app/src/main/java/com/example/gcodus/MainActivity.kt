@@ -138,7 +138,8 @@ class MainActivity : AppCompatActivity() {
         refreshCodesInBackground()
         refreshLiveDatabaseInBackground()
         migrateTrackingKeys()
-        FirebaseTopicSync.sync(this)
+        NotificationHelper.ensureChannel(this)
+        FirebaseDeviceSync.sync(this)
         showBannerDatabaseLoading()
         startCountdownTicker()
     }
@@ -1179,7 +1180,7 @@ class MainActivity : AppCompatActivity() {
             if (enabled) editor.putBoolean(firebaseKey, true) else editor.remove(firebaseKey)
         }
         editor.apply()
-        FirebaseTopicSync.sync(this)
+        FirebaseDeviceSync.sync(this)
 
         val notificationPrefs =
             getSharedPreferences("g_codus_notifications", Context.MODE_PRIVATE)
@@ -1624,7 +1625,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setFavorite(gameId: String, value: Boolean) {
         prefs.edit().putBoolean("favorite_$gameId", value).apply()
-        FirebaseTopicSync.sync(this)
+        FirebaseDeviceSync.sync(this)
     }
 
     private fun makeScroll() = ScrollView(this).apply {
