@@ -36,9 +36,17 @@ object BannerSource {
         val resultGames = JSONArray()
 
         for ((gameId, gameName, base) in games) {
-            val confirmed = readRows(base, true)
-                ?: throw IllegalStateException("Не удалось скачать подтверждённую таблицу: $base")
-            val leaks = readRows(base, false) ?: emptyList()
+            val confirmed = try {
+                readRows(base, true)
+            } catch (_: Exception) {
+                null
+            } ?: emptyList()
+
+            val leaks = try {
+                readRows(base, false)
+            } catch (_: Exception) {
+                emptyList()
+            }
 
             val confirmedSorted = confirmed.sortedBy { it.startInstant }
             val confirmedCurrent = confirmedSorted.filter {
@@ -51,8 +59,7 @@ object BannerSource {
 
             // Confirmed upcoming phases first, then leak rows.
             // A leak never replaces a confirmed row and is never used for current/history.
-            val confirmedFutureWithoutNext = confirmedFuture.drop(1)
-            // A conflict is defined ONLY by version + phase.
+                // A conflict is defined ONLY by version + phase.
             val confirmedVersionPhases = confirmedSorted
                 .map { versionPhaseKey(it.phase) }
                 .toSet()
