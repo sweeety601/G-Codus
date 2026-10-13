@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-12T18:39:53.314437+00:00",
+  "generated_at": "2026-10-13T00:48:30.458753+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -67,9 +67,7 @@
           ],
           "source_status": "confirmed",
           "unconfirmed": false
-        }
-      ],
-      "next": [
+        },
         {
           "phase": "7.1 Phase 2",
           "start": "2026-10-13T00:00:00Z",
@@ -84,6 +82,7 @@
           "unconfirmed": false
         }
       ],
+      "next": [],
       "upcoming": [],
       "history": [],
       "source": "G-Codus banner Excel tables"
