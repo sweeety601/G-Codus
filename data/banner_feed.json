@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-13T18:43:25.504733+00:00",
+  "generated_at": "2026-10-14T00:59:31.789668+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -53,22 +53,6 @@
       "name": "Genshin Impact",
       "current": [
         {
-          "phase": "7.1 Phase 1",
-          "start": "2026-09-23T00:00:00Z",
-          "end": "2026-10-14T00:00:00Z",
-          "characters": [
-            "2.116",
-            "2.117"
-          ],
-          "four_star": [
-            "2.32",
-            "2.26",
-            "2.17"
-          ],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        },
-        {
           "phase": "7.1 Phase 2",
           "start": "2026-10-13T00:00:00Z",
           "end": "2026-11-03T00:00:00Z",
@@ -84,7 +68,24 @@
       ],
       "next": [],
       "upcoming": [],
-      "history": [],
+      "history": [
+        {
+          "phase": "7.1 Phase 1",
+          "start": "2026-09-23T00:00:00Z",
+          "end": "2026-10-14T00:00:00Z",
+          "characters": [
+            "2.116",
+            "2.117"
+          ],
+          "four_star": [
+            "2.32",
+            "2.26",
+            "2.17"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "source": "G-Codus banner Excel tables"
     },
     "Honkai: Star Rail": {
