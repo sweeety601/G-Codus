@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-14T18:57:42.122062+00:00",
+  "generated_at": "2026-10-15T00:57:20.376726+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -136,19 +136,6 @@
       "name": "Arknights: Endfield",
       "current": [
         {
-          "phase": "1.5 Phase 2",
-          "start": "2026-09-24T00:00:00Z",
-          "end": "2026-10-15T00:00:00Z",
-          "characters": [
-            "4.15"
-          ],
-          "four_star": [],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        }
-      ],
-      "next": [
-        {
           "phase": "1.6 Phase 1",
           "start": "2026-10-15T00:00:00Z",
           "end": "2026-11-05T00:00:00Z",
@@ -160,8 +147,21 @@
           "unconfirmed": true
         }
       ],
+      "next": [],
       "upcoming": [],
-      "history": [],
+      "history": [
+        {
+          "phase": "1.5 Phase 2",
+          "start": "2026-09-24T00:00:00Z",
+          "end": "2026-10-15T00:00:00Z",
+          "characters": [
+            "4.15"
+          ],
+          "four_star": [],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "source": "G-Codus banner Excel tables"
     },
     "Zenless Zone Zero": {
