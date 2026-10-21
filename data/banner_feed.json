@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-10-20T18:56:12.906629+00:00",
+  "generated_at": "2026-10-21T01:01:16.993180+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -93,24 +93,6 @@
       "name": "Honkai: Star Rail",
       "current": [
         {
-          "phase": "4.6 Phase 1",
-          "start": "2026-09-28T00:00:00Z",
-          "end": "2026-10-21T00:00:00Z",
-          "characters": [
-            "3.89",
-            "3.26"
-          ],
-          "four_star": [
-            "3.84",
-            "3.61",
-            "3.54"
-          ],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        }
-      ],
-      "next": [
-        {
           "phase": "4.6 Phase 2",
           "start": "2026-10-21T00:00:00Z",
           "end": "2026-11-10T00:00:00Z",
@@ -127,8 +109,26 @@
           "unconfirmed": false
         }
       ],
+      "next": [],
       "upcoming": [],
-      "history": [],
+      "history": [
+        {
+          "phase": "4.6 Phase 1",
+          "start": "2026-09-28T00:00:00Z",
+          "end": "2026-10-21T00:00:00Z",
+          "characters": [
+            "3.89",
+            "3.26"
+          ],
+          "four_star": [
+            "3.84",
+            "3.61",
+            "3.54"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "source": "G-Codus banner Excel tables"
     },
     "Arknights: Endfield": {
@@ -167,8 +167,7 @@
     "Zenless Zone Zero": {
       "id": "zzz",
       "name": "Zenless Zone Zero",
-      "current": [],
-      "next": [
+      "current": [
         {
           "phase": "3.3 Phase 1",
           "start": "2026-10-21T00:00:00Z",
@@ -181,6 +180,7 @@
           "unconfirmed": true
         }
       ],
+      "next": [],
       "upcoming": [],
       "history": [
         {
