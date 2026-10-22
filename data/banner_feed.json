@@ -1,31 +1,12 @@
 {
   "version": 6,
-  "generated_at": "2026-10-21T18:57:43.378245+00:00",
+  "generated_at": "2026-10-22T01:00:08.877975+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
       "id": "wuwa",
       "name": "Wuthering Waves",
       "current": [
-        {
-          "phase": "3.7 Phase 1",
-          "start": "2026-09-30T00:00:00Z",
-          "end": "2026-10-22T00:00:00Z",
-          "characters": [
-            "1.31",
-            "1.23",
-            "1.32"
-          ],
-          "four_star": [
-            "1.9",
-            "1.49",
-            "1.19"
-          ],
-          "source_status": "confirmed",
-          "unconfirmed": false
-        }
-      ],
-      "next": [
         {
           "phase": "3.7 Phase 2",
           "start": "2026-10-22T00:00:00Z",
@@ -44,8 +25,27 @@
           "unconfirmed": false
         }
       ],
+      "next": [],
       "upcoming": [],
-      "history": [],
+      "history": [
+        {
+          "phase": "3.7 Phase 1",
+          "start": "2026-09-30T00:00:00Z",
+          "end": "2026-10-22T00:00:00Z",
+          "characters": [
+            "1.31",
+            "1.23",
+            "1.32"
+          ],
+          "four_star": [
+            "1.9",
+            "1.49",
+            "1.19"
+          ],
+          "source_status": "confirmed",
+          "unconfirmed": false
+        }
+      ],
       "source": "G-Codus banner Excel tables"
     },
     "Genshin Impact": {
