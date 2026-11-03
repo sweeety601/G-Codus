@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-11-02T16:15:39.340209+00:00",
+  "generated_at": "2026-11-03T01:01:50.577163+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -51,7 +51,10 @@
     "Genshin Impact": {
       "id": "genshin",
       "name": "Genshin Impact",
-      "current": [
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [
         {
           "phase": "7.1 Phase 2",
           "start": "2026-10-13T00:00:00Z",
@@ -64,11 +67,7 @@
           "four_star": [],
           "source_status": "confirmed",
           "unconfirmed": false
-        }
-      ],
-      "next": [],
-      "upcoming": [],
-      "history": [
+        },
         {
           "phase": "7.1 Phase 1",
           "start": "2026-09-23T00:00:00Z",
