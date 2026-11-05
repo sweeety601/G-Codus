@@ -1,6 +1,6 @@
 {
   "version": 6,
-  "generated_at": "2026-11-04T19:49:42.897649+00:00",
+  "generated_at": "2026-11-05T06:54:22.164507+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
@@ -133,7 +133,10 @@
     "Arknights: Endfield": {
       "id": "endfield",
       "name": "Arknights: Endfield",
-      "current": [
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [
         {
           "phase": "1.6 Phase 1",
           "start": "2026-10-15T00:00:00Z",
@@ -144,11 +147,7 @@
           "four_star": [],
           "source_status": "unconfirmed",
           "unconfirmed": true
-        }
-      ],
-      "next": [],
-      "upcoming": [],
-      "history": [
+        },
         {
           "phase": "1.5 Phase 2",
           "start": "2026-09-24T00:00:00Z",
