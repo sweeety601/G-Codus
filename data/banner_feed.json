@@ -1,12 +1,15 @@
 {
   "version": 6,
-  "generated_at": "2026-11-10T19:47:58.034273+00:00",
+  "generated_at": "2026-11-11T06:32:57.052916+00:00",
   "source": "G-Codus banner Excel tables",
   "games": {
     "Wuthering Waves": {
       "id": "wuwa",
       "name": "Wuthering Waves",
-      "current": [
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [
         {
           "phase": "3.7 Phase 2",
           "start": "2026-10-22T00:00:00Z",
@@ -23,11 +26,7 @@
           ],
           "source_status": "confirmed",
           "unconfirmed": false
-        }
-      ],
-      "next": [],
-      "upcoming": [],
-      "history": [
+        },
         {
           "phase": "3.7 Phase 1",
           "start": "2026-09-30T00:00:00Z",
@@ -164,7 +163,10 @@
     "Zenless Zone Zero": {
       "id": "zzz",
       "name": "Zenless Zone Zero",
-      "current": [
+      "current": [],
+      "next": [],
+      "upcoming": [],
+      "history": [
         {
           "phase": "3.3 Phase 1",
           "start": "2026-10-21T00:00:00Z",
@@ -175,11 +177,7 @@
           "four_star": [],
           "source_status": "unconfirmed",
           "unconfirmed": true
-        }
-      ],
-      "next": [],
-      "upcoming": [],
-      "history": [
+        },
         {
           "phase": "3.2 Phase 2",
           "start": "2026-09-30T00:00:00Z",
